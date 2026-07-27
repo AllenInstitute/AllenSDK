@@ -12,8 +12,7 @@ def calc_deriv(x, time):
     return dx / dt
 
 
-def _angular_change(summed_voltage: np.ndarray,
-                    vmax: Union[np.ndarray, float]) -> np.ndarray:
+def _angular_change(summed_voltage: np.ndarray, vmax: Union[np.ndarray, float]) -> np.ndarray:
     """
     Compute the change in degrees in radians at each point from the
     summed voltage encoder data.
@@ -37,10 +36,7 @@ def _angular_change(summed_voltage: np.ndarray,
     return delta_theta
 
 
-def _shift(
-        arr: Iterable,
-        periods: int = 1,
-        fill_value: float = np.nan) -> np.ndarray:
+def _shift(arr: Iterable, periods: int = 1, fill_value: float = np.nan) -> np.ndarray:
     """
     Shift index of an iterable (array-like) by desired number of
     periods with an optional fill value (default = NaN).
@@ -89,14 +85,13 @@ def deg_to_dist(angular_speed: np.ndarray) -> np.ndarray:
     wheel_diameter = 6.5 * 2.54  # 6.5" wheel diameter, 2.54 = cm/in
     running_radius = 0.5 * (
         # assume the animal runs at 2/3 the distance from the wheel center
-        2.0 * wheel_diameter / 3.0)
+        2.0 * wheel_diameter / 3.0
+    )
     running_speed_cm_per_sec = angular_speed * running_radius
     return running_speed_cm_per_sec
 
 
-def _identify_wraps(vsig: Iterable, *,
-                    min_threshold: float = 1.5,
-                    max_threshold: float = 3.5):
+def _identify_wraps(vsig: Iterable, *, min_threshold: float = 1.5, max_threshold: float = 3.5):
     """
     Identify "wraps" in the voltage signal. In practice, this is when
     the encoder voltage signal crosses 5V and wraps to 0V, or
@@ -125,13 +120,9 @@ def _identify_wraps(vsig: Iterable, *,
     if not isinstance(vsig, np.ndarray):
         vsig = np.array(vsig)
     # Suppress warnings for when comparing to nan values
-    with np.errstate(invalid='ignore'):
-        pos_wraps = np.asarray(
-            np.logical_and(vsig < min_threshold, shifted_vsig > max_threshold)
-            ).nonzero()[0]
-        neg_wraps = np.asarray(
-            np.logical_and(vsig > max_threshold, shifted_vsig < min_threshold)
-            ).nonzero()[0]
+    with np.errstate(invalid="ignore"):
+        pos_wraps = np.asarray(np.logical_and(vsig < min_threshold, shifted_vsig > max_threshold)).nonzero()[0]
+        neg_wraps = np.asarray(np.logical_and(vsig > max_threshold, shifted_vsig < min_threshold)).nonzero()[0]
     return pos_wraps, neg_wraps
 
 
@@ -160,8 +151,9 @@ def _local_boundaries(time, index, span: float = 0.25) -> tuple:
     ```
     """
     if np.diff(time[~np.isnan(time)]).min() < 0:
-        raise ValueError("Data do not monotonically increase. This probably "
-                         "means there is an error in your time series.")
+        raise ValueError(
+            "Data do not monotonically increase. This probably means there is an error in your time series."
+        )
     t_val = time[index]
     max_val = t_val + abs(span)
     min_val = t_val - abs(span)
@@ -169,13 +161,15 @@ def _local_boundaries(time, index, span: float = 0.25) -> tuple:
     max_ix = eligible_indices.max()
     min_ix = eligible_indices.min()
     if (min_ix == index) or (max_ix == index):
-        warnings.warn("Unable to find two data points around index "
-                      f"for span={span} that do not include the index. "
-                      "This could mean that your time span is too small for "
-                      "the time data sampling rate, the data are not "
-                      "monotonically increasing, or that you are trying "
-                      "to find a neighborhood at the beginning/end of the "
-                      "data stream.")
+        warnings.warn(
+            "Unable to find two data points around index "
+            f"for span={span} that do not include the index. "
+            "This could mean that your time span is too small for "
+            "the time data sampling rate, the data are not "
+            "monotonically increasing, or that you are trying "
+            "to find a neighborhood at the beginning/end of the "
+            "data stream."
+        )
     return min_ix, max_ix
 
 
@@ -191,21 +185,22 @@ def _clip_speed_wraps(speed, time, wrap_indices, t_span: float = 0.25):
     corrected_speed = speed.copy()
     for wrap in wrap_indices:
         start_ix, end_ix = _local_boundaries(time, wrap, t_span)
-        local_slice = np.concatenate(       # Remove the wrap point
-            (speed[start_ix:wrap], speed[wrap+1:end_ix+1]))
-        corrected_speed[wrap] = np.clip(
-            speed[wrap], np.nanmin(local_slice), np.nanmax(local_slice))
+        local_slice = np.concatenate(  # Remove the wrap point
+            (speed[start_ix:wrap], speed[wrap + 1 : end_ix + 1])
+        )
+        corrected_speed[wrap] = np.clip(speed[wrap], np.nanmin(local_slice), np.nanmax(local_slice))
     return corrected_speed
 
 
 def _unwrap_voltage_signal(
-        vsig: Iterable,
-        pos_wrap_ix: Iterable,
-        neg_wrap_ix: Iterable,
-        *,
-        vmax: Optional[float] = None,
-        max_threshold: float = 5.1,
-        max_diff: float = 1.0) -> np.ndarray:
+    vsig: Iterable,
+    pos_wrap_ix: Iterable,
+    neg_wrap_ix: Iterable,
+    *,
+    vmax: Optional[float] = None,
+    max_threshold: float = 5.1,
+    max_diff: float = 1.0,
+) -> np.ndarray:
     """
     Calculate the change in voltage at each timestamp.
     'Unwraps' the
@@ -250,12 +245,10 @@ def _unwrap_voltage_signal(
     vsig_last = _shift(vsig)
     if len(pos_wrap_ix):
         # positive wraps: subtract from the previous value and add vmax
-        unwrapped_diff[pos_wrap_ix] = (
-            (vsig[pos_wrap_ix] + vmax) - vsig_last[pos_wrap_ix])
+        unwrapped_diff[pos_wrap_ix] = (vsig[pos_wrap_ix] + vmax) - vsig_last[pos_wrap_ix]
     # negative: subtract vmax and the previous value
     if len(neg_wrap_ix):
-        unwrapped_diff[neg_wrap_ix] = (
-            vsig[neg_wrap_ix] - (vsig_last[neg_wrap_ix] + vmax))
+        unwrapped_diff[neg_wrap_ix] = vsig[neg_wrap_ix] - (vsig_last[neg_wrap_ix] + vmax)
     # Other indices, just compute straight diff from previous value
     wrap_ix = np.concatenate((pos_wrap_ix, neg_wrap_ix))
     other_ix = np.array(list(set(range(len(vsig_last))).difference(wrap_ix)))
@@ -263,19 +256,17 @@ def _unwrap_voltage_signal(
     # Correct for wrap artifacts based on allowed `max_diff` value
     # (fill with nan)
     # Suppress warnings when comparing with nan values to reduce noise
-    with np.errstate(invalid='ignore'):
-        unwrapped_diff = np.where(
-            np.abs(unwrapped_diff) <= max_diff, unwrapped_diff, np.nan)
+    with np.errstate(invalid="ignore"):
+        unwrapped_diff = np.where(np.abs(unwrapped_diff) <= max_diff, unwrapped_diff, np.nan)
     # Get nan indices to propogate to the cumulative sum (otherwise
     # treated as 0)
     unwrapped_nans = np.array(np.isnan(unwrapped_diff)).nonzero()
-    summed_diff = np.nancumsum(unwrapped_diff) + vsig[0]    # Add the baseline
+    summed_diff = np.nancumsum(unwrapped_diff) + vsig[0]  # Add the baseline
     summed_diff[unwrapped_nans] = np.nan
     return summed_diff
 
 
-def _zscore_threshold_1d(data: np.ndarray,
-                         threshold: float = 5.0) -> np.ndarray:
+def _zscore_threshold_1d(data: np.ndarray, threshold: float = 5.0) -> np.ndarray:
     """
     Replace values in 1d array `data` that exceed `threshold` number
     of SDs from the mean with NaN.
@@ -294,14 +285,12 @@ def _zscore_threshold_1d(data: np.ndarray,
     corrected_data = data.copy().astype("float")
     scores = zscore(data, nan_policy="omit")
     # Suppress warnings when comparing to nan values to reduce noise
-    with np.errstate(invalid='ignore'):
+    with np.errstate(invalid="ignore"):
         corrected_data[np.abs(scores) > threshold] = np.nan
     return corrected_data
 
 
-def get_running_df(
-    data, time: np.ndarray, lowpass: bool = True, zscore_threshold=10.0
-):
+def get_running_df(data, time: np.ndarray, lowpass: bool = True, zscore_threshold=10.0):
     """
     Given the data from the behavior 'pkl' file object and a 1d
     array of timestamps, compute the running speed. Returns a
@@ -355,17 +344,14 @@ def get_running_df(
     v_in = data["items"]["behavior"]["encoders"][0]["vin"]
 
     if len(v_in) > len(time) + 1:
-        error_string = ("length of v_in ({}) cannot be longer than length of "
-                        "time ({}) + 1, they are off by {}").format(
-            len(v_in),
-            len(time),
-            abs(len(v_in) - len(time))
+        error_string = ("length of v_in ({}) cannot be longer than length of time ({}) + 1, they are off by {}").format(
+            len(v_in), len(time), abs(len(v_in) - len(time))
         )
         raise ValueError(error_string)
     if len(v_in) == len(time) + 1:
         warnings.warn(
-            "Time array is 1 value shorter than encoder array. Last encoder "
-            "value removed\n", UserWarning, stacklevel=1)
+            "Time array is 1 value shorter than encoder array. Last encoder value removed\n", UserWarning, stacklevel=1
+        )
         v_in = v_in[:-1]
         v_sig = v_sig[:-1]
 
@@ -375,11 +361,9 @@ def get_running_df(
     dx_raw = data["items"]["behavior"]["encoders"][0]["dx"]
     # Identify "wraps" in the voltage signal that need to be unwrapped
     # This is where the encoder switches from 0V to 5V or vice versa
-    pos_wraps, neg_wraps = _identify_wraps(
-        v_sig, min_threshold=1.5, max_threshold=3.5)
+    pos_wraps, neg_wraps = _identify_wraps(v_sig, min_threshold=1.5, max_threshold=3.5)
     # Unwrap the voltage signal and apply correction for transient spikes
-    unwrapped_vsig = _unwrap_voltage_signal(
-        v_sig, pos_wraps, neg_wraps, max_threshold=5.1, max_diff=1.0)
+    unwrapped_vsig = _unwrap_voltage_signal(v_sig, pos_wraps, neg_wraps, max_threshold=5.1, max_diff=1.0)
     angular_change_point = _angular_change(unwrapped_vsig, v_in)
     angular_change = np.nancumsum(angular_change_point)
     # Add the nans back in (get turned to 0 in nancumsum)
@@ -388,20 +372,21 @@ def get_running_df(
     linear_speed = deg_to_dist(angular_speed)
     # Artifact correction to speed data
     wrap_corrected_linear_speed = _clip_speed_wraps(
-        linear_speed, time, np.concatenate([pos_wraps, neg_wraps]),
-        t_span=0.25)
-    outlier_corrected_linear_speed = _zscore_threshold_1d(
-        wrap_corrected_linear_speed, threshold=zscore_threshold)
+        linear_speed, time, np.concatenate([pos_wraps, neg_wraps]), t_span=0.25
+    )
+    outlier_corrected_linear_speed = _zscore_threshold_1d(wrap_corrected_linear_speed, threshold=zscore_threshold)
 
     # Final filtering (optional) for smoothing out the speed data
     if lowpass:
         b, a = signal.butter(3, Wn=4, fs=60, btype="lowpass")
-        outlier_corrected_linear_speed = signal.filtfilt(
-            b, a, np.nan_to_num(outlier_corrected_linear_speed))
+        outlier_corrected_linear_speed = signal.filtfilt(b, a, np.nan_to_num(outlier_corrected_linear_speed))
 
-    return pd.DataFrame({
-        'speed': outlier_corrected_linear_speed[:len(time)],
-        'dx': dx_raw[:len(time)],
-        'v_sig': v_sig[:len(time)],
-        'v_in': v_in[:len(time)],
-    }, index=pd.Index(time, name='timestamps'))
+    return pd.DataFrame(
+        {
+            "speed": outlier_corrected_linear_speed[: len(time)],
+            "dx": dx_raw[: len(time)],
+            "v_sig": v_sig[: len(time)],
+            "v_in": v_in[: len(time)],
+        },
+        index=pd.Index(time, name="timestamps"),
+    )

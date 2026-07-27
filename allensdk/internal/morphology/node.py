@@ -16,11 +16,12 @@
 import json
 import math
 
+
 def euclidean_distance(node1, node2):
     dx = node1.x - node2.x
     dy = node1.y - node2.y
     dz = node1.z - node2.z
-    return math.sqrt(dx*dx + dy*dy + dz*dz)
+    return math.sqrt(dx * dx + dy * dy + dz * dz)
 
 
 def midpoint(node1, node2):
@@ -30,7 +31,7 @@ def midpoint(node1, node2):
     return [px, py, pz]
 
 
-class Node(object): 
+class Node(object):
     """
     Represents node in SWC morphology file
     """
@@ -68,15 +69,15 @@ class Node(object):
         self.z = z
         self.radius = r
         self.parent = pn
-        # 
+        #
         self.children = []  # IDs of child nodes
-        self.tree_id = -1      # which unconnected graph this node belongs to
+        self.tree_id = -1  # which unconnected graph this node belongs to
         # number of compartment that has this node as its endpoint
         # all nodes except root nodes have a compartment
-        self.compartment_id = -1    
+        self.compartment_id = -1
 
     def to_dict(self):
-        """ Convert the node into a serializable dictionary """
+        """Convert the node into a serializable dictionary"""
         return {
             "id": self.n,
             "type": self.t,
@@ -87,19 +88,19 @@ class Node(object):
             "parent": self.parent,
             "children": self.children,
             "tree_id": self.tree_id,
-            "compartment_id": self.compartment_id
+            "compartment_id": self.compartment_id,
         }
 
     @classmethod
     def from_dict(cls, d):
         return cls(
-            n = d["id"],
-            t = d["type"],
-            x = d["x"],
-            y = d["y"],
-            z = d["z"],
-            r = d["radius"],
-            pn = d["parent"],
+            n=d["id"],
+            t=d["type"],
+            x=d["x"],
+            y=d["y"],
+            z=d["z"],
+            r=d["radius"],
+            pn=d["parent"],
         )
 
     def __getitem__(self, item):
@@ -110,20 +111,29 @@ class Node(object):
         return json.dumps(self.to_dict())
 
     def short_string(self):
-        """ create string with node information in succinct, 
-        single-line form """
-        return "%d %d %.4f %.4f %.4f %.4f %d %s %d" % (self.n, self.t, self.x, self.y, self.z, self.radius, self.parent,
-        str(self.children), self.tree_id)
+        """create string with node information in succinct,
+        single-line form"""
+        return "%d %d %.4f %.4f %.4f %.4f %d %s %d" % (
+            self.n,
+            self.t,
+            self.x,
+            self.y,
+            self.z,
+            self.radius,
+            self.parent,
+            str(self.children),
+            self.tree_id,
+        )
+
 
 # Morphology nodes have the following fields. These allow dictionary access
 #   to node fields (this is for backward compatibility)
-NODE_ID      = 'id'
-NODE_TYPE    = 'type'
-NODE_X       = 'x'
-NODE_Y       = 'y'
-NODE_Z       = 'z'
-NODE_R       = 'radius'
-NODE_PN      = 'parent'
-NODE_TREE_ID = 'tree_id'     
-NODE_CHILDREN = 'children'   
-
+NODE_ID = "id"
+NODE_TYPE = "type"
+NODE_X = "x"
+NODE_Y = "y"
+NODE_Z = "z"
+NODE_R = "radius"
+NODE_PN = "parent"
+NODE_TREE_ID = "tree_id"
+NODE_CHILDREN = "children"

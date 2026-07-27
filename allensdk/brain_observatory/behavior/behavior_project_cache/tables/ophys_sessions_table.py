@@ -12,9 +12,7 @@ from allensdk.brain_observatory.behavior.utils.metadata_parsers import (  # noqa
     parse_num_cortical_structures,
     parse_num_depths,
 )
-from allensdk.core.dataframe_utils import (
-        enforce_df_column_order
-)
+from allensdk.core.dataframe_utils import enforce_df_column_order
 from allensdk.brain_observatory.ophys.project_constants import VBO_METADATA_COLUMN_ORDER  # noqa: E501
 
 
@@ -43,26 +41,15 @@ class BehaviorOphysSessionsTable(ProjectTable, OphysMixin):
         self._index_column = index_column
         ProjectTable.__init__(self, df=df, suppress=suppress)
         OphysMixin.__init__(self)
-        self._df = enforce_df_column_order(
-            self._df,
-            VBO_METADATA_COLUMN_ORDER
-        )
+        self._df = enforce_df_column_order(self._df, VBO_METADATA_COLUMN_ORDER)
 
     def postprocess_additional(self):
         # Add ophys specific information.
-        project_code_col = (
-            "project_code_ophys"
-            if "project_code_ophys" in self._df.columns
-            else "project_code"
-        )
+        project_code_col = "project_code_ophys" if "project_code_ophys" in self._df.columns else "project_code"
         self._df["num_targeted_structures"] = (
-            self._df[project_code_col]
-            .apply(parse_num_cortical_structures)
-            .astype("Int64")
+            self._df[project_code_col].apply(parse_num_cortical_structures).astype("Int64")
         )
-        self._df["num_depths_per_area"] = (
-            self._df[project_code_col].apply(parse_num_depths).astype("Int64")
-        )
+        self._df["num_depths_per_area"] = self._df[project_code_col].apply(parse_num_depths).astype("Int64")
         # Possibly explode and reindex
         self.__explode()
 
@@ -70,11 +57,7 @@ class BehaviorOphysSessionsTable(ProjectTable, OphysMixin):
         if self._index_column == "ophys_session_id":
             pass
         elif self._index_column == "ophys_experiment_id":
-            self._df = (
-                self._df.reset_index()
-                .explode("ophys_experiment_id")
-                .set_index("ophys_experiment_id")
-            )
+            self._df = self._df.reset_index().explode("ophys_experiment_id").set_index("ophys_experiment_id")
         else:
             self._logger.warning(
                 f"Invalid value for `by`, '{self._index_column}', passed to "

@@ -136,9 +136,7 @@ def read_url_post(url):
     the output will be of the corresponding type.
     """
     urlp = urlparse.urlparse(url)
-    main_url = urlparse.urlunsplit(
-        (urlp.scheme, urlp.netloc, urlp.path, "", "")
-    )
+    main_url = urlparse.urlunsplit((urlp.scheme, urlp.netloc, urlp.path, "", ""))
     data = json.dumps(dict(urlparse.parse_qsl(urlp.query)))
 
     handler = urllib_request.HTTPHandler()
@@ -177,10 +175,7 @@ def json_handler(obj):
     elif hasattr(obj, "isoformat"):
         return obj.isoformat()
     else:
-        raise TypeError(
-            "Object of type %s with value of %s is not JSON serializable"
-            % (type(obj), repr(obj))
-        )
+        raise TypeError("Object of type %s with value of %s is not JSON serializable" % (type(obj), repr(obj)))
 
 
 class JsonComments(object):
@@ -204,9 +199,7 @@ class JsonComments(object):
 
                 return json_object
         except ValueError:
-            ju_logger.error(
-                "Could not load json object from file: %s" % (file_name)
-            )
+            ju_logger.error("Could not load json object from file: %s" % (file_name))
             raise
 
     @classmethod
@@ -247,18 +240,14 @@ class JsonComments(object):
             Copy of the input without the comments.
         """
         new_json = []
-        start_iter = JsonComments._multiline_comment_start.finditer(
-            json_string
-        )
+        start_iter = JsonComments._multiline_comment_start.finditer(json_string)
         json_slice_start = 0
 
         for comment_start in start_iter:
             json_slice_end = comment_start.start()
             new_json.append(json_string[json_slice_start:json_slice_end])
             search_start = comment_start.end()
-            comment_end = JsonComments._multiline_comment_end.search(
-                json_string[search_start:]
-            )
+            comment_end = JsonComments._multiline_comment_end.search(json_string[search_start:])
             if comment_end is None:
                 break
             else:

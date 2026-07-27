@@ -7,7 +7,7 @@ from allensdk.model.biophys_sim.config import Config
 
 # Load the morphology
 
-BASEDIR = os.path.dirname(__file__)#"/data/mat/nathang/deap_optimize/passive_fitting"
+BASEDIR = os.path.dirname(__file__)  # "/data/mat/nathang/deap_optimize/passive_fitting"
 
 
 @neuron_utils.read_neuron_fit_stdout
@@ -18,7 +18,7 @@ def neuron_passive_fit(up_data, down_data, swc_path, limit):
     neuron_utils.load_morphology(swc_path)
 
     for sec in h.allsec():
-        sec.insert('pas')
+        sec.insert("pas")
         for seg in sec:
             seg.pas.e = 0
 
@@ -79,21 +79,17 @@ def neuron_passive_fit(up_data, down_data, swc_path, limit):
 
     h.region_areas()
 
-    return {
-        'Ri': fit_Ri,
-        'Cm': fit_Cm,
-        'Rm': fit_Rm,
-        'err': minerr
-        }
+    return {"Ri": fit_Ri, "Cm": fit_Cm, "Rm": fit_Rm, "err": minerr}
+
 
 def arg_parser():
-    parser = argparse.ArgumentParser(description='analyze cap check sweep')
-    parser.add_argument('--up_file')
-    parser.add_argument('--down_file')
-    parser.add_argument('--swc_path')
-    parser.add_argument('--specimen_id', type=int, required=True)
-    parser.add_argument('--limit', type=float, required=True)
-    parser.add_argument('--output_file', required=True)
+    parser = argparse.ArgumentParser(description="analyze cap check sweep")
+    parser.add_argument("--up_file")
+    parser.add_argument("--down_file")
+    parser.add_argument("--swc_path")
+    parser.add_argument("--specimen_id", type=int, required=True)
+    parser.add_argument("--limit", type=float, required=True)
+    parser.add_argument("--output_file", required=True)
     return parser
 
 
@@ -102,29 +98,30 @@ def process_inputs(parser):
     swc_path = args.swc_path
     up_data = np.loadtxt(args.up_file)
     down_data = np.loadtxt(args.down_file)
-    
+
     return args, up_data, down_data, swc_path
 
 
 def main():
     import sys
-    
+
     manifest_path = sys.argv[-1]
     limit = float(sys.argv[-2])
     os.chdir(os.path.dirname(manifest_path))
     app_config = Config()
     description = app_config.load(manifest_path)
-    
-    upfile = description.manifest.get_path('upfile')
-    up_data =  np.loadtxt(upfile)
-    downfile = description.manifest.get_path('downfile')
+
+    upfile = description.manifest.get_path("upfile")
+    up_data = np.loadtxt(upfile)
+    downfile = description.manifest.get_path("downfile")
     down_data = np.loadtxt(downfile)
-    swc_path = description.manifest.get_path('MORPHOLOGY')
-    
+    swc_path = description.manifest.get_path("MORPHOLOGY")
+
     data = neuron_passive_fit(up_data, down_data, swc_path, limit)
-    output_file = description.manifest.get_path('fit_1_file')
-    
+    output_file = description.manifest.get_path("fit_1_file")
+
     json_utilities.write(output_file, data)
+
 
 if __name__ == "__main__":
     main()

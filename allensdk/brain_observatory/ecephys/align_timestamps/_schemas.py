@@ -16,7 +16,7 @@ class ProbeMappable(DefaultSchema):
     output_path = String(
         required=True,
         help="""Output path for the mapped version of this file. Will write a 1D
-                timestamps array with values in seconds on the master clock."""
+                timestamps array with values in seconds on the master clock.""",
     )
 
 
@@ -28,12 +28,14 @@ class ProbeInputParameters(DefaultSchema):
                 the probe clock.""",
     )
     lfp_sampling_rate = Float(
-        required=True, help="""The sampling rate of the LFP collected on this
-                            probe."""
+        required=True,
+        help="""The sampling rate of the LFP collected on this
+                            probe.""",
     )
     start_index = Int(
-        default=0, help="""Sample index of probe recording start time.
-        Defaults to 0."""
+        default=0,
+        help="""Sample index of probe recording start time.
+        Defaults to 0.""",
     )
     barcode_channel_states_path = String(
         required=True,
@@ -66,7 +68,7 @@ class InputParameters(ArgSchema):
     sync_h5_path = String(
         required=True,
         help="""path to h5 file containing syncronization
-                information"""
+                information""",
     )
 
 
@@ -95,7 +97,7 @@ class ProbeOutputParameters(DefaultSchema):
         Float(),
         required=True,
         help="""Start/stop times of likely dropped data, due to gaps in
-                recording or irregular barcode intervals"""
+                recording or irregular barcode intervals""",
     )
 
 
@@ -108,6 +110,4 @@ class OutputSchema(DefaultSchema):
 
 
 class OutputParameters(OutputSchema):
-    probe_outputs = Nested(
-        ProbeOutputParameters, many="True", help="Probewise outputs."
-    )
+    probe_outputs = Nested(ProbeOutputParameters, many="True", help="Probewise outputs.")

@@ -2,18 +2,9 @@ import numpy as np
 
 
 UNIT_FILTER_DEFAULTS = {
-    "amplitude_cutoff_maximum": {
-        "value": 0.1,
-        "missing": np.inf
-    },
-    "presence_ratio_minimum": {
-        "value": 0.95,
-        "missing": -np.inf
-    },
-    "isi_violations_maximum": {
-        "value": 0.5,
-        "missing": np.inf
-    }
+    "amplitude_cutoff_maximum": {"value": 0.1, "missing": np.inf},
+    "presence_ratio_minimum": {"value": 0.95, "missing": -np.inf},
+    "isi_violations_maximum": {"value": 0.5, "missing": np.inf},
 }
 
 

@@ -107,15 +107,11 @@ class Presentations(
             if "trials_id" not in presentations.columns:
                 # Add trials_id to presentations df to allow for joining of the
                 # two tables.
-                presentations["trials_id"] = compute_trials_id_for_stimulus(
-                    presentations, trials.data
-                )
+                presentations["trials_id"] = compute_trials_id_for_stimulus(presentations, trials.data)
             if "is_sham_change" not in presentations.columns:
                 # Mark changes in active and replay stimulus that are
                 # #sham-changes
-                presentations = compute_is_sham_change(
-                    presentations, trials.data
-                )
+                presentations = compute_is_sham_change(presentations, trials.data)
         if sort_columns:
             presentations = enforce_df_column_order(
                 presentations,
@@ -141,9 +137,7 @@ class Presentations(
             )
         super().__init__(name="presentations", value=presentations)
 
-    def to_nwb(
-        self, nwbfile: NWBFile, stimulus_name_column="stimulus_name"
-    ) -> NWBFile:
+    def to_nwb(self, nwbfile: NWBFile, stimulus_name_column="stimulus_name") -> NWBFile:
         """Adds a stimulus table (defining stimulus characteristics for each
         time point in a session) to an nwbfile as TimeIntervals.
 
@@ -159,9 +153,7 @@ class Presentations(
         stimulus_names = stimulus_table[stimulus_name_column].unique()
 
         for stim_name in sorted(stimulus_names):
-            specific_stimulus_table = stimulus_table[
-                stimulus_table[stimulus_name_column] == stim_name
-            ]
+            specific_stimulus_table = stimulus_table[stimulus_table[stimulus_name_column] == stim_name]
             # Drop columns where all values in column are NaN
             cleaned_table = specific_stimulus_table.dropna(axis=1, how="all")
             # For columns with mixed strings and NaNs, fill NaNs with 'N/A'
@@ -193,9 +185,7 @@ class Presentations(
             for row in cleaned_table.itertuples(index=False):
                 row = row._asdict()
 
-                presentation_interval.add_interval(
-                    **row, tags="stimulus_time_interval", timeseries=ts
-                )
+                presentation_interval.add_interval(**row, tags="stimulus_time_interval", timeseries=ts)
 
             nwbfile.add_time_intervals(presentation_interval)
 
@@ -241,9 +231,7 @@ class Presentations(
                 presentation_dfs.append(df)
 
         table = pd.concat(presentation_dfs, sort=False)
-        table = table.astype(
-            {c: "int64" for c in table.select_dtypes(include="int")}
-        )
+        table = table.astype({c: "int64" for c in table.select_dtypes(include="int")})
 
         # coercing bool columns with nans to boolean. "Boolean" dtype
         # allows null values, while "bool" does not (see comment in to_nwb)
@@ -263,16 +251,12 @@ class Presentations(
 
         if add_is_change:
             table["is_change"] = is_change_event(stimulus_presentations=table)
-            table["flashes_since_change"] = get_flashes_since_change(
-                stimulus_presentations=table
-            )
+            table["flashes_since_change"] = get_flashes_since_change(stimulus_presentations=table)
         trials = None
         if add_trials_dependent_values and nwbfile.trials is not None:
             trials = Trials.from_nwb(nwbfile)
 
-        return Presentations(
-            presentations=table, column_list=column_list, trials=trials
-        )
+        return Presentations(presentations=table, column_list=column_list, trials=trials)
 
     @classmethod
     def from_stimulus_file(
@@ -318,13 +302,9 @@ class Presentations(
             and whose columns are presentation characteristics.
         """
         data = stimulus_file.data
-        raw_stim_pres_df = get_stimulus_presentations(
-            data, stimulus_timestamps.value
-        )
+        raw_stim_pres_df = get_stimulus_presentations(data, stimulus_timestamps.value)
         raw_stim_pres_df = raw_stim_pres_df.drop(columns=["index"])
-        raw_stim_pres_df = cls._check_for_errant_omitted_stimulus(
-            input_df=raw_stim_pres_df
-        )
+        raw_stim_pres_df = cls._check_for_errant_omitted_stimulus(input_df=raw_stim_pres_df)
 
         # Fill in nulls for image_name
         # This makes two assumptions:
@@ -333,13 +313,9 @@ class Presentations(
         #      values for `image_name` are null.
         if pd.isnull(raw_stim_pres_df["image_name"]).all():
             if ~pd.isnull(raw_stim_pres_df["orientation"]).all():
-                raw_stim_pres_df["image_name"] = raw_stim_pres_df[
-                    "orientation"
-                ].apply(lambda x: f"gratings_{x}")
+                raw_stim_pres_df["image_name"] = raw_stim_pres_df["orientation"].apply(lambda x: f"gratings_{x}")
             else:
-                raise ValueError(
-                    "All values for 'orientation' and " "'image_name are null."
-                )
+                raise ValueError("All values for 'orientation' and 'image_name are null.")
 
         stimulus_metadata_df = get_stimulus_metadata(data)
 
@@ -363,9 +339,7 @@ class Presentations(
             .sort_index()
             .set_index("timestamps", drop=True)
         )
-        stimulus_index_df["image_index"] = stimulus_index_df[
-            "image_index"
-        ].astype("int")
+        stimulus_index_df["image_index"] = stimulus_index_df["image_index"].astype("int")
         stim_pres_df = raw_stim_pres_df.merge(
             stimulus_index_df,
             left_on="start_time",
@@ -379,24 +353,14 @@ class Presentations(
                 f" {len(stim_pres_df)}."
             )
 
-        stim_pres_df["is_change"] = is_change_event(
-            stimulus_presentations=stim_pres_df
-        )
-        stim_pres_df["flashes_since_change"] = get_flashes_since_change(
-            stimulus_presentations=stim_pres_df
-        )
+        stim_pres_df["is_change"] = is_change_event(stimulus_presentations=stim_pres_df)
+        stim_pres_df["flashes_since_change"] = get_flashes_since_change(stimulus_presentations=stim_pres_df)
 
         # Sort columns then drop columns which contain only all NaN values
-        stim_pres_df = stim_pres_df[sorted(stim_pres_df)].dropna(
-            axis=1, how="all"
-        )
+        stim_pres_df = stim_pres_df[sorted(stim_pres_df)].dropna(axis=1, how="all")
         if limit_to_images is not None:
-            stim_pres_df = stim_pres_df[
-                stim_pres_df["image_name"].isin(limit_to_images)
-            ]
-            stim_pres_df.index = pd.Index(
-                range(stim_pres_df.shape[0]), name=stim_pres_df.index.name
-            )
+            stim_pres_df = stim_pres_df[stim_pres_df["image_name"].isin(limit_to_images)]
+            stim_pres_df.index = pd.Index(range(stim_pres_df.shape[0]), name=stim_pres_df.index.name)
 
         stim_pres_df["stimulus_block"] = 0
         stim_pres_df["stimulus_name"] = stimulus_file.stimulus_name
@@ -408,9 +372,7 @@ class Presentations(
             behavior_session_id=behavior_session_id,
         )
 
-        has_fingerprint_stimulus = (
-            "fingerprint" in stimulus_file.data["items"]["behavior"]["items"]
-        )
+        has_fingerprint_stimulus = "fingerprint" in stimulus_file.data["items"]["behavior"]["items"]
         if has_fingerprint_stimulus:
             stim_pres_df = cls._add_fingerprint_stimulus(
                 stimulus_presentations=stim_pres_df,
@@ -423,13 +385,9 @@ class Presentations(
             coerce_bool_to_boolean=True,
         )
         if project_code is not None:
-            stim_pres_df = produce_stimulus_block_names(
-                stim_pres_df, stimulus_file.session_type, project_code.value
-            )
+            stim_pres_df = produce_stimulus_block_names(stim_pres_df, stimulus_file.session_type, project_code.value)
 
-        return Presentations(
-            presentations=stim_pres_df, column_list=column_list, trials=trials
-        )
+        return Presentations(presentations=stim_pres_df, column_list=column_list, trials=trials)
 
     @classmethod
     def from_path(
@@ -460,9 +418,7 @@ class Presentations(
         """
         path = Path(path)
         df = pd.read_csv(path)
-        cls._add_is_image_novel(
-            stimulus_presentations=df, behavior_session_id=behavior_session_id
-        )
+        cls._add_is_image_novel(stimulus_presentations=df, behavior_session_id=behavior_session_id)
         exclude_columns = exclude_columns if exclude_columns else []
         df = df[[c for c in df if c not in exclude_columns]]
         df = cls._postprocess(
@@ -497,26 +453,15 @@ class Presentations(
         -------
         Dict mapping image name to is_novel
         """
-        mouse = Mouse.from_behavior_session_id(
-            behavior_session_id=behavior_session_id
-        )
-        prior_images_shown = mouse.get_images_shown(
-            up_to_behavior_session_id=behavior_session_id
-        )
+        mouse = Mouse.from_behavior_session_id(behavior_session_id=behavior_session_id)
+        prior_images_shown = mouse.get_images_shown(up_to_behavior_session_id=behavior_session_id)
 
-        image_names = set(
-            [x for x in image_names if x != "omitted" and type(x) is str]
-        )
-        is_novel = {
-            f"{image_name}": image_name not in prior_images_shown
-            for image_name in image_names
-        }
+        image_names = set([x for x in image_names if x != "omitted" and type(x) is str])
+        is_novel = {f"{image_name}": image_name not in prior_images_shown for image_name in image_names}
         return is_novel
 
     @classmethod
-    def _add_is_image_novel(
-        cls, stimulus_presentations: pd.DataFrame, behavior_session_id: int
-    ):
+    def _add_is_image_novel(cls, stimulus_presentations: pd.DataFrame, behavior_session_id: int):
         """Adds a column 'is_image_novel' to `stimulus_presentations`
 
         Parameters
@@ -525,9 +470,7 @@ class Presentations(
         behavior_session_id: LIMS id of behavior session
 
         """
-        stimulus_presentations["is_image_novel"] = stimulus_presentations[
-            "image_name"
-        ].map(
+        stimulus_presentations["is_image_novel"] = stimulus_presentations["image_name"].map(
             cls._get_is_image_novel(
                 image_names=stimulus_presentations["image_name"].tolist(),
                 behavior_session_id=behavior_session_id,
@@ -558,17 +501,13 @@ class Presentations(
             Amount of time a stimuli is omitted for in seconds"""
         df = presentations
         if fill_omitted_values:
-            cls._fill_missing_values_for_omitted_flashes(
-                df=df, omitted_time_duration=omitted_time_duration
-            )
+            cls._fill_missing_values_for_omitted_flashes(df=df, omitted_time_duration=omitted_time_duration)
         if coerce_bool_to_boolean:
             df = df.astype(
                 {
                     c: "boolean"
                     for c in df.select_dtypes("O")
-                    if set(df[c][~df[c].isna()].unique()).issubset(
-                        {True, False}
-                    )
+                    if set(df[c][~df[c].isna()].unique()).issubset({True, False})
                 }
             )
         df = cls._check_for_errant_omitted_stimulus(input_df=df)
@@ -597,11 +536,9 @@ class Presentations(
             found, return input_df unmodified.
         """
 
-        def safe_omitted_check(input_df: pd.Series,
-                               stimulus_block: Optional[int]):
+        def safe_omitted_check(input_df: pd.Series, stimulus_block: Optional[int]):
             if stimulus_block is not None:
-                first_row = input_df[
-                    input_df['stimulus_block'] == stim_block].iloc[0]
+                first_row = input_df[input_df["stimulus_block"] == stim_block].iloc[0]
             else:
                 first_row = input_df.iloc[0]
 
@@ -612,18 +549,14 @@ class Presentations(
 
         if "omitted" in input_df.columns and len(input_df) > 0:
             if "stimulus_block" in input_df.columns:
-                for stim_block in input_df['stimulus_block'].unique():
-                    input_df = safe_omitted_check(input_df=input_df,
-                                                  stimulus_block=stim_block)
+                for stim_block in input_df["stimulus_block"].unique():
+                    input_df = safe_omitted_check(input_df=input_df, stimulus_block=stim_block)
             else:
-                input_df = safe_omitted_check(input_df=input_df,
-                                              stimulus_block=None)
+                input_df = safe_omitted_check(input_df=input_df, stimulus_block=None)
         return input_df
 
     @staticmethod
-    def _fill_missing_values_for_omitted_flashes(
-        df: pd.DataFrame, omitted_time_duration: float = 0.25
-    ) -> pd.DataFrame:
+    def _fill_missing_values_for_omitted_flashes(df: pd.DataFrame, omitted_time_duration: float = 0.25) -> pd.DataFrame:
         """
         This function sets the stop time for a row that is an omitted
         stimulus. An omitted stimulus is a stimulus where a mouse is
@@ -639,16 +572,12 @@ class Presentations(
             Amount of time a stimulus is omitted for in seconds
         """
         omitted = df["omitted"].fillna(False)
-        df.loc[omitted, "stop_time"] = (
-            df.loc[omitted, "start_time"] + omitted_time_duration
-        )
+        df.loc[omitted, "stop_time"] = df.loc[omitted, "start_time"] + omitted_time_duration
         df.loc[omitted, "duration"] = omitted_time_duration
         return df
 
     @classmethod
-    def _get_spontaneous_stimulus(
-        cls, stimulus_presentations_table: pd.DataFrame
-    ) -> pd.DataFrame:
+    def _get_spontaneous_stimulus(cls, stimulus_presentations_table: pd.DataFrame) -> pd.DataFrame:
         """The spontaneous stimulus is a gray screen shown in between
         different stimulus blocks. This method finds any gaps in the stimulus
         presentations. These gaps are assumed to be spontaneous stimulus.
@@ -680,17 +609,11 @@ class Presentations(
         ):
             res.append(
                 {
-                    "duration": stimulus_presentations_table.iloc[0][
-                        "start_time"
-                    ],
+                    "duration": stimulus_presentations_table.iloc[0]["start_time"],
                     "start_time": 0,
-                    "stop_time": stimulus_presentations_table.iloc[0][
-                        "start_time"
-                    ],
+                    "stop_time": stimulus_presentations_table.iloc[0]["start_time"],
                     "start_frame": 0,
-                    "end_frame": stimulus_presentations_table.iloc[0][
-                        "start_frame"
-                    ],
+                    "end_frame": stimulus_presentations_table.iloc[0]["start_frame"],
                     "stimulus_block": 0,
                     "stimulus_name": "spontaneous",
                 }
@@ -700,27 +623,21 @@ class Presentations(
             stimulus_presentations_table["stimulus_block"] += 1
 
         spontaneous_stimulus_blocks = get_spontaneous_block_indices(
-            stimulus_blocks=(
-                stimulus_presentations_table["stimulus_block"].values
-            )
+            stimulus_blocks=(stimulus_presentations_table["stimulus_block"].values)
         )
 
         for spontaneous_block in spontaneous_stimulus_blocks:
             prev_stop_time = stimulus_presentations_table[
-                stimulus_presentations_table["stimulus_block"]
-                == spontaneous_block - 1
+                stimulus_presentations_table["stimulus_block"] == spontaneous_block - 1
             ]["stop_time"].max()
             prev_end_frame = stimulus_presentations_table[
-                stimulus_presentations_table["stimulus_block"]
-                == spontaneous_block - 1
+                stimulus_presentations_table["stimulus_block"] == spontaneous_block - 1
             ]["end_frame"].max()
             next_start_time = stimulus_presentations_table[
-                stimulus_presentations_table["stimulus_block"]
-                == spontaneous_block + 1
+                stimulus_presentations_table["stimulus_block"] == spontaneous_block + 1
             ]["start_time"].min()
             next_start_frame = stimulus_presentations_table[
-                stimulus_presentations_table["stimulus_block"]
-                == spontaneous_block + 1
+                stimulus_presentations_table["stimulus_block"] == spontaneous_block + 1
             ]["start_frame"].min()
             res.append(
                 {
@@ -736,9 +653,7 @@ class Presentations(
 
         res = pd.DataFrame(res)
 
-        return pd.concat([stimulus_presentations_table, res]).sort_values(
-            "start_frame"
-        )
+        return pd.concat([stimulus_presentations_table, res]).sort_values("start_frame")
 
     @classmethod
     def _add_fingerprint_stimulus(
@@ -763,12 +678,8 @@ class Presentations(
         except MalformedStimulusFileError:
             return stimulus_presentations
 
-        stimulus_presentations = pd.concat(
-            [stimulus_presentations, fingerprint_stimulus.table]
-        )
-        stimulus_presentations = cls._get_spontaneous_stimulus(
-            stimulus_presentations_table=stimulus_presentations
-        )
+        stimulus_presentations = pd.concat([stimulus_presentations, fingerprint_stimulus.table])
+        stimulus_presentations = cls._get_spontaneous_stimulus(stimulus_presentations_table=stimulus_presentations)
 
         # reset index to go from 0...end
         stimulus_presentations.index = pd.Index(
@@ -801,9 +712,7 @@ def get_spontaneous_block_indices(stimulus_blocks: np.ndarray) -> np.ndarray:
     block_diffs = np.diff(blocks)
     if (block_diffs > 2).any():
         raise RuntimeError(
-            f"There should not be any stimulus block "
-            f"diffs greater than 2. The stimulus "
-            f"blocks are {blocks}"
+            f"There should not be any stimulus block diffs greater than 2. The stimulus blocks are {blocks}"
         )
 
     # i.e. if the current blocks are [0, 2], then block_diffs will

@@ -9,8 +9,7 @@ from allensdk.core.auth_config import CREDENTIAL_KEYS
 
 logger = logging.getLogger(__name__)
 
-DbCredentials = namedtuple("DbCredentials",
-                           ["dbname", "user", "host", "port", "password"])
+DbCredentials = namedtuple("DbCredentials", ["dbname", "user", "host", "port", "password"])
 
 
 class CredentialProvider(ABC):
@@ -26,6 +25,7 @@ class EnvCredentialProvider(CredentialProvider):
     Provides credentials from environment variables for variables listed
     in CREDENTIAL_KEYS.
     """
+
     METHOD = "env"
 
     def __init__(self, environ: Optional[Dict[str, Any]] = None):
@@ -39,8 +39,7 @@ class EnvCredentialProvider(CredentialProvider):
         """
         if environ is None:
             environ = os.environ
-        self.credentials = dict((k[0], environ.get(k[0], k[1]))
-                                for k in CREDENTIAL_KEYS)
+        self.credentials = dict((k[0], environ.get(k[0], k[1])) for k in CREDENTIAL_KEYS)
 
     def provide(self, credential):
         return self.credentials.get(credential)
@@ -59,8 +58,7 @@ def get_credential_provider():
     return CREDENTIAL_PROVIDER
 
 
-def credential_injector(credential_map: Dict[str, Any],
-                        provider: Optional[CredentialProvider] = None):
+def credential_injector(credential_map: Dict[str, Any], provider: Optional[CredentialProvider] = None):
     """
     Decorator used to inject credentials from another source if not
     explicitly provided in the function call. This function will only supply
@@ -97,17 +95,17 @@ def credential_injector(credential_map: Dict[str, Any],
         def wrapper(*args, **kwargs):
             for kw, credential in credential_map.items():
                 if kw not in kwargs.keys():
-                    logger.debug(f"No explicit value provided for {kw}. "
-                                 "Searching credential provider.")
+                    logger.debug(f"No explicit value provided for {kw}. Searching credential provider.")
                     secret = provider.provide(credential)
                     if secret is not None:
-                        logger.debug("Found value in credential provider, "
-                                     f"from '{provider.METHOD}' method.")
+                        logger.debug(f"Found value in credential provider, from '{provider.METHOD}' method.")
                         kwargs.update({kw: provider.provide(credential)})
                     else:
                         logger.warning(
-                            f"Value for {kw} was neither explicitly provided "
-                            "nor found in credential provider.")
+                            f"Value for {kw} was neither explicitly provided nor found in credential provider."
+                        )
             return func(*args, **kwargs)
+
         return wrapper
+
     return injector_decorator

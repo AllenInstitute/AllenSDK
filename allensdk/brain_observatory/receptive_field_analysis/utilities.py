@@ -68,9 +68,7 @@ def convolve(img, sigma=4):
         return img
 
     img_pad = np.zeros((3 * img.shape[0], 3 * img.shape[1]))
-    img_pad[
-        img.shape[0] : 2 * img.shape[0], img.shape[1] : 2 * img.shape[1]
-    ] = img
+    img_pad[img.shape[0] : 2 * img.shape[0], img.shape[1] : 2 * img.shape[1]] = img
 
     x = np.arange(3 * img.shape[0])
     y = np.arange(3 * img.shape[1])
@@ -93,9 +91,7 @@ def convolve(img, sigma=4):
 
     z_on_new = block_reduce(ZZ_on_f, (upsample, upsample))
     z_on_new = z_on_new / z_on_new.sum() * img.sum()
-    z_on_new = z_on_new[
-        img.shape[0] : 2 * img.shape[0], img.shape[1] : 2 * img.shape[1]
-    ]
+    z_on_new = z_on_new[img.shape[0] : 2 * img.shape[0], img.shape[1] : 2 * img.shape[1]]
 
     return z_on_new
 
@@ -103,20 +99,14 @@ def convolve(img, sigma=4):
 @memoize
 def get_A(data, stimulus):
     stimulus_table = data.get_stimulus_table(stimulus)
-    stimulus_template = data.get_stimulus_template(stimulus)[
-        stimulus_table["frame"].values, :, :
-    ]
+    stimulus_template = data.get_stimulus_template(stimulus)[stimulus_table["frame"].values, :, :]
 
     number_of_pixels = stimulus_template.shape[1] * stimulus_template.shape[2]
 
     A = np.zeros((2 * number_of_pixels, stimulus_template.shape[0]))
     for fi in range(stimulus_template.shape[0]):
-        A[:number_of_pixels, fi] = (
-            stimulus_template[fi, :, :].flatten() > 127
-        ).astype(float)
-        A[number_of_pixels:, fi] = (
-            stimulus_template[fi, :, :].flatten() < 127
-        ).astype(float)
+        A[:number_of_pixels, fi] = (stimulus_template[fi, :, :].flatten() > 127).astype(float)
+        A[number_of_pixels:, fi] = (stimulus_template[fi, :, :].flatten() < 127).astype(float)
 
     return A
 
@@ -124,23 +114,17 @@ def get_A(data, stimulus):
 @memoize
 def get_A_blur(data, stimulus):
     stimulus_table = data.get_stimulus_table(stimulus)
-    stimulus_template = data.get_stimulus_template(stimulus)[
-        stimulus_table["frame"].values, :, :
-    ]
+    stimulus_template = data.get_stimulus_template(stimulus)[stimulus_table["frame"].values, :, :]
 
     A = get_A(data, stimulus).copy()
 
     number_of_pixels = A.shape[0] // 2
     for fi in range(A.shape[1]):
         A[:number_of_pixels, fi] = convolve(
-            A[:number_of_pixels, fi].reshape(
-                stimulus_template.shape[1], stimulus_template.shape[2]
-            )
+            A[:number_of_pixels, fi].reshape(stimulus_template.shape[1], stimulus_template.shape[2])
         ).flatten()
         A[number_of_pixels:, fi] = convolve(
-            A[number_of_pixels:, fi].reshape(
-                stimulus_template.shape[1], stimulus_template.shape[2]
-            )
+            A[number_of_pixels:, fi].reshape(stimulus_template.shape[1], stimulus_template.shape[2])
         ).flatten()
 
     return A
@@ -158,13 +142,7 @@ def get_shuffle_matrix(
     shuffle_data = np.zeros((2 * number_of_pixels, number_of_shuffles))
     evr = range(len(event_vector))
     for ii in range(number_of_shuffles):
-        size = number_of_events + int(
-            np.round(
-                response_detection_error_std_dev
-                * number_of_events
-                * np.random.randn()
-            )
-        )
+        size = number_of_events + int(np.round(response_detection_error_std_dev * number_of_events * np.random.randn()))
         shuffled_event_inds = np.random.choice(evr, size=size, replace=False)
 
         b_tmp = np.zeros(len(event_vector), dtype=bool)
@@ -174,9 +152,7 @@ def get_shuffle_matrix(
     return shuffle_data
 
 
-def get_sparse_noise_epoch_mask_list(
-    st, number_of_acquisition_frames, threshold=7
-):
+def get_sparse_noise_epoch_mask_list(st, number_of_acquisition_frames, threshold=7):
     delta = st.start.values[1:] - st.end.values[:-1]
     cut_inds = np.where(delta > threshold)[0] + 1
 
@@ -248,10 +224,7 @@ def smooth(x, window_len=11, window="hanning", mode="valid"):
         return x
 
     if window not in ["flat", "hanning", "hamming", "bartlett", "blackman"]:
-        raise ValueError(
-            "Window is on of 'flat', 'hanning', 'hamming', 'bartlett', "
-            "'blackman'"
-        )
+        raise ValueError("Window is on of 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'")
 
     s = np.r_[x[window_len - 1 : 0 : -1], x, x[-1:-window_len:-1]]
     # print(len(s))
@@ -269,8 +242,7 @@ def get_components(receptive_field_data):
 
     candidate_pixel_list = np.where(receptive_field_data.flatten())[0]
     pixel_coord_dict = dict(
-        (px, (int(px / s2), (px - s2 * int(px / s2)), px % (s1 * s2) == px))
-        for px in candidate_pixel_list
+        (px, (int(px / s2), (px - s2 * int(px / s2)), px % (s1 * s2) == px)) for px in candidate_pixel_list
     )
 
     component_list = []
@@ -305,13 +277,9 @@ def get_components(receptive_field_data):
         component_list = new_component_list
 
     if len(component_list) == 0:
-        return np.zeros(
-            (1, receptive_field_data.shape[0], receptive_field_data.shape[1])
-        ), len(component_list)
+        return np.zeros((1, receptive_field_data.shape[0], receptive_field_data.shape[1])), len(component_list)
     elif len(component_list) == 1:
-        return_array = np.zeros(
-            (1, receptive_field_data.shape[0], receptive_field_data.shape[1])
-        )
+        return_array = np.zeros((1, receptive_field_data.shape[0], receptive_field_data.shape[1]))
     else:
         return_array = np.zeros(
             (
@@ -322,13 +290,9 @@ def get_components(receptive_field_data):
         )
 
     for ii, component in enumerate(component_list):
-        curr_component_mask = np.zeros_like(
-            receptive_field_data, dtype=bool
-        ).flatten()
+        curr_component_mask = np.zeros_like(receptive_field_data, dtype=bool).flatten()
         curr_component_mask[component] = True
-        return_array[ii, :, :] = curr_component_mask.reshape(
-            receptive_field_data.shape
-        )
+        return_array[ii, :, :] = curr_component_mask.reshape(receptive_field_data.shape)
 
     return return_array, len(component_list)
 

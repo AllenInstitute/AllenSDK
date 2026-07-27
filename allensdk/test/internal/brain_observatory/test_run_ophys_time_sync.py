@@ -1,4 +1,4 @@
-""" Tests for the executable that synchronizes distinct data streams within an
+"""Tests for the executable that synchronizes distinct data streams within an
 ophys experiment. For tests of the logic used by this executable, see
 test_time_sync
 """
@@ -13,7 +13,10 @@ import h5py
 
 import allensdk
 from allensdk.internal.pipeline_modules.run_ophys_time_sync import (
-    TimeSyncOutputs, TimeSyncWriter, check_stimulus_delay, run_ophys_time_sync
+    TimeSyncOutputs,
+    TimeSyncWriter,
+    check_stimulus_delay,
+    run_ophys_time_sync,
 )
 
 
@@ -32,38 +35,37 @@ def outputs():
         np.linspace(3, 4, 10),
         np.arange(10),
         np.arange(10, 20),
-        np.arange(20, 30)
+        np.arange(20, 30),
     )
 
 
 @pytest.fixture
 def writer(tmpdir_factory):
     tmpdir_path = str(tmpdir_factory.mktemp("run_ophys_time_sync_tests"))
-    return TimeSyncWriter(
-        os.path.join(tmpdir_path, "data.h5"),
-        os.path.join(tmpdir_path, "output.json")
-    )
+    return TimeSyncWriter(os.path.join(tmpdir_path, "data.h5"), os.path.join(tmpdir_path, "output.json"))
 
 
 def test_validate_paths_writable(writer):
     try:
         writer.validate_paths()
     except Exception as err:
-        pytest.fail(
-            f"expected no error. Got: {err.__class__.__name__}(\"{err}\")")
+        pytest.fail(f'expected no error. Got: {err.__class__.__name__}("{err}")')
 
 
-@pytest.mark.parametrize("h5_key,expected", [
-    ["stimulus_alignment", np.arange(10)],
-    ["eye_tracking_alignment", np.arange(10, 20)],
-    ["body_camera_alignment", np.arange(20, 30)],
-    ["twop_vsync_fall", np.linspace(0, 1, 10)],
-    ["ophys_delta", 0],
-    ["stim_delta", 1],
-    ["stim_delay", 0.35],
-    ["eye_delta", 2],
-    ["behavior_delta", 3]
-])
+@pytest.mark.parametrize(
+    "h5_key,expected",
+    [
+        ["stimulus_alignment", np.arange(10)],
+        ["eye_tracking_alignment", np.arange(10, 20)],
+        ["body_camera_alignment", np.arange(20, 30)],
+        ["twop_vsync_fall", np.linspace(0, 1, 10)],
+        ["ophys_delta", 0],
+        ["stim_delta", 1],
+        ["stim_delay", 0.35],
+        ["eye_delta", 2],
+        ["behavior_delta", 3],
+    ],
+)
 def test_write_output_h5(writer, outputs, h5_key, expected):
     writer.write_output_h5(outputs)
 
@@ -76,15 +78,18 @@ def test_write_output_h5(writer, outputs, h5_key, expected):
             assert obtained[()] == expected
 
 
-@pytest.mark.parametrize("json_key,expected", [
-    ["allensdk_version", allensdk.__version__],
-    ["experiment_id", 100],
-    ["ophys_delta", 0],
-    ["stim_delta", 1],
-    ["stim_delay", 0.35],
-    ["eye_delta", 2],
-    ["behavior_delta", 3]
-])
+@pytest.mark.parametrize(
+    "json_key,expected",
+    [
+        ["allensdk_version", allensdk.__version__],
+        ["experiment_id", 100],
+        ["ophys_delta", 0],
+        ["stim_delta", 1],
+        ["stim_delay", 0.35],
+        ["eye_delta", 2],
+        ["behavior_delta", 3],
+    ],
+)
 def test_write_output_json(writer, outputs, json_key, expected):
     writer.write_output_json(outputs)
 
@@ -113,12 +118,7 @@ def test_run_ophys_time_sync():
         corrected_eye_video_timestamps: np.ndarray
         corrected_behavior_video_timestamps: np.ndarray
 
-    aligner = Aligner(
-        (np.arange(10), 0, 0.5),
-        (np.arange(10), 1),
-        (np.arange(10), 2),
-        (np.arange(10), 3)
-    )
+    aligner = Aligner((np.arange(10), 0, 0.5), (np.arange(10), 1), (np.arange(10), 2), (np.arange(10), 3))
 
     obtained = run_ophys_time_sync(aligner, 100, 0.0, 2.0)
 
@@ -137,9 +137,8 @@ def test_run_ophys_time_sync():
         ["behavior_times", np.arange(10)],
         ["stimulus_alignment", np.arange(10)],
         ["eye_alignment", np.arange(10)],
-        ["behavior_alignment", np.arange(10)]
+        ["behavior_alignment", np.arange(10)],
     ]:
-
         current_obt = getattr(obtained, name)
 
         if isinstance(expected, np.ndarray):
@@ -148,9 +147,6 @@ def test_run_ophys_time_sync():
             match = expected == current_obt
 
         if not match:
-            mismatches.append(
-                f"{name} mismatched: expected {expected}, "
-                f"obtained {current_obt}"
-            )
+            mismatches.append(f"{name} mismatched: expected {expected}, obtained {current_obt}")
 
     assert len(mismatches) == 0, "\n" + "\n".join(mismatches)

@@ -21,9 +21,7 @@ class DataFile(abc.ABC):
         Path to file.
     """
 
-    def __init__(self,
-                 filepath: Union[str, Path],
-                 **kwargs):  # pragma: no cover
+    def __init__(self, filepath: Union[str, Path], **kwargs):  # pragma: no cover
         self._filepath: str = safe_system_path(str(filepath))
         self._data = self.load_data(filepath=self._filepath, **kwargs)
 
@@ -37,8 +35,7 @@ class DataFile(abc.ABC):
 
     @classmethod
     @abc.abstractmethod
-    def from_json(cls,
-                  dict_repr: dict) -> "DataFile":  # pragma: no cover
+    def from_json(cls, dict_repr: dict) -> "DataFile":  # pragma: no cover
         """Populates a DataFile from a JSON compatible dict (likely parsed by
         argschema)
 
@@ -70,8 +67,7 @@ class DataFile(abc.ABC):
 
     @staticmethod
     @abc.abstractmethod
-    def load_data(filepath: Union[str, Path],
-                  **kwargs) -> Any:  # pragma: no cover
+    def load_data(filepath: Union[str, Path], **kwargs) -> Any:  # pragma: no cover
         """Given a filepath (that is meant to by read by the DataFile type),
         load the contents of the file into a Python type.
         (dict, DataFrame, list, etc...)

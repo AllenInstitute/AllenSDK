@@ -9,7 +9,7 @@ CREDENTIAL_KEYS = [
     ("MTRAIN_USER", None),
     ("MTRAIN_HOST", None),
     ("MTRAIN_PORT", 5432),
-    ("MTRAIN_PASSWORD", None)
+    ("MTRAIN_PASSWORD", None),
 ]
 
 # For PostgresQueryMixin
@@ -18,7 +18,7 @@ LIMS_DB_CREDENTIAL_MAP = {
     "user": "LIMS_USER",
     "host": "LIMS_HOST",
     "password": "LIMS_PASSWORD",
-    "port": "LIMS_PORT"
+    "port": "LIMS_PORT",
 }
 
 # For PostgresQueryMixin
@@ -27,5 +27,5 @@ MTRAIN_DB_CREDENTIAL_MAP = {
     "user": "MTRAIN_USER",
     "host": "MTRAIN_HOST",
     "password": "MTRAIN_PASSWORD",
-    "port": "MTRAIN_PORT"
+    "port": "MTRAIN_PORT",
 }

@@ -10,18 +10,24 @@ from allensdk.core.nwb_data_set import NwbDataSet
 # manual keys are values that can be passed in through input.json.
 # these values are used if the particular value cannot be computed.
 # a better name might be 'DEFAULT_VALUE_KEYS'
-from allensdk.internal.pipeline_modules.IVSCC.ephys_nwb.lab_notebook_reader \
-    import \
-    create_lab_notebook_reader
-from allensdk.internal.pipeline_modules.IVSCC.ephys_nwb.qc_support import \
-    measure_blowout, measure_seal, find_stim_start, measure_vm, \
-    get_last_vm_epoch, find_stim_interval, find_stim_amplitude_and_duration, \
-    measure_electrode_0, get_last_vm_noise_epoch, get_stability_vm_epoch, \
-    get_first_vm_noise_epoch, measure_input_resistance, \
-    measure_initial_access_resistance
+from allensdk.internal.pipeline_modules.IVSCC.ephys_nwb.lab_notebook_reader import create_lab_notebook_reader
+from allensdk.internal.pipeline_modules.IVSCC.ephys_nwb.qc_support import (
+    measure_blowout,
+    measure_seal,
+    find_stim_start,
+    measure_vm,
+    get_last_vm_epoch,
+    find_stim_interval,
+    find_stim_amplitude_and_duration,
+    measure_electrode_0,
+    get_last_vm_noise_epoch,
+    get_stability_vm_epoch,
+    get_first_vm_noise_epoch,
+    measure_input_resistance,
+    measure_initial_access_resistance,
+)
 
-MANUAL_KEYS = ['manual_seal_gohm', 'manual_initial_access_resistance_mohm',
-               'manual_initial_input_mohm']
+MANUAL_KEYS = ["manual_seal_gohm", "manual_initial_access_resistance_mohm", "manual_initial_input_mohm"]
 
 # names of blocks used in output.json
 # for sweep-specific data:
@@ -55,8 +61,7 @@ def build_sweep_stim_map():
     try:
         nwb_file = h5py.File(nwb_file_name, "r")
     except Exception:
-        raise Exception(
-            "Unable to open input NWB file '%s'" % str(nwb_file_name))
+        raise Exception("Unable to open input NWB file '%s'" % str(nwb_file_name))
     print("Opened '%s'" % str(nwb_file_name))
     sweep_stim_map = {}
     stim_sweep_map = {}
@@ -81,13 +86,13 @@ def build_sweep_stim_map():
 # fetches stimulus code for a given sweep name, or None if no stimulus
 #   was found for the specified sweep
 def get_sweep_name_by_stimulus_code(stim_name):
-    """ Returns the first sweep name that uses the specified stimulus
-        type. 'First' does not mean lowest sweep number, only the first
-        one found using a [random] dictionary search.
+    """Returns the first sweep name that uses the specified stimulus
+    type. 'First' does not mean lowest sweep number, only the first
+    one found using a [random] dictionary search.
 
-        Input: stimulus name (string)
+    Input: stimulus name (string)
 
-        Output: sweep name (string), or None if no sweep found for this stim
+    Output: sweep name (string), or None if no sweep found for this stim
     """
     global sweep_stim_map
     for k, v in stim_sweep_map.items():
@@ -99,24 +104,24 @@ def get_sweep_name_by_stimulus_code(stim_name):
 # returns True if stimulus name for specified sweep indicates the sweep
 #   is a ramp and False otherwise
 def sweep_is_ramp(sweep_name):
-    """ Input: sweep name (string)
+    """Input: sweep name (string)
 
-        Output: boolean (True if sweep is ramp, False otherwise)
+    Output: boolean (True if sweep is ramp, False otherwise)
     """
     global sweep_stim_map
-    return sweep_stim_map[sweep_name].startswith('C1RP')
+    return sweep_stim_map[sweep_name].startswith("C1RP")
 
 
 # old code based on using NwbDataSet objects. provide a way to
 #   create them in order to leverage old code as much as possible
 def get_sweep_data(sweep_name):
-    """ Input: sweep name (string)
+    """Input: sweep name (string)
 
-        Output: NwbDataSet object
+    Output: NwbDataSet object
     """
     global nwb_file_name
     try:
-        num = int(sweep_name.split('_')[-1])
+        num = int(sweep_name.split("_")[-1])
     except Exception:
         print("Unable to parse sweep number from '%s'" % str(sweep_name))
         raise
@@ -126,36 +131,32 @@ def get_sweep_data(sweep_name):
 # functions to lookup a sweep having the desired stimulus code
 # NOTE: if multiple instance exist then only one instance is returned
 def get_blowout_sweep():
-    """ Returns NwbDataSet for the blowout sweep, or None if it's absent
-    """
-    sweep_name = get_sweep_name_by_stimulus_code('EXTPBLWOUT')
+    """Returns NwbDataSet for the blowout sweep, or None if it's absent"""
+    sweep_name = get_sweep_name_by_stimulus_code("EXTPBLWOUT")
     if sweep_name is None:
         return None
     return get_sweep_data(sweep_name)
 
 
 def get_bath_sweep():
-    """ Returns NwbDataSet for the bath sweep, or None if it's absent
-    """
-    sweep_name = get_sweep_name_by_stimulus_code('EXTPINBATH')
+    """Returns NwbDataSet for the bath sweep, or None if it's absent"""
+    sweep_name = get_sweep_name_by_stimulus_code("EXTPINBATH")
     if sweep_name is None:
         return None
     return get_sweep_data(sweep_name)
 
 
 def get_seal_sweep():
-    """ Returns NwbDataSet for the seal sweep, or None if it's absent
-    """
-    sweep_name = get_sweep_name_by_stimulus_code('EXTPCllATT')
+    """Returns NwbDataSet for the seal sweep, or None if it's absent"""
+    sweep_name = get_sweep_name_by_stimulus_code("EXTPCllATT")
     if sweep_name is None:
         return None
     return get_sweep_data(sweep_name)
 
 
 def get_breakin_sweep():
-    """ Returns NwbDataSet for the breakin sweep, or None if it's absent
-    """
-    sweep_name = get_sweep_name_by_stimulus_code('EXTPBREAKN')
+    """Returns NwbDataSet for the breakin sweep, or None if it's absent"""
+    sweep_name = get_sweep_name_by_stimulus_code("EXTPBREAKN")
     if sweep_name is None:
         return None
     return get_sweep_data(sweep_name)
@@ -167,42 +168,38 @@ def get_breakin_sweep():
 ########################################################################
 # QC-relevant feature extraction code
 
+
 # cell-level values (for ephys_roi_results)
 def cell_level_features(jin, jout, sweep_tag_list, manual_values):
-    """
-    """
+    """ """
     output_data = {}
     jout[JSON_BLOCK_EXPERIMENT_DATA] = output_data
     # measure blowout voltage
     try:
         blowout_data = get_blowout_sweep()
-        blowout = measure_blowout(blowout_data['response'],
-                                  blowout_data['index_range'][0])
-        output_data['blowout_mv'] = blowout
+        blowout = measure_blowout(blowout_data["response"], blowout_data["index_range"][0])
+        output_data["blowout_mv"] = blowout
     except Exception:
         msg = "Blowout is not available"
         sweep_tag_list.append(msg)
         logging.warning(msg)
-        output_data['blowout_mv'] = None
+        output_data["blowout_mv"] = None
 
     # measure "electrode 0"
     try:
         bath_data = get_bath_sweep()
-        e0 = measure_electrode_0(bath_data['response'],
-                                 bath_data['sampling_rate'])
-        output_data['electrode_0_pa'] = e0
+        e0 = measure_electrode_0(bath_data["response"], bath_data["sampling_rate"])
+        output_data["electrode_0_pa"] = e0
     except Exception:
         msg = "Electrode 0 is not available"
         sweep_tag_list.append(msg)
         logging.warning(msg)
-        output_data['electrode_0_pa'] = None
+        output_data["electrode_0_pa"] = None
 
     # measure clamp seal
     try:
         seal_data = get_seal_sweep()
-        seal = measure_seal(seal_data['stimulus'],
-                            seal_data['response'],
-                            seal_data['sampling_rate'])
+        seal = measure_seal(seal_data["stimulus"], seal_data["response"], seal_data["sampling_rate"])
         # error may arise in computing seal, which falls through to
         #   exception handler. if seal computation didn't fail but
         #   computation generated invalid value, trigger same
@@ -215,7 +212,7 @@ def cell_level_features(jin, jout, sweep_tag_list, manual_values):
         sweep_tag_list.append(msg)
         logging.warning(msg)
         # look for manual seal value and use it if it's available
-        seal = manual_values.get('manual_seal_gohm', None)
+        seal = manual_values.get("manual_seal_gohm", None)
         if seal is not None:
             logging.info("using manual seal value: %f" % seal)
             sweep_tag_list.append("Seal set using manual value")
@@ -238,15 +235,15 @@ def cell_level_features(jin, jout, sweep_tag_list, manual_values):
         ###########################
         # input resistance
         try:
-            ir = measure_input_resistance(breakin_data['stimulus'],
-                                          breakin_data['response'],
-                                          breakin_data['sampling_rate'])
+            ir = measure_input_resistance(
+                breakin_data["stimulus"], breakin_data["response"], breakin_data["sampling_rate"]
+            )
         except Exception:
             logging.warning("Error reading input resistance.")
         # apply manual value if it's available
         if ir is None:
             sweep_tag_list.append("Input resistance is not available")
-            ir = manual_values.get('manual_initial_input_mohm', None)
+            ir = manual_values.get("manual_initial_input_mohm", None)
             if ir is not None:
                 msg = "Using manual value for input resistance"
                 logging.info(msg)
@@ -254,23 +251,21 @@ def cell_level_features(jin, jout, sweep_tag_list, manual_values):
         ###########################
         # initial access resistance
         try:
-            sr = measure_initial_access_resistance(breakin_data['stimulus'],
-                                                   breakin_data['response'],
-                                                   breakin_data[
-                                                       'sampling_rate'])
+            sr = measure_initial_access_resistance(
+                breakin_data["stimulus"], breakin_data["response"], breakin_data["sampling_rate"]
+            )
         except Exception:
             logging.warning("Error reading initial access resistance.")
         # apply manual value if it's available
         if sr is None:
             sweep_tag_list.append("Initial access resistance is not available")
-            sr = manual_values.get('manual_initial_access_resistance_mohm',
-                                   None)
+            sr = manual_values.get("manual_initial_access_resistance_mohm", None)
             if sr is not None:
                 msg = "Using manual initial access resistance"
                 logging.info(msg)
                 sweep_tag_list.append(msg)
     #
-    output_data['input_resistance_mohm'] = ir
+    output_data["input_resistance_mohm"] = ir
     output_data["initial_access_resistance_mohm"] = sr
 
     sr_ratio = None  # input access resistance ratio
@@ -279,19 +274,18 @@ def cell_level_features(jin, jout, sweep_tag_list, manual_values):
             sr_ratio = sr / ir
         except Exception:
             pass  # let sr_ratio stay as None
-    output_data['input_access_resistance_ratio'] = sr_ratio
+    output_data["input_access_resistance_ratio"] = sr_ratio
 
 
 ##############################
 def sweep_level_features(jin, jout, sweep_tag_list):
-    """
-    """
+    """ """
     global sweep_list
     # pull out features from each sweep (for ephys_sweeps)
     jout[JSON_BLOCK_SWEEP_DATA] = {}
     for sweep_name in sweep_list:
         # pull data streams from file
-        sweep_num = int(sweep_name.split('_')[-1])
+        sweep_num = int(sweep_name.split("_")[-1])
         try:
             sweep_data = NwbDataSet(nwb_file_name).get_sweep(sweep_num)
         except Exception:
@@ -304,10 +298,10 @@ def sweep_level_features(jin, jout, sweep_tag_list):
         if sweep_data["stimulus_unit"] == "Volts":
             continue  # voltage-clamp
 
-        volts = sweep_data['response']
-        current = sweep_data['stimulus']
-        hz = sweep_data['sampling_rate']
-        idx_start, idx_stop = sweep_data['index_range']
+        volts = sweep_data["response"]
+        current = sweep_data["stimulus"]
+        hz = sweep_data["sampling_rate"]
+        idx_start, idx_stop = sweep_data["index_range"]
 
         # measure Vm and noise before stimulus
         idx0, idx1 = get_first_vm_noise_epoch(idx_start, current, hz)
@@ -320,7 +314,7 @@ def sweep_level_features(jin, jout, sweep_tag_list):
         # do not check for ramps, because they do not have enough time to
         # recover
         mean1 = None
-        sweep_not_truncated = (idx_stop == len(current) - 1)
+        sweep_not_truncated = idx_stop == len(current) - 1
         if sweep_not_truncated and not sweep_is_ramp(sweep_name):
             idx0, idx1 = get_last_vm_epoch(idx_stop, current, hz)
             mean1, _ = measure_vm(1e3 * volts[idx0:idx1])
@@ -331,7 +325,7 @@ def sweep_level_features(jin, jout, sweep_tag_list):
 
         # measure Vm and noise over extended interval, to check stability
         stim_start = find_stim_start(idx_start, current)
-        sweep['stimulus_start_time'] = stim_start / sweep_data['sampling_rate']
+        sweep["stimulus_start_time"] = stim_start / sweep_data["sampling_rate"]
 
         idx0, idx1 = get_stability_vm_epoch(idx_start, stim_start, hz)
         mean2, rms2 = measure_vm(1000 * volts[idx0:idx1])
@@ -350,13 +344,12 @@ def sweep_level_features(jin, jout, sweep_tag_list):
             sweep["vm_delta_mv"] = None
 
         # compute stimulus duration, amplitude, interal
-        stim_amp, stim_dur = find_stim_amplitude_and_duration(idx_start,
-                                                              current, hz)
+        stim_amp, stim_dur = find_stim_amplitude_and_duration(idx_start, current, hz)
         stim_int = find_stim_interval(idx_start, current, hz)
 
-        sweep['stimulus_amplitude'] = stim_amp * 1e12
-        sweep['stimulus_duration'] = stim_dur
-        sweep['stimulus_interval'] = stim_int
+        sweep["stimulus_amplitude"] = stim_amp * 1e12
+        sweep["stimulus_duration"] = stim_dur
+        sweep["stimulus_interval"] = stim_int
 
         tag_list = []
         for i in range(len(sweep_tag_list)):
@@ -377,7 +370,7 @@ def summarize_sweeps(jin, jout):
 
     h5_file_name = jin.get("input_h5", None)
     notebook = create_lab_notebook_reader(nwb_file_name, h5_file_name)
-    borg = h5py.File(nwb_file_name, 'r')
+    borg = h5py.File(nwb_file_name, "r")
 
     # two json blocks to store data in
     exp_data = jout[JSON_BLOCK_EXPERIMENT_DATA]
@@ -402,7 +395,7 @@ def summarize_sweeps(jin, jout):
     session_date = borg["session_start_time"][()]
     if len(session_date) == 1:
         session_date = session_date[0]
-    exp_data['recording_date'] = session_date
+    exp_data["recording_date"] = session_date
 
     # get sampling rate
     # use same output strategy as h5-nwb converter
@@ -417,9 +410,8 @@ def summarize_sweeps(jin, jout):
                 sampling_rate = sweep_ts["starting_time"].attrs["rate"]
                 break
     if sampling_rate is None:
-        raise Exception(
-            "Unable to determine sampling rate from current clamp sweep.")
-    exp_data['sampling_rate'] = sampling_rate
+        raise Exception("Unable to determine sampling rate from current clamp sweep.")
+    exp_data["sampling_rate"] = sampling_rate
     #    sweep_data = []
     #    output_data["sweep_summary"] = sweep_data
 
@@ -427,22 +419,20 @@ def summarize_sweeps(jin, jout):
     for sweep_name in borg["acquisition/timeseries"]:
         # get h5 timeseries object, and the sweep number
         sweep_ts = borg["acquisition/timeseries"][sweep_name]
-        sweep_num = int(sweep_name.split('_')[-1])
+        sweep_num = int(sweep_name.split("_")[-1])
         # sweep_num = int(sweep_name[:-4].split('_')[-1]) # for reading igor
         # nwb
         # fetch stim name from lab notebook
         stim_name = notebook.get_value("Stim Wave Name", sweep_num, "")
         if len(stim_name) == 0:
-            raise Exception(
-                "Could not read stimulus wave name from lab notebook for "
-                "sweep %d" % sweep_num)
+            raise Exception("Could not read stimulus wave name from lab notebook for sweep %d" % sweep_num)
 
         # stim units are based on timeseries type
         ancestry = sweep_ts.attrs["ancestry"]
         if "CurrentClamp" in ancestry[-1]:
-            stim_units = 'pA'
+            stim_units = "pA"
         elif "VoltageClamp" in ancestry[-1]:
-            stim_units = 'mV'
+            stim_units = "mV"
         else:
             # it's probably OK to skip this sweep and put a 'continue'
             #   here instead of an exception, but wait until there's
@@ -454,9 +444,7 @@ def summarize_sweeps(jin, jout):
         # -> need to strip last 5 chars off to make match for lookup
         stim_type_name = stim_type_name_map.get(stim_name[:-5], None)
         if stim_type_name is None:
-            raise Exception(
-                "Could not find stimulus raw name (\"%s\") for sweep %d." %
-                (stim_name, sweep_num))
+            raise Exception('Could not find stimulus raw name ("%s") for sweep %d.' % (stim_name, sweep_num))
 
         # voltage-clamp sweeps shouldn't have a record yet -- make one
         if sweep_name not in swp_data:
@@ -466,8 +454,7 @@ def summarize_sweeps(jin, jout):
         # sweep number
         info["sweep_number"] = sweep_num
         # bridge balance
-        bridge_balance = notebook.get_value("Bridge Bal Value", sweep_num,
-                                            None)
+        bridge_balance = notebook.get_value("Bridge Bal Value", sweep_num, None)
         # IT-14677
         # if bridge_balance is None, that's OK. do NOT change it to NaN
 
@@ -475,8 +462,7 @@ def summarize_sweeps(jin, jout):
         # stimulus units
         info["stimulus_units"] = stim_units
         # leak_pa (bias current)
-        bias_current = notebook.get_value("I-Clamp Holding Level", sweep_num,
-                                          None)
+        bias_current = notebook.get_value("I-Clamp Holding Level", sweep_num, None)
         # IT-14677
         # if bias_current is None, that's OK. do NOT change it to NaN
 
@@ -488,12 +474,12 @@ def summarize_sweeps(jin, jout):
             raise Exception("Unable to read scale factor for " + sweep_name)
         # PBS-229 change stim name by appending set_sweep_count
         cnt = notebook.get_value("Set Sweep Count", sweep_num, 0)
-        stim_name_ext = stim_name.split('_')[0] + "[%d]" % int(cnt)
+        stim_name_ext = stim_name.split("_")[0] + "[%d]" % int(cnt)
         info["ephys_stimulus"] = {
             # 'description': stim_name,
-            'description': stim_name_ext,
-            'amplitude': scale_factor,
-            'ephys_stimulus_type': {'name': stim_type_name}
+            "description": stim_name_ext,
+            "amplitude": scale_factor,
+            "ephys_stimulus_type": {"name": stim_type_name},
         }
     #
     borg.close()

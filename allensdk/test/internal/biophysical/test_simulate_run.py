@@ -1,16 +1,16 @@
 import pytest
 from unittest.mock import patch, mock_open, Mock, MagicMock
+
 try:
     import __builtin__ as builtins
 except Exception:
     import builtins
 from allensdk.model.biophysical.utils import Utils
 from allensdk.model.biophys_sim.config import Config
-from allensdk.internal.model.biophysical.run_simulate_lims \
-    import RunSimulateLims
+from allensdk.internal.model.biophysical.run_simulate_lims import RunSimulateLims
 from allensdk.model.biophys_sim.neuron.hoc_utils import HocUtils
 
-MANIFEST_JSON = '''
+MANIFEST_JSON = """
 {
   "biophys": [
     {
@@ -710,18 +710,19 @@ MANIFEST_JSON = '''
     }
   ]
 }
-'''
+"""
+
 
 @pytest.fixture
 def run_simulate():
-    rs = RunSimulateLims('manifest.json', 'out.json')
-    
+    rs = RunSimulateLims("manifest.json", "out.json")
+
     return rs
 
 
 def test_init(run_simulate):
-    assert run_simulate.input_json == 'manifest.json'
-    assert run_simulate.output_json == 'out.json'
+    assert run_simulate.input_json == "manifest.json"
+    assert run_simulate.output_json == "out.json"
     assert run_simulate.app_config is None
     assert run_simulate.manifest is None
 
@@ -731,23 +732,18 @@ def test_init(run_simulate):
 @patch.object(HocUtils, "__init__")
 def test_simulate(hoc_init, mock_h, run_simulate):
     # import allensdk.eclipse_debug
-    
-    mock_utils = Mock(name='mock_utils',
-                      h=mock_h)
 
-    with patch('allensdk.internal.api.queries.biophysical_module_reader.BiophysicalModuleReader',
-               MagicMock(name="bio_mod_reader")):
-        with patch('allensdk.model.biophysical.runner.save_nwb',
-                   MagicMock(name="save_nwb")):
-            with patch('allensdk.model.biophysical.runner.NwbDataSet',
-                       MagicMock(name='nwb_data_set')):
-                with patch('allensdk.model.biophysical.runner.copy',
-                           MagicMock(name='shutil_copy')):
-                    with patch('allensdk.model.biophysical.utils.create_utils',
-                               return_value=mock_utils):
-                        with patch(builtins.__name__ + ".open",
-                                   mock_open(
-                                       read_data=MANIFEST_JSON)):
-                            fit_description = Config().load('manifest.json')
+    mock_utils = Mock(name="mock_utils", h=mock_h)
+
+    with patch(
+        "allensdk.internal.api.queries.biophysical_module_reader.BiophysicalModuleReader",
+        MagicMock(name="bio_mod_reader"),
+    ):
+        with patch("allensdk.model.biophysical.runner.save_nwb", MagicMock(name="save_nwb")):
+            with patch("allensdk.model.biophysical.runner.NwbDataSet", MagicMock(name="nwb_data_set")):
+                with patch("allensdk.model.biophysical.runner.copy", MagicMock(name="shutil_copy")):
+                    with patch("allensdk.model.biophysical.utils.create_utils", return_value=mock_utils):
+                        with patch(builtins.__name__ + ".open", mock_open(read_data=MANIFEST_JSON)):
+                            fit_description = Config().load("manifest.json")
                             Utils.description = fit_description
                             run_simulate.simulate()

@@ -5,13 +5,13 @@ import math
 from allensdk.internal.core.lims_pipeline_module import PipelineModule
 from allensdk.core.nwb_data_set import NwbDataSet
 
-    
+
 def main(jin):
     # load QC criteria and sweep table from input json file
     try:
-        qc_criteria = jin['ephys_qc_criteria']
-        experiment_data = jin['experiment_data']
-        sweep_data = jin['sweep_data']
+        qc_criteria = jin["ephys_qc_criteria"]
+        experiment_data = jin["experiment_data"]
+        sweep_data = jin["sweep_data"]
         nwb_file = jin["nwb_file"]
     except Exception:
         raise IOError("Input json file is missing requisite data")
@@ -53,7 +53,6 @@ def main(jin):
         exp_fail_tags.append("Error analyzing blowout. " + e.message)
         experiment_state["failed_blowout"] = True
 
-
     # "electrode 0"
     experiment_state["failed_electrode_0"] = False
     try:
@@ -67,7 +66,6 @@ def main(jin):
     except Exception as e:
         exp_fail_tags.append("Error analyzing blowout. " + e.message)
         experiment_state["failed_electrode_0"] = True
-
 
     # measure clamp seal
     experiment_state["failed_seal"] = False
@@ -88,18 +86,17 @@ def main(jin):
         exp_fail_tags.append(msg)
         experiment_state["failed_seal"] = True
 
-
     # input and access resistance
     sr_tags = []
 
     try:
-        sir_ratio = experiment_data['input_access_resistance_ratio']
-        #r = experiment_data['input_resistance_mohm']
+        sir_ratio = experiment_data["input_access_resistance_ratio"]
+        # r = experiment_data['input_resistance_mohm']
     except Exception:
         sr_tags.append("Resistance ratio not available")
 
     try:
-        sr = experiment_data['initial_access_resistance_mohm']
+        sr = experiment_data["initial_access_resistance_mohm"]
     except Exception:
         sr_tags.append("Initial access resistance not available")
 
@@ -129,9 +126,7 @@ def main(jin):
     if len(sr_tags) > 0:
         exp_fail_tags.extend(sr_tags)
 
-
     experiment_state["fail_tags"] = exp_fail_tags
-
 
     ####################################################################
     # check features for each sweep
@@ -150,7 +145,7 @@ def main(jin):
             unit = sweep["stimulus_units"]
             # determine if sweep is current or voltage clamp
             # name may end in "[#]", so strip out section after open bracket
-            stim_short = stim.split('[')[0]
+            stim_short = stim.split("[")[0]
             if stim_short in jin["voltage_clamp_stimuli"]:
                 if unit != "Volts" and unit != "mV":
                     msg = "%s (%s) in wrong mode -- expected voltage clamp" % (name, stim)
@@ -163,33 +158,33 @@ def main(jin):
                 fail_tags.append("%s has unrecognized stimulus (%s)" % (name, stim))
 
             if unit == "Volts" or unit == "mV":
-                continue    # no QC on voltage clamp
+                continue  # no QC on voltage clamp
 
             if len(fail_tags) > 0:
                 sweep_state[name] = {}
                 sweep_state[name]["state"] = "Fail"
                 sweep_state[name]["reasons"] = fail_tags
                 continue
-            
+
             # pull data streams from file (this is for detecting truncated
             #   sweeps)
             sweep_data = NwbDataSet(nwb_file).get_sweep(sweep_num)
-            current = sweep_data['stimulus']
-            idx_start, idx_stop = sweep_data['index_range']
+            current = sweep_data["stimulus"]
+            idx_start, idx_stop = sweep_data["index_range"]
 
             if sweep["pre_noise_rms_mv"] > qc_criteria["pre_noise_rms_mv_max"]:
                 fail_tags.append("pre-noise")
 
             # check Vm and noise at end of recording
-            # only do so if acquisition not truncated 
-            # do not check for ramps, because they do not have 
+            # only do so if acquisition not truncated
+            # do not check for ramps, because they do not have
             #   enough time to recover
-            is_ramp = stim.startswith('C1RP')
+            is_ramp = stim.startswith("C1RP")
             if is_ramp:
                 logging.info("sweep %d skipping vrest criteria on ramp", sweep_num)
             else:
                 # measure post-stimulus noise
-                sweep_not_truncated = ( idx_stop == len(current) - 1 )
+                sweep_not_truncated = idx_stop == len(current) - 1
                 if sweep_not_truncated:
                     post_noise_rms_mv = sweep["post_noise_rms_mv"]
                     if post_noise_rms_mv > qc_criteria["post_noise_rms_mv_max"]:
@@ -203,7 +198,6 @@ def main(jin):
             if sweep["vm_delta_mv"] > qc_criteria["vm_delta_mv_max"]:
                 fail_tags.append("Vm delta")
 
-
             # fail sweeps if stimulus duration is zero
             # Uncomment out hte following 3 lines to have sweeps without stimulus
             #   faile QC
@@ -211,7 +205,6 @@ def main(jin):
                 desc = sweep["ephys_stimulus"]["description"]
                 if not desc.startswith("EXTP"):
                     fail_tags.append("No stimulus detected")
-
 
             sweep_state[name] = {}
             if len(fail_tags) > 0:
@@ -233,11 +226,11 @@ def main(jin):
 
     return jout
 
-if __name__ == "__main__": 
-    # read module input. PipelineModule object automatically parses the 
+
+if __name__ == "__main__":
+    # read module input. PipelineModule object automatically parses the
     #   command line to pull out input.json and output.json file names
     module = PipelineModule()
-    jin = module.input_data()   # loads input.json
+    jin = module.input_data()  # loads input.json
     jout = main(jin)
     module.write_output_data(jout)  # writes output.json
-

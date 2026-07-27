@@ -8,22 +8,15 @@ from pathlib import Path
 import argschema
 
 from allensdk.config.manifest import Manifest
-from ._schemas import (
-    SessionUploadInputSchema,
-    SessionUploadOutputSchema,
-    available_hashers
-)
+from ._schemas import SessionUploadInputSchema, SessionUploadOutputSchema, available_hashers
 
 
 def hash_file(path, hasher_cls, blocks_per_chunk=128):
-    """
-
-    """
+    """ """
     hasher = hasher_cls()
-    with open(path, 'rb') as f:
+    with open(path, "rb") as f:
         # TODO: Update to new assignment syntax if drop < python 3.8 support
-        for chunk in iter(
-                lambda: f.read(hasher.block_size*blocks_per_chunk), b""):
+        for chunk in iter(lambda: f.read(hasher.block_size * blocks_per_chunk), b""):
             hasher.update(chunk)
     return hasher.digest()
 
@@ -38,13 +31,12 @@ def walk_fs_tree(root, fn):
 
 
 def copy_file_entry(source, dest, use_rsync, make_parent_dirs, chmod=None):
-
     leftmost = None
     if make_parent_dirs:
         leftmost = Manifest.safe_make_parent_dirs(dest)
 
     if use_rsync:
-        sp.check_call(['rsync', '-a', source, dest])
+        sp.check_call(["rsync", "-a", source, dest])
     else:
         if Path(source).is_dir():
             shutil.copytree(source, dest)
@@ -77,16 +69,11 @@ def compare(source, dest, hasher_cls, raise_if_comparison_fails):
     dest_path = Path(dest)
 
     if source_path.is_dir() and dest_path.is_dir():
-        return compare_directories(
-            source, dest, hasher_cls, raise_if_comparison_fails)
+        return compare_directories(source, dest, hasher_cls, raise_if_comparison_fails)
     elif (not source_path.is_dir()) and (not dest_path.is_dir()):
-        return compare_files(
-            source, dest, hasher_cls, raise_if_comparison_fails)
+        return compare_files(source, dest, hasher_cls, raise_if_comparison_fails)
     else:
-        raise_or_warn(
-            f"unable to compare files with directories: {source}, {dest}",
-            raise_if_comparison_fails
-        )
+        raise_or_warn(f"unable to compare files with directories: {source}, {dest}", raise_if_comparison_fails)
 
 
 def compare_files(source, dest, hasher_cls, raise_if_comparison_fails):
@@ -95,8 +82,8 @@ def compare_files(source, dest, hasher_cls, raise_if_comparison_fails):
 
     if source_hash != dest_hash:
         raise_or_warn(
-            f"comparison of {source} and {dest} "
-            f"using {hasher_cls.__name__} failed", raise_if_comparison_fails)
+            f"comparison of {source} and {dest} using {hasher_cls.__name__} failed", raise_if_comparison_fails
+        )
 
     return source_hash, dest_hash
 
@@ -107,9 +94,8 @@ def compare_directories(source, dest, hasher_cls, raise_if_comparison_fails):
 
     if len(source_contents) != len(dest_contents):
         raise_or_warn(
-            f"{source} contains {len(source_contents)} items "
-            f"while {dest} contains {len(dest_contents)} items",
-            raise_if_comparison_fails
+            f"{source} contains {len(source_contents)} items while {dest} contains {len(dest_contents)} items",
+            raise_if_comparison_fails,
         )
 
     for sitem, ditem in zip(source_contents, dest_contents):
@@ -117,21 +103,12 @@ def compare_directories(source, dest, hasher_cls, raise_if_comparison_fails):
         dpath = str(Path(dest, ditem))
 
         if sitem != ditem:
-            raise_or_warn(
-                f"mismatch between {spath} and {dpath}",
-                raise_if_comparison_fails
-            )
+            raise_or_warn(f"mismatch between {spath} and {dpath}", raise_if_comparison_fails)
             compare(spath, dpath, hasher_cls, raise_if_comparison_fails)
 
 
 def main(
-    files,
-    use_rsync=True,
-    hasher_key=None,
-    raise_if_comparison_fails=True,
-    make_parent_dirs=True,
-    chmod=775,
-    **kwargs
+    files, use_rsync=True, hasher_key=None, raise_if_comparison_fails=True, make_parent_dirs=True, chmod=775, **kwargs
 ):
     hasher_cls = available_hashers[hasher_key]
     output = []
@@ -139,28 +116,21 @@ def main(
     for file_entry in files:
         record = cp.deepcopy(file_entry)
 
-        copy_file_entry(
-            file_entry['source'], file_entry['destination'],
-            use_rsync, make_parent_dirs, chmod=chmod
-        )
+        copy_file_entry(file_entry["source"], file_entry["destination"], use_rsync, make_parent_dirs, chmod=chmod)
 
         if hasher_cls is not None:
-            hashes = compare(
-                file_entry['source'], file_entry['destination'],
-                hasher_cls, raise_if_comparison_fails
-            )
+            hashes = compare(file_entry["source"], file_entry["destination"], hasher_cls, raise_if_comparison_fails)
             if hashes is not None:
-                record['source_hash'] = [int(ii) for ii in hashes[0]]
-                record['destination_hash'] = [int(ii) for ii in hashes[1]]
+                record["source_hash"] = [int(ii) for ii in hashes[0]]
+                record["destination_hash"] = [int(ii) for ii in hashes[1]]
 
         output.append(record)
 
-    return {'files': output}
+    return {"files": output}
 
 
-if __name__ == '__main__':
-    logging.basicConfig(
-        format='%(asctime)s - %(process)s - %(levelname)s - %(message)s')
+if __name__ == "__main__":
+    logging.basicConfig(format="%(asctime)s - %(process)s - %(levelname)s - %(message)s")
 
     parser = argschema.ArgSchemaParser(
         schema_type=SessionUploadInputSchema,

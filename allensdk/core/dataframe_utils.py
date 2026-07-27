@@ -72,11 +72,7 @@ def patch_df_from_other(
             target_df[column] = None
 
     if index_column in columns_to_patch:
-        msg += (
-            f"{index_column} is in the list of "
-            f"columns to patch {columns_to_patch}; "
-            "unsure how to handle that case\n"
-        )
+        msg += f"{index_column} is in the list of columns to patch {columns_to_patch}; unsure how to handle that case\n"
 
     if len(msg) > 0:
         msg = f"failures in patch_df_from_other:\n{msg}"
@@ -95,10 +91,7 @@ def patch_df_from_other(
     return target_df
 
 
-def enforce_df_column_order(
-        input_df: pd.DataFrame,
-        column_order: List[str]
-) -> pd.DataFrame:
+def enforce_df_column_order(input_df: pd.DataFrame, column_order: List[str]) -> pd.DataFrame:
     """Return the data frame but with columns ordered.
 
     Parameters
@@ -122,16 +115,12 @@ def enforce_df_column_order(
             pruned_order.append(col)
     # Get the full list of columns in the data frame with our ordered columns
     # first.
-    pruned_order.extend(
-        list(set(input_df.columns).difference(set(pruned_order)))
-    )
+    pruned_order.extend(list(set(input_df.columns).difference(set(pruned_order))))
     return input_df[pruned_order]
 
 
 def enforce_df_int_typing(
-        input_df: pd.DataFrame,
-        int_columns: List[str],
-        use_pandas_type: object = False
+    input_df: pd.DataFrame, int_columns: List[str], use_pandas_type: object = False
 ) -> pd.DataFrame:
     """Enforce integer typing for columns that may have lost int typing when
     combined into the final DataFrame.
@@ -164,9 +153,7 @@ def enforce_df_int_typing(
     return input_df
 
 
-def return_one_dataframe_row_only(
-    input_table: pd.DataFrame, index_value: int, table_name: str
-) -> pd.Series:
+def return_one_dataframe_row_only(input_table: pd.DataFrame, index_value: int, table_name: str) -> pd.Series:
     """Lookup and return one and only one row from the DataFrame returning
     an informative error if no or multiple rows are returned for a given
     index.

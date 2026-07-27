@@ -59,8 +59,7 @@ from allensdk.brain_observatory.nwb import (
 
 # NOTE: This is a really ugly hack to get around the fact that warehouse does
 # not have Ophys session ids associated with experiment ids.
-from .ophys_experiment_session_id_mapping import \
-    ophys_experiment_session_id_map
+from .ophys_experiment_session_id_mapping import ophys_experiment_session_id_map
 
 from ..api.cloud_cache.cloud_cache import S3CloudCache
 
@@ -119,15 +118,11 @@ class BrainObservatoryCache(Cache):
     EYE_GAZE_DATA_KEY = "EYE_GAZE_DATA"
     MANIFEST_VERSION = "1.3"
 
-    def __init__(self, cache=True, manifest_file=None, base_uri=None,
-                 api=None):
-
+    def __init__(self, cache=True, manifest_file=None, base_uri=None, api=None):
         if manifest_file is None:
             manifest_file = get_default_manifest_file("brain_observatory")
 
-        super(BrainObservatoryCache, self).__init__(
-            manifest=manifest_file, cache=cache, version=self.MANIFEST_VERSION
-        )
+        super(BrainObservatoryCache, self).__init__(manifest=manifest_file, cache=cache, version=self.MANIFEST_VERSION)
 
         if api is None:
             self.api = BrainObservatoryApi(base_uri=base_uri)
@@ -137,9 +132,7 @@ class BrainObservatoryCache(Cache):
     def get_all_targeted_structures(self):
         """Return a list of all targeted structures in the data set."""
         containers = self.get_experiment_containers(simple=False)
-        targeted_structures = set(
-            [c["targeted_structure"]["acronym"] for c in containers]
-        )
+        targeted_structures = set([c["targeted_structure"]["acronym"] for c in containers])
         return sorted(list(targeted_structures))
 
     def get_all_cre_lines(self):
@@ -233,12 +226,9 @@ class BrainObservatoryCache(Cache):
         _assert_not_string(reporter_lines, "reporter_lines")
         _assert_not_string(transgenic_lines, "transgenic_lines")
 
-        file_name = self.get_cache_path(file_name,
-                                        self.EXPERIMENT_CONTAINERS_KEY)
+        file_name = self.get_cache_path(file_name, self.EXPERIMENT_CONTAINERS_KEY)
 
-        containers = self.api.get_experiment_containers(
-            path=file_name, strategy="lazy", **Cache.cache_json()
-        )
+        containers = self.api.get_experiment_containers(path=file_name, strategy="lazy", **Cache.cache_json())
 
         containers = self.api.filter_experiment_containers(
             containers,
@@ -356,22 +346,16 @@ class BrainObservatoryCache(Cache):
 
         file_name = self.get_cache_path(file_name, self.EXPERIMENTS_KEY)
 
-        exps = self.api.get_ophys_experiments(
-            path=file_name, strategy="lazy", **Cache.cache_json()
-        )
+        exps = self.api.get_ophys_experiments(path=file_name, strategy="lazy", **Cache.cache_json())
 
         # NOTE: Ugly hack to update the 'fail_eye_tracking' field
         # which is using True/False values for the previous eye mapping
         # implementation. This will also need to be fixed in warehouse.
         # ----- Start of ugly hack -----
-        response = self.api.template_query(
-            "brain_observatory_queries", "all_eye_mapping_files"
-        )
+        response = self.api.template_query("brain_observatory_queries", "all_eye_mapping_files")
 
         session_ids_with_eye_tracking: set = {
-            entry["attachable_id"]
-            for entry in response
-            if entry["attachable_type"] == "OphysSession"
+            entry["attachable_id"] for entry in response if entry["attachable_type"] == "OphysSession"
         }
 
         for indx, exp in enumerate(exps):
@@ -387,13 +371,9 @@ class BrainObservatoryCache(Cache):
 
         if cell_specimen_ids is not None:
             cells = self.get_cell_specimens(ids=cell_specimen_ids)
-            cell_container_ids = set(
-                [cell["experiment_container_id"] for cell in cells]
-            )
+            cell_container_ids = set([cell["experiment_container_id"] for cell in cells])
             if experiment_container_ids is not None:
-                experiment_container_ids = list(
-                    set(experiment_container_ids) - cell_container_ids
-                )
+                experiment_container_ids = list(set(experiment_container_ids) - cell_container_ids)
             else:
                 experiment_container_ids = list(cell_container_ids)
 
@@ -421,9 +401,7 @@ class BrainObservatoryCache(Cache):
 
         file_name = self.get_cache_path(file_name, self.STIMULUS_MAPPINGS_KEY)
 
-        mappings = self.api.get_stimulus_mappings(
-            path=file_name, strategy="lazy", **Cache.cache_json()
-        )
+        mappings = self.api.get_stimulus_mappings(path=file_name, strategy="lazy", **Cache.cache_json())
 
         return mappings
 
@@ -504,11 +482,7 @@ class BrainObservatoryCache(Cache):
         # drop the thumbnail columns
         if simple:
             mappings = self._get_stimulus_mappings()
-            thumbnails = [
-                m["item"]
-                for m in mappings
-                if m["item_type"] == "T" and m["level"] == "R"
-            ]
+            thumbnails = [m["item"] for m in mappings if m["item_type"] == "T" and m["level"] == "R"]
             for cs in cell_specimens:
                 for t in thumbnails:
                     del cs[t]
@@ -516,9 +490,7 @@ class BrainObservatoryCache(Cache):
         return cell_specimens
 
     def get_nwb_filepath(self, ophys_experiment_id=None):
-        cache_nwb_filepath = self.get_cache_path(
-            None, self.EXPERIMENT_DATA_KEY, ophys_experiment_id
-        )
+        cache_nwb_filepath = self.get_cache_path(None, self.EXPERIMENT_DATA_KEY, ophys_experiment_id)
         if os.path.exists(cache_nwb_filepath):
             return cache_nwb_filepath
         else:
@@ -543,19 +515,13 @@ class BrainObservatoryCache(Cache):
         -------
         BrainObservatoryNwbDataSet
         """
-        file_name = self.get_cache_path(
-            file_name, self.EXPERIMENT_DATA_KEY, ophys_experiment_id
-        )
+        file_name = self.get_cache_path(file_name, self.EXPERIMENT_DATA_KEY, ophys_experiment_id)
 
-        self.api.save_ophys_experiment_data(
-            ophys_experiment_id, file_name, strategy="lazy"
-        )
+        self.api.save_ophys_experiment_data(ophys_experiment_id, file_name, strategy="lazy")
 
         return BrainObservatoryNwbDataSet(file_name)
 
-    def get_ophys_experiment_analysis(
-        self, ophys_experiment_id, stimulus_type, file_name=None
-    ):
+    def get_ophys_experiment_analysis(self, ophys_experiment_id, stimulus_type, file_name=None):
         """Download the h5 analysis file for a stimulus set, for a particular
         ophys_experiment
         (if it hasn't already been downloaded) and return a data accessor
@@ -578,42 +544,27 @@ class BrainObservatoryCache(Cache):
         -------
         BrainObservatoryNwbDataSet
         """
-        data_set = self.get_ophys_experiment_data(ophys_experiment_id,
-                                                  file_name=None)
+        data_set = self.get_ophys_experiment_data(ophys_experiment_id, file_name=None)
         session_type = data_set.get_session_type()
 
         if stimulus_type not in stim_info.SESSION_STIMULUS_MAP[session_type]:
             raise RuntimeError(
                 "Stimulus %s not available session type: %s"
-                % (stimulus_type,
-                   stim_info.SESSION_STIMULUS_MAP[stimulus_type])
+                % (stimulus_type, stim_info.SESSION_STIMULUS_MAP[stimulus_type])
             )
 
         # Use manifest to figure out where to cache the file:
-        file_name = self.get_cache_path(
-            file_name, self.ANALYSIS_DATA_KEY, ophys_experiment_id,
-            session_type
-        )
+        file_name = self.get_cache_path(file_name, self.ANALYSIS_DATA_KEY, ophys_experiment_id, session_type)
 
         # Cache the analsis file from an RMA query:
-        self.api.save_ophys_experiment_analysis_data(
-            ophys_experiment_id, file_name, strategy="lazy"
-        )
+        self.api.save_ophys_experiment_analysis_data(ophys_experiment_id, file_name, strategy="lazy")
 
         # Get the analysis class from ANALYSIS_CLASS_DICT, and build
         # from the static method:
-        if (
-            stimulus_type
-            in stim_info.LOCALLY_SPARSE_NOISE_STIMULUS_TYPES
-            + stim_info.NATURAL_MOVIE_STIMULUS_TYPES
-        ):
-            return ANALYSIS_CLASS_DICT[stimulus_type].from_analysis_file(
-                data_set, file_name, stimulus_type
-            )
+        if stimulus_type in stim_info.LOCALLY_SPARSE_NOISE_STIMULUS_TYPES + stim_info.NATURAL_MOVIE_STIMULUS_TYPES:
+            return ANALYSIS_CLASS_DICT[stimulus_type].from_analysis_file(data_set, file_name, stimulus_type)
         else:
-            return ANALYSIS_CLASS_DICT[stimulus_type].from_analysis_file(
-                data_set, file_name
-            )
+            return ANALYSIS_CLASS_DICT[stimulus_type].from_analysis_file(data_set, file_name)
 
     def get_ophys_experiment_events(self, ophys_experiment_id, file_name=None):
         """Download the npz events file for an ophys_experiment if it hasn't
@@ -632,13 +583,9 @@ class BrainObservatoryCache(Cache):
         events: numpy.ndarray
             [N_cells,N_times] array of events.
         """
-        file_name = self.get_cache_path(
-            file_name, self.EVENTS_DATA_KEY, ophys_experiment_id
-        )
+        file_name = self.get_cache_path(file_name, self.EVENTS_DATA_KEY, ophys_experiment_id)
 
-        self.api.save_ophys_experiment_event_data(
-            ophys_experiment_id, file_name, strategy="lazy"
-        )
+        self.api.save_ophys_experiment_event_data(ophys_experiment_id, file_name, strategy="lazy")
 
         return np.load(file_name, allow_pickle=False)["ev"]
 
@@ -723,18 +670,12 @@ class BrainObservatoryCache(Cache):
         # experiment ids.
         # ----- Start of ugly hack -----
         try:
-            ophys_session_id = \
-                ophys_experiment_session_id_map[ophys_experiment_id]
+            ophys_session_id = ophys_experiment_session_id_map[ophys_experiment_id]
         except KeyError:
-            raise RuntimeError(
-                f"Experiment id '{ophys_experiment_id}' has no "
-                f"associated session!"
-            )
+            raise RuntimeError(f"Experiment id '{ophys_experiment_id}' has no associated session!")
         # ----- End of ugly hack -----
 
-        file_name = self.get_cache_path(
-            file_name, self.EYE_GAZE_DATA_KEY, ophys_session_id
-        )
+        file_name = self.get_cache_path(file_name, self.EYE_GAZE_DATA_KEY, ophys_session_id)
 
         if not file_name:
             raise RuntimeError(
@@ -745,9 +686,7 @@ class BrainObservatoryCache(Cache):
 
         # NOTE: `save_ophys_experiment_eye_gaze_data` will also need to be
         # updated to remove ophy_session_id param when ugly hack is removed.
-        self.api.save_ophys_experiment_eye_gaze_data(
-            ophys_experiment_id, ophys_session_id, file_name, strategy="lazy"
-        )
+        self.api.save_ophys_experiment_eye_gaze_data(ophys_experiment_id, ophys_session_id, file_name, strategy="lazy")
 
         gaze_mapping_data = read_eye_gaze_mappings(Path(file_name))
 
@@ -822,8 +761,4 @@ class BrainObservatoryCache(Cache):
 
 def _assert_not_string(arg, name):
     if isinstance(arg, str):
-        raise TypeError(
-            "Argument '%s' with value '%s' is a string type, but "
-            "should be a list."
-            % (name, arg)
-        )
+        raise TypeError("Argument '%s' with value '%s' is a string type, but should be a list." % (name, arg))

@@ -4,10 +4,8 @@ from uuid import UUID
 
 
 def build_in_list_selector_query(
-        col: str,
-        valid_list: Optional[List[SupportsStr]] = None,
-        operator: str = "WHERE",
-        valid: bool = True) -> str:
+    col: str, valid_list: Optional[List[SupportsStr]] = None, operator: str = "WHERE", valid: bool = True
+) -> str:
     """
     Filter for rows where the value of a column is contained in a list
     (or, if valid=False, where the value is not contained in that list).
@@ -34,34 +32,30 @@ def build_in_list_selector_query(
         The clause performing the request filter
     """
     if operator not in ("AND", "OR", "WHERE"):
-        msg = ("Operator must be 'AND', 'OR', or 'WHERE'; "
-               f"you gave '{operator}'")
+        msg = f"Operator must be 'AND', 'OR', or 'WHERE'; you gave '{operator}'"
         raise ValueError(msg)
 
     if not valid_list:
         return ""
 
     if type(valid_list[0]) is str:
-        valid_list = _convert_list_of_string_to_sql_safe_string(
-            strings=valid_list)
+        valid_list = _convert_list_of_string_to_sql_safe_string(strings=valid_list)
 
     if valid:
         relation = "IN"
     else:
         relation = "NOT IN"
 
-    session_query = (
-        f"""{operator} {col} {relation} ({",".join(
-            sorted(set(map(str, valid_list))))})""")
+    session_query = f"""{operator} {col} {relation} ({",".join(sorted(set(map(str, valid_list))))})"""
     return session_query
 
 
 def build_where_clause(clauses: List[str]):
     if not clauses:
-        return ''
-    where_clause = ' AND '.join(clauses)
-    if not where_clause[:5].lower() == 'where':
-        where_clause = f'WHERE {where_clause}'
+        return ""
+    where_clause = " AND ".join(clauses)
+    if not where_clause[:5].lower() == "where":
+        where_clause = f"WHERE {where_clause}"
     return where_clause
 
 
@@ -98,9 +92,7 @@ def _sanitize_uuid_list(uuid_list: List[str]) -> List[str]:
     return sanitized_list
 
 
-def _convert_list_of_string_to_sql_safe_string(
-        strings: List[str]
-) -> List[str]:
+def _convert_list_of_string_to_sql_safe_string(strings: List[str]) -> List[str]:
     """
     Given list of string ["A", "B"]
     converts to ["'A'", "'B'"]

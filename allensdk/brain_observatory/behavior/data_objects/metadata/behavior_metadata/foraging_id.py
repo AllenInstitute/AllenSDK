@@ -1,13 +1,13 @@
 import uuid
 
 from allensdk.core import DataObject
-from allensdk.core import \
-    JsonReadableInterface, LimsReadableInterface
+from allensdk.core import JsonReadableInterface, LimsReadableInterface
 from allensdk.internal.api import PostgresQueryMixin
 
 
 class ForagingId(DataObject, LimsReadableInterface, JsonReadableInterface):
     """Foraging id"""
+
     def __init__(self, foraging_id: uuid.UUID):
         super().__init__(name="foraging_id", value=foraging_id)
 
@@ -16,8 +16,7 @@ class ForagingId(DataObject, LimsReadableInterface, JsonReadableInterface):
         pass
 
     @classmethod
-    def from_lims(cls, behavior_session_id: int,
-                  lims_db: PostgresQueryMixin) -> "ForagingId":
+    def from_lims(cls, behavior_session_id: int, lims_db: PostgresQueryMixin) -> "ForagingId":
         query = f"""
             SELECT
                 foraging_id

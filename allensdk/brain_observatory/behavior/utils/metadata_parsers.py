@@ -1,7 +1,6 @@
 from typing import Optional
 
-from allensdk.brain_observatory.ophys.project_constants import (
-    NUM_DEPTHS_DICT, NUM_STRUCTURES_DICT)
+from allensdk.brain_observatory.ophys.project_constants import NUM_DEPTHS_DICT, NUM_STRUCTURES_DICT
 
 
 ############################
@@ -53,9 +52,7 @@ def parse_stimulus_set(session_type: str) -> str:
     elif stimulus_type == "gratings":
         stim_set = "gratings"
     else:
-        raise ValueError(
-            f"Session_type {session_type} not formatted as " "expected."
-        )
+        raise ValueError(f"Session_type {session_type} not formatted as expected.")
     return stim_set
 
 

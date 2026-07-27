@@ -2,10 +2,7 @@ import numpy as np
 import warnings
 
 
-def validate_epoch_durations(table,
-                             start_key="Start",
-                             end_key="End",
-                             fail_on_negative_durations=False):
+def validate_epoch_durations(table, start_key="Start", end_key="End", fail_on_negative_durations=False):
     durations = table[end_key] - table[start_key]
     min_duration_index = durations.idxmin()
     min_duration = durations[min_duration_index]
@@ -39,17 +36,14 @@ def validate_max_spontaneous_epoch_duration(
     end_key="End",
 ):
     if get_spontanous_epochs is None:
+
         def get_spontanous_epochs(table):
             table[np.isnan(table[index_key])]
 
     spontaneous_epochs = get_spontanous_epochs(table)
 
     if spontaneous_epochs is not None:
-
-        durations = (
-            spontaneous_epochs[end_key].values
-            - spontaneous_epochs[start_key].values
-        )
+        durations = spontaneous_epochs[end_key].values - spontaneous_epochs[start_key].values
 
         try:
             if np.amax(durations) > max_duration:
@@ -57,6 +51,6 @@ def validate_max_spontaneous_epoch_duration(
                     f"""there is a spontaneous activity duration longer than
                     {max_duration}""",
                     UserWarning,
-                    )
+                )
         except ValueError:
             warnings.warn("No spontaneous intervals detected.", UserWarning)

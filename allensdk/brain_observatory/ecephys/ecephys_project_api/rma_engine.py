@@ -13,35 +13,28 @@ class RmaRequestError(Exception):
 
 
 class RmaEngine(HttpEngine):
-
     @property
     def format_query_string(self):
         return f"query.{self.rma_format}"
 
     def __init__(
-        self, 
-        scheme, 
-        host, 
-        rma_prefix: str = "api/v2/data", 
-        rma_format: str = "json", 
-        page_size: int = 5000, 
-        **kwargs
+        self, scheme, host, rma_prefix: str = "api/v2/data", rma_format: str = "json", page_size: int = 5000, **kwargs
     ):
-        """ Simple tool for making rma and streaming http requests.
+        """Simple tool for making rma and streaming http requests.
 
         Parameters
         ----------
         scheme :
             e.g "http" or "https"
-        host : 
+        host :
             will be used as the base for request urls
         rma_prefix :
             rma request routes will be prefixed with this string
-        rma_format : 
+        rma_format :
             Format of reuturned response. e.g. "json", "xml", "csv"
         page_size :
             how many rma records to request in one query.
-        **kwargs : 
+        **kwargs :
             will be passed to parent
         """
 
@@ -56,11 +49,11 @@ class RmaEngine(HttpEngine):
         return f"{url},rma::options[start_row$eq{start}][num_rows$eq{count}][order$eq'id']"
 
     def get_rma(self, query: str):
-        """ Makes a paging rma query
+        """Makes a paging rma query
 
         Parameters
         ----------
-        query : 
+        query :
             The RMA query parameters
 
         """
@@ -84,7 +77,6 @@ class RmaEngine(HttpEngine):
             logging.debug(f"downloaded {start_row} of {total_rows} records ({time.time() - start_time:.3f} seconds)")
             yield response_json["msg"]
 
-
     def get_rma_list(self, query):
         response = []
         for chunk in self.get_rma(query):
@@ -101,18 +93,17 @@ class RmaEngine(HttpEngine):
 
 
 class AsyncRmaEngine(RmaEngine, AsyncHttpEngine):
-    
     def __init__(self, scheme: str, host: str, **kwargs):
-        """ Simple tool for making rma and asynchronous streaming http 
+        """Simple tool for making rma and asynchronous streaming http
         requests.
 
         Parameters
         ----------
         scheme :
             e.g "http" or "https"
-        host : 
+        host :
             will be used as the base for request urls
-        **kwargs : 
+        **kwargs :
             will be passed to parent
         """
 
@@ -120,8 +111,7 @@ class AsyncRmaEngine(RmaEngine, AsyncHttpEngine):
 
 
 def infer_column_types(dataframe):
-    """ RMA queries often come back with string-typed columns. This utility tries to infer numeric types.
-    """
+    """RMA queries often come back with string-typed columns. This utility tries to infer numeric types."""
 
     dataframe = dataframe.copy()
 
@@ -130,6 +120,6 @@ def infer_column_types(dataframe):
             dataframe[colname] = dataframe[colname].apply(ast.literal_eval)
         except (ValueError, SyntaxError):
             continue
-    
+
     dataframe = dataframe.infer_objects()
     return dataframe

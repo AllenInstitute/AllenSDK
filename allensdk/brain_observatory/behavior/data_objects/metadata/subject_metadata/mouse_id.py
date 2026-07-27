@@ -29,9 +29,7 @@ class MouseId(
         return cls(mouse_id=mouse_id)
 
     @classmethod
-    def from_lims(
-        cls, behavior_session_id: int, lims_db: PostgresQueryMixin
-    ) -> "MouseId":
+    def from_lims(cls, behavior_session_id: int, lims_db: PostgresQueryMixin) -> "MouseId":
         # TODO: Should this even be included?
         # Found sometimes there were entries with NONE which is
         # why they are filtered out; also many entries in the table

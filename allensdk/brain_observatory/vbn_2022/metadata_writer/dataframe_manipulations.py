@@ -26,9 +26,7 @@ from allensdk.internal.api.queries.behavior_lims_queries import (
 )
 
 
-def _add_session_number(
-    sessions_df: pd.DataFrame, index_col: str
-) -> pd.DataFrame:
+def _add_session_number(sessions_df: pd.DataFrame, index_col: str) -> pd.DataFrame:
     """
     For each mouse: order sessions by date_of_acquisition. Add a session_number
     column corresponding to where that session falls in the mouse's history.
@@ -77,9 +75,7 @@ def _add_session_number(
             new_data.append(element)
     new_df = pd.DataFrame(data=new_data)
 
-    sessions_df = sessions_df.join(
-        new_df.set_index(index_col), on=index_col, how="left"
-    )
+    sessions_df = sessions_df.join(new_df.set_index(index_col), on=index_col, how="left")
     return sessions_df
 
 
@@ -207,13 +203,10 @@ def _add_prior_omissions(
     # add prior_exposures_to_omissions to the full history data frame
     contains_omissions = pd.Series(False, index=full_history_df.index)
     contains_omissions.loc[
-        (full_history_df.session_type.notnull())
-        & (full_history_df.session_type.str.lower().str.contains("ephys"))
+        (full_history_df.session_type.notnull()) & (full_history_df.session_type.str.lower().str.contains("ephys"))
     ] = True
 
-    full_history_df[
-        "prior_exposures_to_omissions"
-    ] = __get_prior_exposure_count(
+    full_history_df["prior_exposures_to_omissions"] = __get_prior_exposure_count(
         df=full_history_df, to=contains_omissions, agg_method="cumsum"
     )
 
@@ -293,10 +286,7 @@ def _patch_date_and_stage_from_pickle_file(
     for col in columns_to_patch:
         msg = ""
         if col not in ("date_of_acquisition", "session_type"):
-            msg += (
-                "can only patch 'date_of_acquisition' "
-                "and 'session_type'; you asked for '{col}'\n"
-            )
+            msg += "can only patch 'date_of_acquisition' and 'session_type'; you asked for '{col}'\n"
         if len(msg) > 0:
             raise ValueError(msg)
 
@@ -305,7 +295,7 @@ def _patch_date_and_stage_from_pickle_file(
     invalid_rows = np.zeros(len(behavior_df), dtype=bool)
     for col_name in flag_columns:
         if col_name not in behavior_df.columns:
-            raise ValueError("dataframe does not contain column " "{col_name}")
+            raise ValueError("dataframe does not contain column {col_name}")
         invalid_rows[behavior_df[col_name].isna()] = True
 
     invalid_beh = behavior_df.iloc[invalid_rows].behavior_session_id.values
@@ -320,13 +310,9 @@ def _patch_date_and_stage_from_pickle_file(
         t0 = time.time()
         n_to_log = max(1, n_to_patch // 10)
 
-        for beh_ct, (beh_id, pkl_path) in enumerate(
-            zip(pickle_path_df.behavior_session_id, pickle_path_df.pkl_path)
-        ):
+        for beh_ct, (beh_id, pkl_path) in enumerate(zip(pickle_path_df.behavior_session_id, pickle_path_df.pkl_path)):
             stim_file = BehaviorStimulusFile(filepath=pkl_path)
-            new_date = DateOfAcquisition.from_stimulus_file(
-                stimulus_file=stim_file
-            ).value
+            new_date = DateOfAcquisition.from_stimulus_file(stimulus_file=stim_file).value
             new_session_type = stim_file.session_type
 
             new_vals = {
@@ -338,9 +324,7 @@ def _patch_date_and_stage_from_pickle_file(
             if len(new_row) == 1:
                 new_row = new_row[0]
 
-            behavior_df.loc[
-                behavior_df.behavior_session_id == beh_id, columns_to_patch
-            ] = new_row
+            behavior_df.loc[behavior_df.behavior_session_id == beh_id, columns_to_patch] = new_row
 
             if (beh_ct + 1) % n_to_log == 0 and logger is not None:
                 duration = time.time() - t0
@@ -348,7 +332,7 @@ def _patch_date_and_stage_from_pickle_file(
                 pred = n_to_patch * per
                 remaining = pred - duration
                 logger.info(
-                    f"Patched {beh_ct+1} of {n_to_patch} "
+                    f"Patched {beh_ct + 1} of {n_to_patch} "
                     f"in {duration:.2e} seconds; "
                     f"predict {remaining:.2e} seconds more"
                 )
@@ -378,17 +362,13 @@ def _add_age_in_days(df: pd.DataFrame, index_column: str) -> pd.DataFrame:
     df: pd.DataFrame
         Same as input, but with age_in_days added
     """
-    age_in_days = (
-        df["date_of_acquisition"].dt.date - df["date_of_birth"].dt.date
-    )
+    age_in_days = df["date_of_acquisition"].dt.date - df["date_of_birth"].dt.date
     age_in_days = age_in_days.apply(lambda x: x.days)
     df["age_in_days"] = age_in_days
     return df
 
 
-def _add_images_from_behavior(
-    ecephys_table: pd.DataFrame, behavior_table: pd.DataFrame
-) -> pd.DataFrame:
+def _add_images_from_behavior(ecephys_table: pd.DataFrame, behavior_table: pd.DataFrame) -> pd.DataFrame:
     """
     Use the behavior sessions table to add image_set and
     prior_exposures_to_image_set to ecephys table.
@@ -431,9 +411,7 @@ def _add_images_from_behavior(
     return ecephys_table
 
 
-def strip_substructure_acronym_df(
-    df: pd.DataFrame, col_name: str
-) -> pd.DataFrame:
+def strip_substructure_acronym_df(df: pd.DataFrame, col_name: str) -> pd.DataFrame:
     """
     Take the structure_acronym(s) column of a dataframe
     and remove the substructure (i.e. convert DG-mo to DG).

@@ -12,10 +12,8 @@ DATA_DIR = os.environ.get(
 )
 
 
-def apply_input_json_template(
-    template_path, input_json_path, temp_dir, data_dir=DATA_DIR
-):
-    """ A utility for adjusting the input json so that:
+def apply_input_json_template(template_path, input_json_path, temp_dir, data_dir=DATA_DIR):
+    """A utility for adjusting the input json so that:
         1. input paths find cached data in the data dir
         2. output paths write to a specified temp_dir
     The adjusted input json will be written to temp_dir.
@@ -25,26 +23,15 @@ def apply_input_json_template(
     with open(template_path, "r") as input_json_file:
         input_json_data = json.load(input_json_file)
 
-    input_json_data["sync_h5_path"] = os.path.join(
-        data_dir, input_json_data["sync_h5_path"]
-    )
+    input_json_data["sync_h5_path"] = os.path.join(data_dir, input_json_data["sync_h5_path"])
 
     for probe in input_json_data["probes"]:
-
-        probe["barcode_channel_states_path"] = os.path.join(
-            data_dir, probe["barcode_channel_states_path"]
-        )
-        probe["barcode_timestamps_path"] = os.path.join(
-            data_dir, probe["barcode_timestamps_path"]
-        )
+        probe["barcode_channel_states_path"] = os.path.join(data_dir, probe["barcode_channel_states_path"])
+        probe["barcode_timestamps_path"] = os.path.join(data_dir, probe["barcode_timestamps_path"])
 
         for timestamps_file in probe["mappable_timestamp_files"]:
-            timestamps_file["input_path"] = os.path.join(
-                data_dir, timestamps_file["input_path"]
-            )
-            timestamps_file["output_path"] = os.path.join(
-                temp_dir, timestamps_file["output_path"]
-            )
+            timestamps_file["input_path"] = os.path.join(data_dir, timestamps_file["input_path"])
+            timestamps_file["output_path"] = os.path.join(temp_dir, timestamps_file["output_path"])
 
     with open(input_json_path, "w") as input_json_file:
         json.dump(input_json_data, input_json_file)
@@ -70,20 +57,12 @@ def align_timestamps_706875901_expected_params():
 def align_timestamps_706875901_expected_files():
     return lambda data_dir: {
         "probeA": {
-            "spikes_timestamps": os.path.join(
-                data_dir, "706875901_probeA_aligned_spike_timestamps.npy"
-            ),
-            "lfp_timestamps": os.path.join(
-                data_dir, "706875901_probeA_aligned_lfp_timestamps.npy"
-            ),
+            "spikes_timestamps": os.path.join(data_dir, "706875901_probeA_aligned_spike_timestamps.npy"),
+            "lfp_timestamps": os.path.join(data_dir, "706875901_probeA_aligned_lfp_timestamps.npy"),
         },
         "probeB": {
-            "spikes_timestamps": os.path.join(
-                data_dir, "706875901_probeB_aligned_spike_timestamps.npy"
-            ),
-            "lfp_timestamps": os.path.join(
-                data_dir, "706875901_probeB_aligned_lfp_timestamps.npy"
-            ),
+            "spikes_timestamps": os.path.join(data_dir, "706875901_probeB_aligned_spike_timestamps.npy"),
+            "lfp_timestamps": os.path.join(data_dir, "706875901_probeB_aligned_lfp_timestamps.npy"),
         },
     }
 
@@ -98,9 +77,7 @@ def run_align_timestamps_706875901(tmpdir_factory):
     executable.extend(["--input_json", input_json_path])
     executable.extend(["--output_json", output_json_path])
 
-    input_json_template_path = os.path.join(
-        DATA_DIR, "706875901_align_timestamps_input.json"
-    )
+    input_json_template_path = os.path.join(DATA_DIR, "706875901_align_timestamps_input.json")
     apply_input_json_template(input_json_template_path, input_json_path, base_path)
 
     sp.check_call(executable)
@@ -112,7 +89,6 @@ def run_align_timestamps_706875901(tmpdir_factory):
 def test_align_timestamps_parameters_706875901(
     run_align_timestamps_706875901, align_timestamps_706875901_expected_params
 ):
-
     with open(run_align_timestamps_706875901, "r") as output_json_file:
         output_json_data = json.load(output_json_file)
 
@@ -120,27 +96,17 @@ def test_align_timestamps_parameters_706875901(
         expected = align_timestamps_706875901_expected_params[probe["name"]]
 
         assert expected["total_time_shift"] == probe["total_time_shift"]
-        assert (
-            expected["global_probe_sampling_rate"]
-            == probe["global_probe_sampling_rate"]
-        )
-        assert (
-            expected["global_probe_lfp_sampling_rate"]
-            == probe["global_probe_lfp_sampling_rate"]
-        )
+        assert expected["global_probe_sampling_rate"] == probe["global_probe_sampling_rate"]
+        assert expected["global_probe_lfp_sampling_rate"] == probe["global_probe_lfp_sampling_rate"]
 
 
 @pytest.mark.requires_bamboo
-def test_align_timestamps_files_706875901(
-    run_align_timestamps_706875901, align_timestamps_706875901_expected_files
-):
-
+def test_align_timestamps_files_706875901(run_align_timestamps_706875901, align_timestamps_706875901_expected_files):
     with open(run_align_timestamps_706875901, "r") as output_json_file:
         output_json_data = json.load(output_json_file)
 
     expected_files = align_timestamps_706875901_expected_files(DATA_DIR)
     for probe in output_json_data["probe_outputs"]:
-
         for output_file_key, output_file_path in probe["output_paths"].items():
             expected_file_path = expected_files[probe["name"]][output_file_key]
             expected_data = np.load(expected_file_path, allow_pickle=False)
@@ -152,7 +118,6 @@ def test_align_timestamps_files_706875901(
 
 @pytest.mark.requires_bamboo
 def test_align_timestamps_barcode_agreement_706875901(run_align_timestamps_706875901):
-
     with open(run_align_timestamps_706875901, "r") as output_json_file:
         output_json_data = json.load(output_json_file)
 
@@ -167,13 +132,9 @@ def test_align_timestamps_barcode_agreement_706875901(run_align_timestamps_70687
         barcode_data = np.load(probe["barcode_timestamps_path"], allow_pickle=False)
 
         total_time_shift = probe_parameters[name]["total_time_shift"]
-        global_probe_sampling_rate = probe_parameters[name][
-            "global_probe_sampling_rate"
-        ]
+        global_probe_sampling_rate = probe_parameters[name]["global_probe_sampling_rate"]
 
-        aligned_barcode_data.append(
-            barcode_data / global_probe_sampling_rate - total_time_shift
-        )
+        aligned_barcode_data.append(barcode_data / global_probe_sampling_rate - total_time_shift)
         barcode_timestamp_lengths.append(len(aligned_barcode_data))
 
     min_length = np.amin(barcode_timestamp_lengths)

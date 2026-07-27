@@ -41,8 +41,7 @@ import pytest
 import scipy.stats as stats
 import numpy as np
 
-from allensdk.brain_observatory.receptive_field_analysis import \
-    chisquarerf as chi
+from allensdk.brain_observatory.receptive_field_analysis import chisquarerf as chi
 
 
 @pytest.fixture
@@ -51,8 +50,7 @@ def rf_events():
 
     def make(receptive_field_mask, lsn):
         activity = np.logical_or(lsn == 255, lsn == 0)
-        return np.logical_and(activity, receptive_field_mask).sum(axis=(1, 2))[
-               :, None]
+        return np.logical_and(activity, receptive_field_mask).sum(axis=(1, 2))[:, None]
 
     return make
 
@@ -69,7 +67,7 @@ def locally_sparse_noise():
 def rf_mask():
     def make(nr, nc, slices):
         mask = np.zeros((nr, nc))
-        mask[slices[0][0]:slices[0][-1], slices[1][0]:slices[1][-1]] = 1
+        mask[slices[0][0] : slices[0][-1], slices[1][0] : slices[1][-1]] = 1
         return mask
 
     return make
@@ -103,8 +101,7 @@ def trials_per_pixel():
 
 
 # not testing d < 1 here
-@pytest.mark.parametrize('r,c,d',
-                         [[2, 3, 4], [28, 16, 3], [28, 16, 2], [10, 20, 12]])
+@pytest.mark.parametrize("r,c,d", [[2, 3, 4], [28, 16, 3], [28, 16, 2], [10, 20, 12]])
 def test_interpolate_rf(r, c, d):
     image = np.arange(r * c).reshape([r, c])
 
@@ -114,20 +111,20 @@ def test_interpolate_rf(r, c, d):
     obtained = chi.interpolate_RF(image, d)
     grad = np.gradient(obtained)
 
-    assert (np.allclose(grad[0], np.zeros_like(grad[0]) + delta_row))
-    assert (np.allclose(grad[1], np.zeros_like(grad[1]) + delta_col))
+    assert np.allclose(grad[0], np.zeros_like(grad[0]) + delta_row)
+    assert np.allclose(grad[1], np.zeros_like(grad[1]) + delta_col)
 
 
 # tests integration with interpolate
 # not testing case where r, c are small
-@pytest.mark.parametrize('r,c,d', [[28, 16, 3], [28, 16, 2], [10, 20, 12]])
+@pytest.mark.parametrize("r,c,d", [[28, 16, 3], [28, 16, 2], [10, 20, 12]])
 def test_deinterpolate_rf(r, c, d):
     image = np.arange(r * c).reshape([r, c])
 
     interp = chi.interpolate_RF(image, d)
     obt = chi.deinterpolate_RF(interp, c, r, d)
 
-    assert (np.allclose(image, obt))
+    assert np.allclose(image, obt)
 
 
 def test_smooth_sta():
@@ -139,9 +136,9 @@ def test_smooth_sta():
     thresholded[thresholded < 0.5] = 0
     thresholded[thresholded > 0.5] = 1
 
-    assert (np.allclose(smoothed.T, smoothed))
-    assert (np.allclose(image, thresholded))
-    assert (np.count_nonzero(smoothed) > np.count_nonzero(image))
+    assert np.allclose(smoothed.T, smoothed)
+    assert np.allclose(image, thresholded)
+    assert np.count_nonzero(smoothed) > np.count_nonzero(image)
 
 
 def test_build_trial_matrix():
@@ -156,37 +153,31 @@ def test_build_trial_matrix():
     exp[0, 0, 1, 1] = 1
 
     obt = chi.build_trial_matrix(lsn_template, 2)
-    assert (np.allclose(exp, obt))
+    assert np.allclose(exp, obt)
 
 
-def test_get_expected_events_by_pixel(exclusion_mask, events_per_pixel,
-                                      trials_per_pixel):
-    obt = chi.get_expected_events_by_pixel(exclusion_mask, events_per_pixel,
-                                           trials_per_pixel)
+def test_get_expected_events_by_pixel(exclusion_mask, events_per_pixel, trials_per_pixel):
+    obt = chi.get_expected_events_by_pixel(exclusion_mask, events_per_pixel, trials_per_pixel)
 
-    assert (obt[
-                0, 0, 0, 0] == 0.625)  # 5 events, 8 trials (events counted
+    assert obt[0, 0, 0, 0] == 0.625  # 5 events, 8 trials (events counted
     # even if 0 trials)
-    assert (obt[1, 1, 0, 0] == 0.5)  # 4 events, 8 trials
-    assert (obt[0, 0, 0, 1] == 0.0)  # no trials
-    assert (obt[1, 3, 3, 0] == 0.0)  # out of mask
+    assert obt[1, 1, 0, 0] == 0.5  # 4 events, 8 trials
+    assert obt[0, 0, 0, 1] == 0.0  # no trials
+    assert obt[1, 3, 3, 0] == 0.0  # out of mask
 
 
-def test_chi_square_within_mask(exclusion_mask, events_per_pixel,
-                                trials_per_pixel):
-    obt_p, obt_ch = chi.chi_square_within_mask(exclusion_mask,
-                                               events_per_pixel,
-                                               trials_per_pixel)
+def test_chi_square_within_mask(exclusion_mask, events_per_pixel, trials_per_pixel):
+    obt_p, obt_ch = chi.chi_square_within_mask(exclusion_mask, events_per_pixel, trials_per_pixel)
 
     resps = np.array([4, 0, 0, 0, 0, 0, 0, 0])
     resids = resps - 0.5
-    chi_sum = (resids ** 2 / 0.5).sum()
+    chi_sum = (resids**2 / 0.5).sum()
 
     exp_p = 1.0 - stats.chi2.cdf(chi_sum, 15)
 
     # the zeroth test cell has a response without a trial.
     # this is infinitely surprising, so the pval is 0
-    assert (np.allclose(obt_p, [0, exp_p]))
+    assert np.allclose(obt_p, [0, exp_p])
 
 
 def test_get_disc_masks():
@@ -204,8 +195,8 @@ def test_get_disc_masks():
 
     obt = chi.get_disc_masks(lsn_template, radius=1)
 
-    assert (np.allclose(exp1, obt[1, 1, :, :]))
-    assert (np.allclose(exp0, obt[0, 0, :, :]))
+    assert np.allclose(exp1, obt[1, 1, :, :])
+    assert np.allclose(exp0, obt[0, 0, :, :])
 
 
 def test_get_events_per_pixel():
@@ -234,34 +225,31 @@ def test_get_events_per_pixel():
     exp[1, 1, 1, 1] = 2
 
     obt = chi.get_events_per_pixel(events, trials)
-    assert (np.allclose(obt, exp))
+    assert np.allclose(obt, exp)
 
 
-@pytest.mark.parametrize('base,ex', [[5., 10], [0.1, 12],
-                                     [np.arange(20), np.linspace(0, 1, 20)]])
+@pytest.mark.parametrize("base,ex", [[5.0, 10], [0.1, 12], [np.arange(20), np.linspace(0, 1, 20)]])
 def test_nll_to_pvalue(base, ex):
     obt = chi.NLL_to_pvalue(ex, base)
     exp = np.power(base, -ex)
 
-    assert (np.allclose(exp, obt))
+    assert np.allclose(exp, obt)
 
 
 # test by reversing nll_to_pvalue
-@pytest.mark.parametrize('base,ex', [[10., 2], [10., 4],
-                                     [np.array([10, 10, 10]),
-                                      np.linspace(0, 1, 3)]])
+@pytest.mark.parametrize("base,ex", [[10.0, 2], [10.0, 4], [np.array([10, 10, 10]), np.linspace(0, 1, 3)]])
 def test_pvalue_to_nll(base, ex):
     pv = chi.NLL_to_pvalue(ex, base)
     max_nll = np.amax(ex)
 
     obt = chi.pvalue_to_NLL(pv, max_nll)
 
-    assert (np.allclose(ex, obt))
+    assert np.allclose(ex, obt)
 
 
-@pytest.mark.skipif(os.getenv('NO_TEST_RANDOM') == 'true',
-                    reason="random seed may not produce the same results on "
-                           "all machines")
+@pytest.mark.skipif(
+    os.getenv("NO_TEST_RANDOM") == "true", reason="random seed may not produce the same results on all machines"
+)
 def test_chi_square_binary(locally_sparse_noise, rf_events, rf_mask):
     ntr = 2000
     nr = 20
@@ -273,14 +261,13 @@ def test_chi_square_binary(locally_sparse_noise, rf_events, rf_mask):
     events = rf_events(mask, lsn)
 
     obt = chi.chi_square_binary(events, lsn)
-    assert (obt[0][slices[0][0]:slices[0][-1],
-            slices[1][0]:slices[1][-1]].sum() == 0)
-    assert (obt.sum() > 0)
+    assert obt[0][slices[0][0] : slices[0][-1], slices[1][0] : slices[1][-1]].sum() == 0
+    assert obt.sum() > 0
 
 
-@pytest.mark.skipif(os.getenv('NO_TEST_RANDOM') == 'true',
-                    reason="random seed may not produce the same results on "
-                           "all machines")
+@pytest.mark.skipif(
+    os.getenv("NO_TEST_RANDOM") == "true", reason="random seed may not produce the same results on all machines"
+)
 def test_get_peak_significance(locally_sparse_noise, rf_events, rf_mask):
     ntr = 2000
     nr = 20
@@ -296,8 +283,8 @@ def test_get_peak_significance(locally_sparse_noise, rf_events, rf_mask):
 
     significant_cells, best_p, _, _ = chi.get_peak_significance(chi_nll, lsn)
 
-    assert (np.allclose(best_p, 0))
-    assert (np.allclose(significant_cells, [True]))
+    assert np.allclose(best_p, 0)
+    assert np.allclose(significant_cells, [True])
 
 
 def test_locate_median():
@@ -305,4 +292,4 @@ def test_locate_median():
     where = np.where(mask)
 
     obt = chi.locate_median(*where)
-    assert (np.allclose(obt, [4, 4]))
+    assert np.allclose(obt, [4, 4])

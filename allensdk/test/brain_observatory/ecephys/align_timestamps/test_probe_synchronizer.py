@@ -1,4 +1,3 @@
-
 import pytest
 import numpy as np
 
@@ -9,7 +8,6 @@ from allensdk.brain_observatory.ecephys.align_timestamps.probe_synchronizer impo
 
 
 def get_test_barcodes():
-
     master_barcode_times = np.linspace(0, 30, 10)
     master_barcodes = np.arange(0, 11)
 
@@ -31,15 +29,12 @@ def get_test_barcodes():
 
 @pytest.fixture
 def synchronizer():
-
     local_sampling_rate = 4.0
     probe_start_index = 0
 
     mbt, mb, pbt, pb, min_time, max_time = get_test_barcodes()
 
-    result = ProbeSynchronizer.compute(
-        mbt, mb, pbt, pb, min_time, max_time, probe_start_index, local_sampling_rate
-    )
+    result = ProbeSynchronizer.compute(mbt, mb, pbt, pb, min_time, max_time, probe_start_index, local_sampling_rate)
 
     return result
 
@@ -61,7 +56,6 @@ def synchronizer():
     ],
 )
 def test_call(synchronizer, samples, sync_condition, expected):
-
     if sync_condition in ("master", "probe"):
         obtained = synchronizer(samples, sync_condition=sync_condition)
         # print(obtained)
@@ -73,5 +67,4 @@ def test_call(synchronizer, samples, sync_condition, expected):
 
 
 def test_sampling_rate_scale(synchronizer):
-
     assert synchronizer.sampling_rate_scale == 0.5

@@ -3,7 +3,7 @@ import pandas as pd
 import pytest
 
 from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession
-from allensdk.brain_observatory.ecephys.stimulus_analysis.receptive_field_mapping import ( # noqa
+from allensdk.brain_observatory.ecephys.stimulus_analysis.receptive_field_mapping import (  # noqa
     ReceptiveFieldMapping,
     fit_2d_gaussian,
     threshold_rf,
@@ -47,18 +47,12 @@ class MockRFMSessionApi(MockSessionApi):
                         [21.25],
                     )
                 ),
-                "stimulus_name": ["spontaneous"]
-                + ["gabors"] * 81
-                + ["spontaneous"],
+                "stimulus_name": ["spontaneous"] + ["gabors"] * 81 + ["spontaneous"],
                 "stimulus_block": [0] + [1] * 81 + [0],
                 "duration": [0.5] + [0.25] * 81 + [0.5],
                 "stimulus_index": [0] + [1] * 81 + [0],
-                "x_position": np.concatenate(
-                    ([np.nan], features[0, :], [np.nan])
-                ),
-                "y_position": np.concatenate(
-                    ([np.nan], features[1, :], [np.nan])
-                ),
+                "x_position": np.concatenate(([np.nan], features[0, :], [np.nan])),
+                "y_position": np.concatenate(([np.nan], features[1, :], [np.nan])),
             },
             index=pd.Index(name="id", data=np.arange(83)),
         )
@@ -86,9 +80,7 @@ def test_stimulus(ecephys_api):
     rfm = ReceptiveFieldMapping(ecephys_session=session)
     assert isinstance(rfm.stim_table, pd.DataFrame)
     assert len(rfm.stim_table) == 81
-    assert set(rfm.stim_table.columns).issuperset(
-        {"x_position", "y_position", "start_time", "stop_time"}
-    )
+    assert set(rfm.stim_table.columns).issuperset({"x_position", "y_position", "start_time", "stop_time"})
 
     assert set(rfm.azimuths) == {
         30.0,
@@ -182,24 +174,10 @@ def test_receptive_fields(ecephys_api):
     )
 
     # Some randomly sampled testing to make sure everything works as expected
-    assert (
-        rfm.receptive_fields["spike_counts"][{"unit_id": 0}].values.sum() == 4
-    )
-    assert (
-        rfm.receptive_fields["spike_counts"][{"unit_id": 3}].values.sum() == 0
-    )
-    assert (
-        rfm.receptive_fields["spike_counts"][
-            {"unit_id": 2, "x_position": 8, "y_position": 3}
-        ]
-        == 3
-    )
-    assert np.all(
-        rfm.receptive_fields["spike_counts"][
-            {"x_position": 2, "y_position": 5}
-        ]
-        == [1, 0, 0, 0, 1, 1]
-    )
+    assert rfm.receptive_fields["spike_counts"][{"unit_id": 0}].values.sum() == 4
+    assert rfm.receptive_fields["spike_counts"][{"unit_id": 3}].values.sum() == 0
+    assert rfm.receptive_fields["spike_counts"][{"unit_id": 2, "x_position": 8, "y_position": 3}] == 3
+    assert np.all(rfm.receptive_fields["spike_counts"][{"x_position": 2, "y_position": 5}] == [1, 0, 0, 0, 1, 1])
 
 
 # Some special receptive fields for testing
@@ -222,9 +200,7 @@ rf_field_real = np.array(
 
 # RF as a typical gaussian
 x, y = np.meshgrid(np.linspace(-1, 1, 9), np.linspace(-1, 1, 9))
-rf_field_gaussian = np.exp(
-    -((np.sqrt(x * x + y * y) - 0.0) ** 2 / (2.0 * 1.0**2))
-)
+rf_field_gaussian = np.exp(-((np.sqrt(x * x + y * y) - 0.0) ** 2 / (2.0 * 1.0**2)))
 
 # Only activity at one of the corners of the field
 rf_field_edge = np.zeros((9, 9))
@@ -255,9 +231,7 @@ rf_field_edge[8, 8] = 5.0
         (rf_field_edge, 0.05, None, 8.0, 8.0, 1.0),
     ],
 )
-def test_threshold_rf(
-    rf, threshold, expected_mask, expected_x, expected_y, expected_area
-):
+def test_threshold_rf(rf, threshold, expected_mask, expected_x, expected_y, expected_area):
     mask_rf, x, y, area = threshold_rf(rf, threshold)
     assert np.isclose(x, expected_x, equal_nan=True)
     assert np.isclose(y, expected_y, equal_nan=True)
@@ -299,7 +273,5 @@ def test_fit_2d_gaussian(matrix, expected):
 
 if __name__ == "__main__":
     test_metrics()
-    test_fit_2d_gaussian(
-        rf_field_edge, (np.array([5.0, 8.0, 8.0, 0.0, 0.0]), True)
-    )
+    test_fit_2d_gaussian(rf_field_edge, (np.array([5.0, 8.0, 8.0, 0.0, 0.0]), True))
     pass

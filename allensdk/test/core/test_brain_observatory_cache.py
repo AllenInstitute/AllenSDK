@@ -115,8 +115,10 @@ CACHE_MANIFEST = """
 
 @pytest.fixture()
 def events_test_data():
-    return {"pattern": "/allen/aibs/informatics/module_test_data/observatory/events/%d_events.npz",
-            "experiment_id": 715923832}
+    return {
+        "pattern": "/allen/aibs/informatics/module_test_data/observatory/events/%d_events.npz",
+        "experiment_id": 715923832,
+    }
 
 
 @pytest.fixture(scope="function")
@@ -124,31 +126,25 @@ def brain_observatory_cache():
     boc = None
 
     try:
-        manifest_data = bytes(CACHE_MANIFEST, 'UTF-8')  # Python 3
+        manifest_data = bytes(CACHE_MANIFEST, "UTF-8")  # Python 3
     except Exception:
         manifest_data = bytes(CACHE_MANIFEST)  # Python 2.7
 
-    with patch('os.path.exists',
-               return_value=True):
-        with patch(builtins.__name__ + ".open",
-                   mock_open(read_data=manifest_data)):
+    with patch("os.path.exists", return_value=True):
+        with patch(builtins.__name__ + ".open", mock_open(read_data=manifest_data)):
             # Download a list of all targeted areas
-            boc = BrainObservatoryCache(manifest_file="some_path/manifest.json",
-                                        base_uri='http://api.brain-map.org')
+            boc = BrainObservatoryCache(manifest_file="some_path/manifest.json", base_uri="http://api.brain-map.org")
 
     return boc
 
 
 @patch.object(BrainObservatoryApi, "json_msg_query")
-def test_get_all_targeted_structures(mock_json_msg_query,
-                                     brain_observatory_cache):
-    with patch('os.path.exists') as m:
+def test_get_all_targeted_structures(mock_json_msg_query, brain_observatory_cache):
+    with patch("os.path.exists") as m:
         m.return_value = False
 
-        with patch('allensdk.core.json_utilities.write',
-                   MagicMock(name='write_json')):
-            with patch('allensdk.core.json_utilities.read',
-                       MagicMock(name='read_json')):
+        with patch("allensdk.core.json_utilities.write", MagicMock(name="write_json")):
+            with patch("allensdk.core.json_utilities.read", MagicMock(name="read_json")):
                 brain_observatory_cache.get_all_targeted_structures()
 
         mock_json_msg_query.assert_called_once_with(
@@ -157,41 +153,36 @@ def test_get_all_targeted_structures(mock_json_msg_query,
             "ophys_experiments,isi_experiment,"
             "specimen(donor(conditions,age,transgenic_lines)),"
             "targeted_structure,"
-            "rma::options[num_rows$eq'all'][count$eqfalse]")
+            "rma::options[num_rows$eq'all'][count$eqfalse]"
+        )
 
 
 @patch.object(BrainObservatoryApi, "json_msg_query")
-def test_get_experiment_containers(mock_json_msg_query,
-                                   brain_observatory_cache):
-    with patch('os.path.exists') as m:
+def test_get_experiment_containers(mock_json_msg_query, brain_observatory_cache):
+    with patch("os.path.exists") as m:
         m.return_value = False
 
-        with patch('allensdk.core.json_utilities.write',
-                   MagicMock(name='write_json')):
-            with patch('allensdk.core.json_utilities.read',
-                       MagicMock(name='read_json')):
+        with patch("allensdk.core.json_utilities.write", MagicMock(name="write_json")):
+            with patch("allensdk.core.json_utilities.read", MagicMock(name="read_json")):
                 # Download experiment containers for VISp experiments
-                brain_observatory_cache.get_experiment_containers(
-                    targeted_structures=['VISp'])
+                brain_observatory_cache.get_experiment_containers(targeted_structures=["VISp"])
 
     mock_json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::ExperimentContainer,rma::include,"
         "ophys_experiments,isi_experiment,"
         "specimen(donor(conditions,age,transgenic_lines)),targeted_structure,"
-        "rma::options[num_rows$eq'all'][count$eqfalse]")
+        "rma::options[num_rows$eq'all'][count$eqfalse]"
+    )
 
 
 @patch.object(BrainObservatoryApi, "json_msg_query")
-def test_get_all_cre_lines(mock_json_msg_query,
-                           brain_observatory_cache):
-    with patch('os.path.exists') as m:
+def test_get_all_cre_lines(mock_json_msg_query, brain_observatory_cache):
+    with patch("os.path.exists") as m:
         m.return_value = False
 
-        with patch('allensdk.core.json_utilities.write',
-                   MagicMock(name='write_json')):
-            with patch('allensdk.core.json_utilities.read',
-                       MagicMock(name='read_json')):
+        with patch("allensdk.core.json_utilities.write", MagicMock(name="write_json")):
+            with patch("allensdk.core.json_utilities.read", MagicMock(name="read_json")):
                 # Download a list of all cre lines
                 brain_observatory_cache.get_all_cre_lines()
 
@@ -200,103 +191,103 @@ def test_get_all_cre_lines(mock_json_msg_query,
         "model::ExperimentContainer,rma::include,"
         "ophys_experiments,isi_experiment,"
         "specimen(donor(conditions,age,transgenic_lines)),targeted_structure,"
-        "rma::options[num_rows$eq'all'][count$eqfalse]")
+        "rma::options[num_rows$eq'all'][count$eqfalse]"
+    )
 
 
 @patch.object(BrainObservatoryApi, "json_msg_query")
-def test_get_ophys_experiments(mock_json_msg_query,
-                               brain_observatory_cache):
-    with patch('os.path.exists') as m:
+def test_get_ophys_experiments(mock_json_msg_query, brain_observatory_cache):
+    with patch("os.path.exists") as m:
         m.return_value = False
 
-        with patch('allensdk.core.json_utilities.write',
-                   MagicMock(name='write_json')):
-            with patch('allensdk.core.json_utilities.read',
-                       MagicMock(name='read_json')):
+        with patch("allensdk.core.json_utilities.write", MagicMock(name="write_json")):
+            with patch("allensdk.core.json_utilities.read", MagicMock(name="read_json")):
                 # Download a list of all transgenic driver lines
                 brain_observatory_cache.get_ophys_experiments()
 
-    calls = [call("http://api.brain-map.org/api/v2/data/query.json?q="
-                  "model::OphysExperiment,rma::include,experiment_container,"
-                  "well_known_files(well_known_file_type),targeted_structure,"
-                  "specimen(donor(age,transgenic_lines)),"
-                  "rma::options[num_rows$eq'all'][count$eqfalse]"),
-
-             call("http://api.brain-map.org/api/v2/data/query.json?q="
-                  "model::WellKnownFile,rma::criteria,well_known_file_type[name$eqEyeDlcScreenMapping],"
-                  "rma::options[num_rows$eq'all'][count$eqfalse]")]
+    calls = [
+        call(
+            "http://api.brain-map.org/api/v2/data/query.json?q="
+            "model::OphysExperiment,rma::include,experiment_container,"
+            "well_known_files(well_known_file_type),targeted_structure,"
+            "specimen(donor(age,transgenic_lines)),"
+            "rma::options[num_rows$eq'all'][count$eqfalse]"
+        ),
+        call(
+            "http://api.brain-map.org/api/v2/data/query.json?q="
+            "model::WellKnownFile,rma::criteria,well_known_file_type[name$eqEyeDlcScreenMapping],"
+            "rma::options[num_rows$eq'all'][count$eqfalse]"
+        ),
+    ]
 
     mock_json_msg_query.assert_has_calls(calls)
 
 
 @patch.object(BrainObservatoryApi, "json_msg_query")
-def test_get_all_session_types(mock_json_msg_query,
-                               brain_observatory_cache):
-    with patch('os.path.exists') as m:
+def test_get_all_session_types(mock_json_msg_query, brain_observatory_cache):
+    with patch("os.path.exists") as m:
         m.return_value = False
 
-        with patch('allensdk.core.json_utilities.write',
-                   MagicMock(name='write_json')):
-            with patch('allensdk.core.json_utilities.read',
-                       MagicMock(name='read_json')):
+        with patch("allensdk.core.json_utilities.write", MagicMock(name="write_json")):
+            with patch("allensdk.core.json_utilities.read", MagicMock(name="read_json")):
                 # Download a list of all transgenic driver lines
                 brain_observatory_cache.get_all_session_types()
 
-    calls = [call("http://api.brain-map.org/api/v2/data/query.json?q="
-                  "model::OphysExperiment,rma::include,experiment_container,"
-                  "well_known_files(well_known_file_type),targeted_structure,"
-                  "specimen(donor(age,transgenic_lines)),"
-                  "rma::options[num_rows$eq'all'][count$eqfalse]"),
-
-             call("http://api.brain-map.org/api/v2/data/query.json?q="
-                  "model::WellKnownFile,rma::criteria,well_known_file_type[name$eqEyeDlcScreenMapping],"
-                  "rma::options[num_rows$eq'all'][count$eqfalse]")]
+    calls = [
+        call(
+            "http://api.brain-map.org/api/v2/data/query.json?q="
+            "model::OphysExperiment,rma::include,experiment_container,"
+            "well_known_files(well_known_file_type),targeted_structure,"
+            "specimen(donor(age,transgenic_lines)),"
+            "rma::options[num_rows$eq'all'][count$eqfalse]"
+        ),
+        call(
+            "http://api.brain-map.org/api/v2/data/query.json?q="
+            "model::WellKnownFile,rma::criteria,well_known_file_type[name$eqEyeDlcScreenMapping],"
+            "rma::options[num_rows$eq'all'][count$eqfalse]"
+        ),
+    ]
 
     mock_json_msg_query.assert_has_calls(calls)
 
 
 @patch.object(BrainObservatoryApi, "json_msg_query")
-def test_get_stimulus_mappings(mock_json_msg_query,
-                               brain_observatory_cache):
-    with patch('os.path.exists') as m:
+def test_get_stimulus_mappings(mock_json_msg_query, brain_observatory_cache):
+    with patch("os.path.exists") as m:
         m.return_value = False
 
-        with patch('allensdk.core.json_utilities.write',
-                   MagicMock(name='write_json')):
-            with patch('allensdk.core.json_utilities.read',
-                       MagicMock(name='read_json')):
+        with patch("allensdk.core.json_utilities.write", MagicMock(name="write_json")):
+            with patch("allensdk.core.json_utilities.read", MagicMock(name="read_json")):
                 # Download a list of all transgenic driver lines
                 brain_observatory_cache._get_stimulus_mappings()
 
     mock_json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::ApiCamStimulusMapping,"
-        "rma::options[num_rows$eq'all'][count$eqfalse]")
+        "rma::options[num_rows$eq'all'][count$eqfalse]"
+    )
 
 
 @pytest.mark.skipif(True, reason="need to develop mocks")
 @patch.object(BrainObservatoryApi, "json_msg_query")
-def test_get_cell_specimens(mock_json_msg_query,
-                            brain_observatory_cache):
-    with patch('os.path.exists') as m:
+def test_get_cell_specimens(mock_json_msg_query, brain_observatory_cache):
+    with patch("os.path.exists") as m:
         m.return_value = False
 
-        with patch('allensdk.core.json_utilities.write',
-                   MagicMock(name='write_json')):
+        with patch("allensdk.core.json_utilities.write", MagicMock(name="write_json")):
             # Download a list of all transgenic driver lines
             brain_observatory_cache.get_cell_specimens()
 
-    mock_json_msg_query.assert_called_once_with(
-        "http://api.brain-map.org/api/v2/data/query.json?q=")
+    mock_json_msg_query.assert_called_once_with("http://api.brain-map.org/api/v2/data/query.json?q=")
 
 
 # NOTE: This test should be updated when ugly hack for associating
 # ophys experiment id with ophys session id is resolved.
 @patch.object(BrainObservatoryApi, "json_msg_query")
-def test_get_ophys_pupil_data(mock_json_msg_query,
-                              brain_observatory_cache):
-
-    with patch.dict('allensdk.core.ophys_experiment_session_id_mapping.ophys_experiment_session_id_map', {111: 777}, clear=True):
+def test_get_ophys_pupil_data(mock_json_msg_query, brain_observatory_cache):
+    with patch.dict(
+        "allensdk.core.ophys_experiment_session_id_mapping.ophys_experiment_session_id_map", {111: 777}, clear=True
+    ):
         # We are only testing that rma query is correct
         try:
             brain_observatory_cache.get_ophys_pupil_data(111, suppress_pupil_data=False)
@@ -313,16 +304,16 @@ def test_get_ophys_pupil_data(mock_json_msg_query,
 
 def test_build_manifest(tmpdir_factory):
     try:
-        manifest_data = bytes(CACHE_MANIFEST, 'UTF-8')  # Python 3
+        manifest_data = bytes(CACHE_MANIFEST, "UTF-8")  # Python 3
     except Exception:
         manifest_data = bytes(CACHE_MANIFEST)  # Python 2.7
 
     manifest_file = str(tmpdir_factory.mktemp("boc").join("manifest.json"))
-    with patch('allensdk.config.manifest_builder.ManifestBuilder.write_json_string') as mock_write_json_string:
+    with patch("allensdk.config.manifest_builder.ManifestBuilder.write_json_string") as mock_write_json_string:
         mock_write_json_string.return_value = manifest_data
 
         BrainObservatoryCache(manifest_file=manifest_file)
-        with open(manifest_file, 'rb') as f:
+        with open(manifest_file, "rb") as f:
             read_manifest_data = f.read()
 
         assert manifest_data == read_manifest_data
@@ -332,41 +323,41 @@ def test_string_argument_errors(brain_observatory_cache):
     boc = brain_observatory_cache
 
     with pytest.raises(TypeError):
-        boc.get_experiment_containers(targeted_structures='str')
+        boc.get_experiment_containers(targeted_structures="str")
 
     with pytest.raises(TypeError):
-        boc.get_experiment_containers(cre_lines='str')
+        boc.get_experiment_containers(cre_lines="str")
 
     with pytest.raises(TypeError):
-        boc.get_ophys_experiments(targeted_structures='str')
+        boc.get_ophys_experiments(targeted_structures="str")
 
     with pytest.raises(TypeError):
-        boc.get_ophys_experiments(cre_lines='str')
+        boc.get_ophys_experiments(cre_lines="str")
 
     with pytest.raises(TypeError):
-        boc.get_ophys_experiments(stimuli='str')
+        boc.get_ophys_experiments(stimuli="str")
 
     with pytest.raises(TypeError):
-        boc.get_ophys_experiments(session_types='str')
+        boc.get_ophys_experiments(session_types="str")
 
-@pytest.mark.skipif(not os.path.exists('/allen/aibs/informatics/module_test_data'), reason='AIBS path not available')
+
+@pytest.mark.skipif(not os.path.exists("/allen/aibs/informatics/module_test_data"), reason="AIBS path not available")
 @pytest.mark.parametrize("path_dict", get_list_of_path_dict())
-def test_brain_observatory_cache_get_analysis_file(brain_observatory_cache, path_dict): 
-
-    nwb_path_pattern = os.path.join(os.path.dirname(path_dict['nwb_file']), '%d.nwb') 
+def test_brain_observatory_cache_get_analysis_file(brain_observatory_cache, path_dict):
+    nwb_path_pattern = os.path.join(os.path.dirname(path_dict["nwb_file"]), "%d.nwb")
     brain_observatory_cache.manifest.add_path(brain_observatory_cache.EXPERIMENT_DATA_KEY, nwb_path_pattern)
 
-    analysis_path_pattern = os.path.join(os.path.dirname(path_dict['analysis_file']), '%d_%s_analysis.h5') 
+    analysis_path_pattern = os.path.join(os.path.dirname(path_dict["analysis_file"]), "%d_%s_analysis.h5")
     brain_observatory_cache.manifest.add_path(brain_observatory_cache.ANALYSIS_DATA_KEY, analysis_path_pattern)
 
-    oeid = path_dict['ophys_experiment_id']
+    oeid = path_dict["ophys_experiment_id"]
     data_set = brain_observatory_cache.get_ophys_experiment_data(oeid)
     for stimulus in data_set.list_stimuli():
         if stimulus != si.SPONTANEOUS_ACTIVITY:
             brain_observatory_cache.get_ophys_experiment_analysis(oeid, stimulus)
 
 
-@pytest.mark.skipif(not os.path.exists('/allen/aibs/informatics/module_test_data'), reason='AIBS path not available')
+@pytest.mark.skipif(not os.path.exists("/allen/aibs/informatics/module_test_data"), reason="AIBS path not available")
 def test_brain_observatory_cache_get_events_data(brain_observatory_cache, events_test_data):
     eid = events_test_data["experiment_id"]
     data_file = events_test_data["pattern"] % eid
@@ -375,4 +366,4 @@ def test_brain_observatory_cache_get_events_data(brain_observatory_cache, events
 
     events = brain_observatory_cache.get_ophys_experiment_events(eid)
     true_events = np.load(data_file, allow_pickle=False)["ev"]
-    assert(np.all(events == true_events))
+    assert np.all(events == true_events)

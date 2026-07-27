@@ -67,9 +67,7 @@ class VBNBehaviorSession(BehaviorSession):
         eye_tracking_z_threshold: float = 3.0,
         eye_tracking_dilation_frames: int = 2,
     ) -> "VBNBehaviorSession":
-        raise NotImplementedError(
-            "from_lims is not supported for a VBNBehaviorSession"
-        )
+        raise NotImplementedError("from_lims is not supported for a VBNBehaviorSession")
 
     @classmethod
     def _read_stimuli(
@@ -148,15 +146,10 @@ class VBNBehaviorSession(BehaviorSession):
         """
 
         if sync_file is None:
-            msg = (
-                f"{cls}._read_licks requires a sync_file; "
-                "you passed in sync_file=None"
-            )
+            msg = f"{cls}._read_licks requires a sync_file; you passed in sync_file=None"
             raise ValueError(msg)
 
-        lick_times = StimulusTimestamps(
-            timestamps=sync_file.data["lick_times"], monitor_delay=0.0
-        )
+        lick_times = StimulusTimestamps(timestamps=sync_file.data["lick_times"], monitor_delay=0.0)
 
         # get the timestamps of the behavior stimulus presentations
         beh_stim_times = cls._read_behavior_stimulus_timestamps(
@@ -175,9 +168,7 @@ class VBNBehaviorSession(BehaviorSession):
         min_time = beh_stim_times_no_monitor.value.min()
         max_time = beh_stim_times_no_monitor.value.max()
 
-        valid = np.logical_and(
-            lick_times.value >= min_time, lick_times.value <= max_time
-        )
+        valid = np.logical_and(lick_times.value >= min_time, lick_times.value <= max_time)
 
         lick_times = lick_times.value[valid]
 
@@ -188,16 +179,10 @@ class VBNBehaviorSession(BehaviorSession):
         # is as close as we can get to the time when it reads the nidaq
         # buffer"
 
-        lick_frames = np.searchsorted(
-            beh_stim_times_no_monitor.value, lick_times
-        )
+        lick_frames = np.searchsorted(beh_stim_times_no_monitor.value, lick_times)
 
         if len(lick_frames) != len(lick_times):
-            msg = (
-                f"{len(lick_frames)} lick frames; "
-                f"{len(lick_times)} lick timestamps "
-                "in the Sync file. Should be equal"
-            )
+            msg = f"{len(lick_frames)} lick frames; {len(lick_times)} lick timestamps in the Sync file. Should be equal"
             raise RuntimeError(msg)
 
         df = pd.DataFrame({"timestamps": lick_times, "frame": lick_frames})
@@ -228,9 +213,7 @@ class VBNBehaviorSession(BehaviorSession):
         }
         camera_line = exposure_sync_line_label_dict[camera_label]
 
-        lost_frames = get_lost_frames(
-            eye_tracking_metadata=eye_tracking_metadata_file
-        )
+        lost_frames = get_lost_frames(eye_tracking_metadata=eye_tracking_metadata_file)
 
         frame_times = sync_utilities.get_synchronized_frame_times(
             session_sync_file=sync_file.filepath,
@@ -239,9 +222,7 @@ class VBNBehaviorSession(BehaviorSession):
             trim_after_spike=False,
         )
 
-        stimulus_timestamps = StimulusTimestamps(
-            timestamps=frame_times.values, monitor_delay=0.0
-        )
+        stimulus_timestamps = StimulusTimestamps(timestamps=frame_times.values, monitor_delay=0.0)
 
         return EyeTrackingTable.from_data_file(
             data_file=eye_tracking_file,
@@ -313,9 +294,7 @@ class BehaviorEcephysSession(VBNBehaviorSession):
             task_parameters=behavior_session._task_parameters,
             trials=behavior_session._trials,
             eye_tracking_table=behavior_session._eye_tracking,
-            eye_tracking_rig_geometry=(
-                behavior_session._eye_tracking_rig_geometry
-            ),
+            eye_tracking_rig_geometry=(behavior_session._eye_tracking_rig_geometry),
         )
         self._probes = probes
         self._optotagging_table = optotagging_table
@@ -353,9 +332,7 @@ class BehaviorEcephysSession(VBNBehaviorSession):
     @property
     def metadata(self) -> dict:
         behavior_meta = super()._get_metadata(behavior_metadata=self._metadata)
-        ecephys_meta = {
-            "ecephys_session_id": self._metadata.ecephys_session_id
-        }
+        ecephys_meta = {"ecephys_session_id": self._metadata.ecephys_session_id}
         return {**behavior_meta, **ecephys_meta}
 
     @property
@@ -403,12 +380,7 @@ class BehaviorEcephysSession(VBNBehaviorSession):
         -------
         `pd.DataFrame` of channels
         """
-        return pd.concat(
-            [
-                p.channels.to_dataframe(filter_by_validity=filter_by_validity)
-                for p in self._probes.probes
-            ]
-        )
+        return pd.concat([p.channels.to_dataframe(filter_by_validity=filter_by_validity) for p in self._probes.probes])
 
     def get_units(
         self,
@@ -492,19 +464,12 @@ class BehaviorEcephysSession(VBNBehaviorSession):
         behavior_session = cls.behavior_data_class().from_json(
             session_data=session_data,
             read_stimulus_presentations_table_from_file=True,
-            stimulus_presentation_exclude_columns=(
-                stimulus_presentation_exclude_columns
-            ),
+            stimulus_presentation_exclude_columns=(stimulus_presentation_exclude_columns),
             sync_file_permissive=True,
             eye_tracking_drop_frames=True,
-            running_speed_load_from_multiple_stimulus_files=(
-                running_speed_load_from_multiple_stimulus_files
-            ),
+            running_speed_load_from_multiple_stimulus_files=(running_speed_load_from_multiple_stimulus_files),
         )
-        probes = Probes.from_json(
-            probes=session_data["probes"],
-            skip_probes=skip_probes
-        )
+        probes = Probes.from_json(probes=session_data["probes"], skip_probes=skip_probes)
         optotagging_table = OptotaggingTable.from_json(dict_repr=session_data)
 
         return BehaviorEcephysSession(
@@ -540,9 +505,7 @@ class BehaviorEcephysSession(VBNBehaviorSession):
     def from_nwb(
         cls,
         nwbfile: NWBFile,
-        probe_meta: Optional[
-            Dict[str, ProbeWithLFPMeta]
-        ] = None,
+        probe_meta: Optional[Dict[str, ProbeWithLFPMeta]] = None,
         **kwargs,
     ) -> "BehaviorEcephysSession":
         """
@@ -559,14 +522,10 @@ class BehaviorEcephysSession(VBNBehaviorSession):
         instantiated `BehaviorEcephysSession`
         """
         kwargs["add_is_change_to_stimulus_presentations_table"] = False
-        behavior_session = cls.behavior_data_class().from_nwb(
-            nwbfile=nwbfile, **kwargs
-        )
+        behavior_session = cls.behavior_data_class().from_nwb(nwbfile=nwbfile, **kwargs)
         return BehaviorEcephysSession(
             behavior_session=behavior_session,
-            probes=Probes.from_nwb(
-                nwbfile=nwbfile, probe_lfp_meta_map=probe_meta
-            ),
+            probes=Probes.from_nwb(nwbfile=nwbfile, probe_lfp_meta_map=probe_meta),
             optotagging_table=OptotaggingTable.from_nwb(nwbfile=nwbfile),
             metadata=BehaviorEcephysMetadata.from_nwb(nwbfile=nwbfile),
         )
@@ -580,8 +539,6 @@ class BehaviorEcephysSession(VBNBehaviorSession):
         if len(probe) == 0:
             raise ValueError(f"Could not find probe with id {probe_id}")
         if len(probe) > 1:
-            raise RuntimeError(
-                f"Multiple probes found with probe_id " f"{probe_id}"
-            )
+            raise RuntimeError(f"Multiple probes found with probe_id {probe_id}")
         probe = probe[0]
         return probe

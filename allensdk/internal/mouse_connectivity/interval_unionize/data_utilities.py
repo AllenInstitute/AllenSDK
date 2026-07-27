@@ -49,15 +49,11 @@ def get_sum_pixels(sum_pixels_path):
     return {"sum_pixels": read(sum_pixels_path)}
 
 
-def get_sum_pixel_intensities(
-    sum_pixel_intensities_path, injection_sum_pixel_intensities_path
-):
+def get_sum_pixel_intensities(sum_pixel_intensities_path, injection_sum_pixel_intensities_path):
     logging.info("getting sum pixel intensities")
     return {
         "sum_pixel_intensities": read(sum_pixel_intensities_path),
-        "injection_sum_pixel_intensities": read(
-            injection_sum_pixel_intensities_path
-        ),
+        "injection_sum_pixel_intensities": read(injection_sum_pixel_intensities_path),
     }
 
 
@@ -66,9 +62,7 @@ def get_cav_density(cav_density_path):
     return {"cav_density": read(cav_density_path)}
 
 
-def get_injection_data(
-    injection_fraction_path, injection_density_path, injection_energy_path
-):
+def get_injection_data(injection_fraction_path, injection_density_path, injection_energy_path):
     """Read nrrd files containing injection signal data"""
 
     logging.info("getting injection_fraction")
@@ -108,9 +102,7 @@ def get_projection_data(
 
     except (IOError, OSError, RuntimeError):
         logging.info("skipping aav exclusion fraction")
-        aav_exclusion_fraction = np.zeros(
-            projection_density.shape, dtype=bool, order="C"
-        )
+        aav_exclusion_fraction = np.zeros(projection_density.shape, dtype=bool, order="C")
 
     return {
         "projection_density": projection_density,

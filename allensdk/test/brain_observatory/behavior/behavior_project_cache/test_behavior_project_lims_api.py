@@ -42,9 +42,7 @@ class MockQueryEngine:
 
 @pytest.fixture
 def MockBehaviorProjectLimsApi():
-    return BehaviorProjectLimsApi(
-        MockQueryEngine(), MockQueryEngine(), MockQueryEngine()
-    )
+    return BehaviorProjectLimsApi(MockQueryEngine(), MockQueryEngine(), MockQueryEngine())
 
 
 @pytest.mark.parametrize(
@@ -80,9 +78,7 @@ def MockBehaviorProjectLimsApi():
         ),
     ],
 )
-def test_build_line_from_donor_query(
-    line, expected, MockBehaviorProjectLimsApi
-):
+def test_build_line_from_donor_query(line, expected, MockBehaviorProjectLimsApi):
     mbp_api = MockBehaviorProjectLimsApi
     assert expected == mbp_api._build_line_from_donor_query(line=line)
 
@@ -96,18 +92,10 @@ class TestProjectTablesAll:
 
         # Note: these tables will need to be updated if the expected table
         # changes
-        cls.release_behavior_sessions_table = pd.read_csv(
-            test_dir / "behavior_session_table.csv"
-        )
-        cls.release_ophys_sessions_table = pd.read_csv(
-            test_dir / "ophys_session_table.csv"
-        )
-        cls.release_ophys_experiments_table = pd.read_csv(
-            test_dir / "ophys_experiment_table.csv"
-        )
-        cls.release_ophys_cells_table = pd.read_csv(
-            test_dir / "ophys_cells_table.csv"
-        )
+        cls.release_behavior_sessions_table = pd.read_csv(test_dir / "behavior_session_table.csv")
+        cls.release_ophys_sessions_table = pd.read_csv(test_dir / "ophys_session_table.csv")
+        cls.release_ophys_experiments_table = pd.read_csv(test_dir / "ophys_experiment_table.csv")
+        cls.release_ophys_cells_table = pd.read_csv(test_dir / "ophys_cells_table.csv")
 
         cls.lims_api = BehaviorProjectLimsApi.default(passed_only=False)
 
@@ -128,79 +116,43 @@ class TestProjectTablesAll:
     def test_all_behavior_sessions(self):
         """Tests that when passed_only=False, that more sessions are returned
         than in the release table"""
-        with patch.object(
-            BehaviorMetadata, "from_lims", wraps=self._get_behavior_session
-        ):
+        with patch.object(BehaviorMetadata, "from_lims", wraps=self._get_behavior_session):
             obtained = self.lims_api.get_behavior_session_table()
 
             # Make sure ids returned are superset of release ids
             assert (
-                len(
-                    set(obtained.index).intersection(
-                        self.release_behavior_sessions_table[
-                            "behavior_session_id"
-                        ]
-                    )
-                )
-                == self.release_behavior_sessions_table[
-                    "behavior_session_id"
-                ].nunique()
+                len(set(obtained.index).intersection(self.release_behavior_sessions_table["behavior_session_id"]))
+                == self.release_behavior_sessions_table["behavior_session_id"].nunique()
             )
-            assert (
-                obtained.shape[0]
-                > self.release_behavior_sessions_table.shape[0]
-            )
+            assert obtained.shape[0] > self.release_behavior_sessions_table.shape[0]
 
     @pytest.mark.requires_bamboo
     def test_all_ophys_sessions(self):
         """Tests that when passed_only=False, that more sessions are returned
         than in the release table"""
-        with patch.object(
-            BehaviorMetadata, "from_lims", wraps=self._get_behavior_session
-        ):
+        with patch.object(BehaviorMetadata, "from_lims", wraps=self._get_behavior_session):
             obtained = self.lims_api.get_ophys_session_table()
 
             # Make sure ids returned are superset of release ids
             assert (
-                len(
-                    set(obtained.index).intersection(
-                        self.release_ophys_sessions_table["ophys_session_id"]
-                    )
-                )
-                == self.release_ophys_sessions_table[
-                    "ophys_session_id"
-                ].nunique()
+                len(set(obtained.index).intersection(self.release_ophys_sessions_table["ophys_session_id"]))
+                == self.release_ophys_sessions_table["ophys_session_id"].nunique()
             )
-            assert (
-                obtained.shape[0] > self.release_ophys_sessions_table.shape[0]
-            )
+            assert obtained.shape[0] > self.release_ophys_sessions_table.shape[0]
 
     @pytest.mark.requires_bamboo
     def test_all_ophys_experiments(self):
         """Tests that when passed_only=False, that more experiments are
         returned than in the release table"""
-        with patch.object(
-            BehaviorMetadata, "from_lims", wraps=self._get_behavior_session
-        ):
+        with patch.object(BehaviorMetadata, "from_lims", wraps=self._get_behavior_session):
             obtained = self.lims_api.get_ophys_experiment_table()
 
             # Make sure ids returned are superset of release ids
             assert (
-                len(
-                    set(obtained.index).intersection(
-                        self.release_ophys_experiments_table[
-                            "ophys_experiment_id"
-                        ]
-                    )
-                )
-                == self.release_ophys_experiments_table[
-                    "ophys_experiment_id"
-                ].nunique()
+                len(set(obtained.index).intersection(self.release_ophys_experiments_table["ophys_experiment_id"]))
+                == self.release_ophys_experiments_table["ophys_experiment_id"].nunique()
             )
-            assert (
-                obtained.shape[0]
-                > self.release_ophys_experiments_table.shape[0]
-            )
+            assert obtained.shape[0] > self.release_ophys_experiments_table.shape[0]
 
     @pytest.mark.requires_bamboo
     def test_all_cells(self):
@@ -211,9 +163,7 @@ class TestProjectTablesAll:
         # Make sure ids returned are superset of release ids
         assert (
             len(
-                set(obtained["ophys_experiment_id"]).intersection(
-                    self.release_ophys_cells_table["ophys_experiment_id"]
-                )
+                set(obtained["ophys_experiment_id"]).intersection(self.release_ophys_cells_table["ophys_experiment_id"])
             )
             == self.release_ophys_cells_table["ophys_experiment_id"].nunique()
         )
@@ -230,16 +180,12 @@ class TestLimsCloudConsistency:
 
         cls.test_dir = Path(__file__).parent / "test_data" / "vbo"
 
-        behavior_sessions_table = pd.read_csv(
-            cls.test_dir / "behavior_session_table.csv"
-        )
-        cls.session_type_map = behavior_sessions_table.set_index(
-            "behavior_session_id"
-        )[["session_type"]].to_dict()["session_type"]
+        behavior_sessions_table = pd.read_csv(cls.test_dir / "behavior_session_table.csv")
+        cls.session_type_map = behavior_sessions_table.set_index("behavior_session_id")[["session_type"]].to_dict()[
+            "session_type"
+        ]
 
-        cls.lims_cache = VisualBehaviorOphysProjectCache.from_lims(
-            data_release_date=["2021-03-25", "2021-08-12"]
-        )
+        cls.lims_cache = VisualBehaviorOphysProjectCache.from_lims(data_release_date=["2021-03-25", "2021-08-12"])
         cls.tempdir = tempdir
 
         with patch.object(
@@ -247,9 +193,7 @@ class TestLimsCloudConsistency:
             "_get_metadata_path",
             wraps=cls._get_project_table_path,
         ):
-            cls.cloud_cache = VisualBehaviorOphysProjectCache.from_s3_cache(
-                cache_dir=tempdir.name
-            )
+            cls.cloud_cache = VisualBehaviorOphysProjectCache.from_s3_cache(cache_dir=tempdir.name)
 
     def teardown_class(self):
         self.tempdir.cleanup()
@@ -261,9 +205,7 @@ class TestLimsCloudConsistency:
             behavior_session_id=BehaviorSessionId(behavior_session_id),
             equipment=None,
             stimulus_frame_rate=None,
-            session_type=SessionType(
-                self.session_type_map[behavior_session_id]
-            ),
+            session_type=SessionType(self.session_type_map[behavior_session_id]),
             behavior_session_uuid=None,
         )
 
@@ -280,9 +222,7 @@ class TestLimsCloudConsistency:
 
     @pytest.mark.requires_bamboo
     def test_behavior_session_table(self):
-        with patch.object(
-            BehaviorMetadata, "from_lims", wraps=self._get_behavior_session
-        ):
+        with patch.object(BehaviorMetadata, "from_lims", wraps=self._get_behavior_session):
             from_lims = self.lims_cache.get_behavior_session_table()
 
         from_lims = from_lims.drop(columns=list(SESSION_SUPPRESS))
@@ -297,9 +237,7 @@ class TestLimsCloudConsistency:
 
     @pytest.mark.requires_bamboo
     def test_ophys_session_table(self):
-        with patch.object(
-            BehaviorMetadata, "from_lims", wraps=self._get_behavior_session
-        ):
+        with patch.object(BehaviorMetadata, "from_lims", wraps=self._get_behavior_session):
             from_lims = self.lims_cache.get_ophys_session_table()
 
         from_lims = from_lims.drop(columns=list(SESSION_SUPPRESS))
@@ -313,14 +251,11 @@ class TestLimsCloudConsistency:
 
     @pytest.mark.requires_bamboo
     def test_ophys_experiments_table(self):
-        with patch.object(
-            BehaviorMetadata, "from_lims", wraps=self._get_behavior_session
-        ):
+        with patch.object(BehaviorMetadata, "from_lims", wraps=self._get_behavior_session):
             from_lims = self.lims_cache.get_ophys_experiment_table()
 
         from_lims = from_lims.drop(
-            columns=list(OPHYS_EXPERIMENTS_SUPPRESS)
-            + list(OPHYS_EXPERIMENTS_SUPPRESS_FINAL),
+            columns=list(OPHYS_EXPERIMENTS_SUPPRESS) + list(OPHYS_EXPERIMENTS_SUPPRESS_FINAL),
             errors="ignore",
         )
 

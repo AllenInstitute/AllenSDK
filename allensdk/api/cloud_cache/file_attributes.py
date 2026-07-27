@@ -22,22 +22,15 @@ class CacheFileAttributes(object):
         (probably computed by the Manifest class)
     """
 
-    def __init__(self,
-                 url: str,
-                 version_id: str,
-                 file_hash: str,
-                 local_path: pathlib.Path):
-
+    def __init__(self, url: str, version_id: str, file_hash: str, local_path: pathlib.Path):
         if not isinstance(url, str):
             raise ValueError(f"url must be str; got {type(url)}")
         if not isinstance(version_id, str):
             raise ValueError(f"version_id must be str; got {type(version_id)}")
         if not isinstance(file_hash, str):
-            raise ValueError(f"file_hash must be str; "
-                             f"got {type(file_hash)}")
+            raise ValueError(f"file_hash must be str; got {type(file_hash)}")
         if not isinstance(local_path, pathlib.Path):
-            raise ValueError(f"local_path must be pathlib.Path; "
-                             f"got {type(local_path)}")
+            raise ValueError(f"local_path must be pathlib.Path; got {type(local_path)}")
 
         self._url = url
         self._version_id = version_id
@@ -61,9 +54,11 @@ class CacheFileAttributes(object):
         return self._local_path
 
     def __str__(self):
-        output = {'url': self.url,
-                  'version_id': self.version_id,
-                  'file_hash': self.file_hash,
-                  'local_path': str(self.local_path)}
+        output = {
+            "url": self.url,
+            "version_id": self.version_id,
+            "file_hash": self.file_hash,
+            "local_path": str(self.local_path),
+        }
         output = json.dumps(output, indent=2, sort_keys=True)
-        return f'CacheFileParameters{output}'
+        return f"CacheFileParameters{output}"

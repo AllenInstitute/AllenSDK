@@ -118,12 +118,8 @@ class MouseConnectivityCache(ReferenceSpaceCache):
     def default_structure_ids(self):
         if not hasattr(self, "_default_structure_ids"):
             tree = self.get_structure_tree()
-            default_structures = tree.get_structures_by_set_id(
-                MouseConnectivityCache.DEFAULT_STRUCTURE_SET_IDS
-            )
-            self._default_structure_ids = [
-                st["id"] for st in default_structures
-            ]
+            default_structures = tree.get_structures_by_set_id(MouseConnectivityCache.DEFAULT_STRUCTURE_SET_IDS)
+            self._default_structure_ids = [st["id"] for st in default_structures]
 
         return self._default_structure_ids
 
@@ -185,9 +181,7 @@ class MouseConnectivityCache(ReferenceSpaceCache):
             self.resolution,
         )
 
-        self.api.download_projection_density(
-            file_name, experiment_id, self.resolution, strategy="lazy"
-        )
+        self.api.download_projection_density(file_name, experiment_id, self.resolution, strategy="lazy")
 
         return nrrd.read(file_name)
 
@@ -218,9 +212,7 @@ class MouseConnectivityCache(ReferenceSpaceCache):
             experiment_id,
             self.resolution,
         )
-        self.api.download_injection_density(
-            file_name, experiment_id, self.resolution, strategy="lazy"
-        )
+        self.api.download_injection_density(file_name, experiment_id, self.resolution, strategy="lazy")
 
         return nrrd.read(file_name)
 
@@ -250,9 +242,7 @@ class MouseConnectivityCache(ReferenceSpaceCache):
             experiment_id,
             self.resolution,
         )
-        self.api.download_injection_fraction(
-            file_name, experiment_id, self.resolution, strategy="lazy"
-        )
+        self.api.download_injection_fraction(file_name, experiment_id, self.resolution, strategy="lazy")
 
         return nrrd.read(file_name)
 
@@ -276,12 +266,8 @@ class MouseConnectivityCache(ReferenceSpaceCache):
 
         """
 
-        file_name = self.get_cache_path(
-            file_name, self.DATA_MASK_KEY, experiment_id, self.resolution
-        )
-        self.api.download_data_mask(
-            file_name, experiment_id, self.resolution, strategy="lazy"
-        )
+        file_name = self.get_cache_path(file_name, self.DATA_MASK_KEY, experiment_id, self.resolution)
+        self.api.download_data_mask(file_name, experiment_id, self.resolution, strategy="lazy")
 
         return nrrd.read(file_name)
 
@@ -326,9 +312,7 @@ class MouseConnectivityCache(ReferenceSpaceCache):
 
         file_name = self.get_cache_path(file_name, self.EXPERIMENTS_KEY)
 
-        experiments = self.api.get_experiments_api(
-            path=file_name, strategy="lazy", **Cache.cache_json()
-        )
+        experiments = self.api.get_experiments_api(path=file_name, strategy="lazy", **Cache.cache_json())
 
         for e in experiments:
             # renaming id
@@ -349,9 +333,7 @@ class MouseConnectivityCache(ReferenceSpaceCache):
             del e["storage_directory"]
 
         # filter the read/downloaded list of experiments
-        experiments = self.filter_experiments(
-            experiments, cre, injection_structure_ids
-        )
+        experiments = self.filter_experiments(experiments, cre, injection_structure_ids)
 
         if dataframe:
             experiments = pd.DataFrame(experiments)
@@ -359,9 +341,7 @@ class MouseConnectivityCache(ReferenceSpaceCache):
 
         return experiments
 
-    def filter_experiments(
-        self, experiments, cre=None, injection_structure_ids=None
-    ):
+    def filter_experiments(self, experiments, cre=None, injection_structure_ids=None):
         """
         Take a list of experiments and filter them by cre status and injection
         structure.
@@ -390,25 +370,18 @@ class MouseConnectivityCache(ReferenceSpaceCache):
         elif cre is not None:
             cre = [c.lower() for c in cre]
             experiments = [
-                e
-                for e in experiments
-                if e["transgenic_line"] is not None
-                and e["transgenic_line"].lower() in cre
+                e for e in experiments if e["transgenic_line"] is not None and e["transgenic_line"].lower() in cre
             ]
 
         if injection_structure_ids is not None:
             descendant_ids = set(
                 reduce(
                     op.add,
-                    self.get_structure_tree().descendant_ids(
-                        injection_structure_ids
-                    ),
+                    self.get_structure_tree().descendant_ids(injection_structure_ids),
                 )
             )
 
-            experiments = [
-                e for e in experiments if e["structure_id"] in descendant_ids
-            ]
+            experiments = [e for e in experiments if e["structure_id"] in descendant_ids]
 
         return experiments
 
@@ -462,9 +435,7 @@ class MouseConnectivityCache(ReferenceSpaceCache):
 
         """
 
-        file_name = self.get_cache_path(
-            file_name, self.STRUCTURE_UNIONIZES_KEY, experiment_id
-        )
+        file_name = self.get_cache_path(file_name, self.STRUCTURE_UNIONIZES_KEY, experiment_id)
 
         filter_fn = functools.partial(
             self.filter_structure_unionizes,
@@ -475,9 +446,7 @@ class MouseConnectivityCache(ReferenceSpaceCache):
         )
 
         def col_rn(x):
-            return pd.DataFrame(x).rename(
-                columns={"section_data_set_id": "experiment_id"}
-            )
+            return pd.DataFrame(x).rename(columns={"section_data_set_id": "experiment_id"})
 
         return self.api.get_structure_unionizes(
             [experiment_id],
@@ -563,25 +532,13 @@ class MouseConnectivityCache(ReferenceSpaceCache):
 
         results = []
         for eid in experiment_ids:
-            this_experiment_unionizes = unionizes[
-                unionizes["experiment_id"] == eid
-            ]
-            this_experiment_unionizes = this_experiment_unionizes.sort_values(
-                by=rank_on, ascending=False
-            )
-            this_experiment_unionizes = this_experiment_unionizes.loc[
-                :, output_keys
-            ]
+            this_experiment_unionizes = unionizes[unionizes["experiment_id"] == eid]
+            this_experiment_unionizes = this_experiment_unionizes.sort_values(by=rank_on, ascending=False)
+            this_experiment_unionizes = this_experiment_unionizes.loc[:, output_keys]
 
-            this_experiment_unionizes = unionizes[
-                unionizes["experiment_id"] == eid
-            ]
-            this_experiment_unionizes = this_experiment_unionizes.sort_values(
-                by=rank_on, ascending=False
-            )
-            this_experiment_unionizes = this_experiment_unionizes.loc[
-                :, output_keys
-            ]
+            this_experiment_unionizes = unionizes[unionizes["experiment_id"] == eid]
+            this_experiment_unionizes = this_experiment_unionizes.sort_values(by=rank_on, ascending=False)
+            this_experiment_unionizes = this_experiment_unionizes.loc[:, output_keys]
 
             records = this_experiment_unionizes.to_dict("records")
             if len(records) > n:
@@ -631,9 +588,7 @@ class MouseConnectivityCache(ReferenceSpaceCache):
             unionizes = unionizes[unionizes.is_injection == is_injection]
 
         if structure_ids is not None:
-            structure_ids = MouseConnectivityCache.validate_structure_ids(
-                structure_ids
-            )
+            structure_ids = MouseConnectivityCache.validate_structure_ids(structure_ids)
 
             if include_descendants:
                 structure_ids = reduce(
@@ -643,14 +598,10 @@ class MouseConnectivityCache(ReferenceSpaceCache):
             else:
                 structure_ids = set(structure_ids)
 
-            unionizes = unionizes[
-                unionizes["structure_id"].isin(structure_ids)
-            ]
+            unionizes = unionizes[unionizes["structure_id"].isin(structure_ids)]
 
         if hemisphere_ids is not None:
-            unionizes = unionizes[
-                unionizes["hemisphere_id"].isin(hemisphere_ids)
-            ]
+            unionizes = unionizes[unionizes["hemisphere_id"].isin(hemisphere_ids)]
 
         return unionizes
 
@@ -746,17 +697,13 @@ class MouseConnectivityCache(ReferenceSpaceCache):
         cidx = 0
         hlabel = {1: "-L", 2: "-R", 3: ""}
 
-        acronym_map = self.get_structure_tree().value_map(
-            lambda x: x["id"], lambda x: x["acronym"]
-        )
+        acronym_map = self.get_structure_tree().value_map(lambda x: x["id"], lambda x: x["acronym"])
 
         for hid in hemisphere_ids:
             for sid in projection_structure_ids:
                 column_lookup[(hid, sid)] = cidx
                 label = acronym_map[sid] + hlabel[hid]
-                columns.append(
-                    {"hemisphere_id": hid, "structure_id": sid, "label": label}
-                )
+                columns.append({"hemisphere_id": hid, "structure_id": sid, "label": label})
                 cidx += 1
 
         for _, row in unionizes.iterrows():
@@ -781,9 +728,7 @@ class MouseConnectivityCache(ReferenceSpaceCache):
                 "columns": columns,
             }
 
-    def get_deformation_field(
-        self, section_data_set_id, header_path=None, voxel_path=None
-    ):
+    def get_deformation_field(self, section_data_set_id, header_path=None, voxel_path=None):
         """Extract the local alignment parameters for this dataset.
         This a 3D vector image (3 components) describing
         a deformable local mapping from CCF voxels to this section data set's
@@ -814,17 +759,11 @@ class MouseConnectivityCache(ReferenceSpaceCache):
             warnings.warn(
                 "deformation fields are only available at {} isometric"
                 "resolutions, but this is a "
-                "{}-micron cache".format(
-                    self.DFMFLD_RESOLUTIONS, self.resolution
-                )
+                "{}-micron cache".format(self.DFMFLD_RESOLUTIONS, self.resolution)
             )
 
-        header_path = self.get_cache_path(
-            header_path, self.DEFORMATION_FIELD_HEADER_KEY, section_data_set_id
-        )
-        voxel_path = self.get_cache_path(
-            voxel_path, self.DEFORMATION_FIELD_VOXEL_KEY, section_data_set_id
-        )
+        header_path = self.get_cache_path(header_path, self.DEFORMATION_FIELD_HEADER_KEY, section_data_set_id)
+        voxel_path = self.get_cache_path(voxel_path, self.DEFORMATION_FIELD_VOXEL_KEY, section_data_set_id)
 
         if not (os.path.exists(header_path) and os.path.exists(voxel_path)):
             Manifest.safe_make_parent_dirs(header_path)
@@ -839,9 +778,7 @@ class MouseConnectivityCache(ReferenceSpaceCache):
             sitk.ReadImage(str(header_path))
         )  # TODO the str call here is only necessary in 2.7
 
-    def get_affine_parameters(
-        self, section_data_set_id, direction="trv", file_name=None
-    ):
+    def get_affine_parameters(self, section_data_set_id, direction="trv", file_name=None):
         """Extract the parameters of the 3D affine tranformation mapping
         this section data set's image-space stack to
         CCF-space (or vice-versa).
@@ -872,10 +809,7 @@ class MouseConnectivityCache(ReferenceSpaceCache):
         """
 
         if direction not in ("trv", "tvr"):
-            raise ValueError(
-                "invalid direction: {}. direction must be one of tvr,"
-                "trv".format(direction)
-            )
+            raise ValueError("invalid direction: {}. direction must be one of tvr,trv".format(direction))
 
         file_name = self.get_cache_path(file_name, self.ALIGNMENT3D_KEY)
 
@@ -908,9 +842,7 @@ class MouseConnectivityCache(ReferenceSpaceCache):
 
         """
 
-        manifest_builder = super(
-            MouseConnectivityCache, self
-        ).add_manifest_paths(manifest_builder)
+        manifest_builder = super(MouseConnectivityCache, self).add_manifest_paths(manifest_builder)
 
         manifest_builder.add_path(
             self.EXPERIMENTS_KEY,

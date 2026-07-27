@@ -5,13 +5,9 @@ from pynwb.ophys import Fluorescence
 
 from allensdk.brain_observatory.behavior.data_files.demix_file import DemixFile
 from allensdk.core import DataObject
-from allensdk.core import \
-    DataFileReadableInterface, NwbReadableInterface
-from allensdk.core import \
-    NwbWritableInterface
-from allensdk.brain_observatory.behavior.data_objects.cell_specimens\
-    .rois_mixin import \
-    RoisMixin
+from allensdk.core import DataFileReadableInterface, NwbReadableInterface
+from allensdk.core import NwbWritableInterface
+from allensdk.brain_observatory.behavior.data_objects.cell_specimens.rois_mixin import RoisMixin
 
 
 class DemixedTraces(
@@ -43,9 +39,7 @@ class DemixedTraces(
         # TODO Remove try/except once VBO released.
         try:
             demixed_traces_nwb = (
-                nwbfile.processing["ophys"]
-                .data_interfaces["demixed_trace"]
-                .roi_response_series["traces"]
+                nwbfile.processing["ophys"].data_interfaces["demixed_trace"].roi_response_series["traces"]
             )
             # f traces stored as timepoints x rois in NWB
             # We want rois x timepoints, hence the transpose
@@ -74,17 +68,8 @@ class DemixedTraces(
         # Create/Add demixed_traces modules and interfaces:
         ophys_module = nwbfile.processing["ophys"]
 
-        roi_table_region = (
-            nwbfile.processing["ophys"]
-            .data_interfaces["dff"]
-            .roi_response_series["traces"]
-            .rois
-        )  # noqa: E501
-        ophys_timestamps = (
-            ophys_module.get_data_interface("dff")
-            .roi_response_series["traces"]
-            .timestamps
-        )
+        roi_table_region = nwbfile.processing["ophys"].data_interfaces["dff"].roi_response_series["traces"].rois  # noqa: E501
+        ophys_timestamps = ophys_module.get_data_interface("dff").roi_response_series["traces"].timestamps
         f_interface = Fluorescence(name="demixed_trace")
         ophys_module.add_data_interface(f_interface)
 

@@ -9,6 +9,7 @@ from allensdk.model.biophys_sim.config import Config
 
 BASEDIR = os.path.dirname(__file__)
 
+
 @neuron_utils.read_neuron_fit_stdout
 def neuron_passive_fit2(up_data, down_data, swc_path, limit):
     h = neuron_utils.get_h()
@@ -17,7 +18,7 @@ def neuron_passive_fit2(up_data, down_data, swc_path, limit):
     neuron_utils.load_morphology(swc_path)
 
     for sec in h.allsec():
-        sec.insert('pas')
+        sec.insert("pas")
         for seg in sec:
             seg.pas.e = 0
 
@@ -74,32 +75,29 @@ def neuron_passive_fit2(up_data, down_data, swc_path, limit):
             minerr = mrf.opt.minerr
 
     h.region_areas()
-    return {
-        'Ri': fit_Ri,
-        'Cm': fit_Cm,
-        'Rm': fit_Rm,
-        'err': minerr
-        }
+    return {"Ri": fit_Ri, "Cm": fit_Cm, "Rm": fit_Rm, "err": minerr}
+
 
 def main():
     import sys
-    
+
     manifest_path = sys.argv[-1]
     limit = float(sys.argv[-2])
     os.chdir(os.path.dirname(manifest_path))
     app_config = Config()
     description = app_config.load(manifest_path)
-    
-    upfile = description.manifest.get_path('upfile')
-    up_data =  np.loadtxt(upfile)
-    downfile = description.manifest.get_path('downfile')
+
+    upfile = description.manifest.get_path("upfile")
+    up_data = np.loadtxt(upfile)
+    downfile = description.manifest.get_path("downfile")
     down_data = np.loadtxt(downfile)
-    swc_path = description.manifest.get_path('MORPHOLOGY')
-    output_file = description.manifest.get_path('fit_2_file')
-    
+    swc_path = description.manifest.get_path("MORPHOLOGY")
+    output_file = description.manifest.get_path("fit_2_file")
+
     data = neuron_passive_fit2(up_data, down_data, swc_path, limit)
-    
+
     json_utilities.write(output_file, data)
+
 
 if __name__ == "__main__":
     main()

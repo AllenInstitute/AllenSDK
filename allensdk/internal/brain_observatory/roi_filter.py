@@ -14,7 +14,7 @@ import pandas as pd
 
 
 class ROIClassifier(object):
-    '''Wrapper for machine learning classifier.
+    """Wrapper for machine learning classifier.
 
     Provides an underlying classifier model implementing `fit`,
     `score`, and `predict`. Tracks additional information for
@@ -35,79 +35,75 @@ class ROIClassifier(object):
         `reporters`: Reporter set used for training.
         `other_appended_labels`: Labels appended outside model.
         `cross_validation_scores`: Cross validation if generated.
-    '''
+    """
+
     def __init__(self, model_data=None):
-        '''Constructor.'''
+        """Constructor."""
         if model_data is None:
             model_data = {}
         self.sklearn_version = sklearn_version
         model_sklearn = model_data.get("sklearn_version", None)
         if sklearn_version != model_sklearn:
-            logging.warning("Using sklearn %s, model trained using %s",
-                            sklearn_version, model_sklearn)
+            logging.warning("Using sklearn %s, model trained using %s", sklearn_version, model_sklearn)
         self.model = model_data.get("model", None)
-        self.training_features = model_data.get("training_features",
-                                                pd.DataFrame())
-        self.training_labels = model_data.get("training_labels",
-                                              pd.DataFrame())
+        self.training_features = model_data.get("training_features", pd.DataFrame())
+        self.training_labels = model_data.get("training_labels", pd.DataFrame())
         self.trimmed_features = model_data.get("trimmed_features", [])
         self.structure_ids = model_data.get("structure_ids", [])
         self.drivers = model_data.get("drivers", [])
         self.reporters = model_data.get("reporters", [])
-        self.other_appended_labels = model_data.get("other_appended_labels",
-                                                    [])
+        self.other_appended_labels = model_data.get("other_appended_labels", [])
         # this is a harsh score for multilabel because it requires ALL
         # labels predicted
-        self.cross_validation_scores = model_data.get(
-            "cross_validation_scores", None)
+        self.cross_validation_scores = model_data.get("cross_validation_scores", None)
         self.unexpected_features = []
 
     @property
     def model_data(self):
-        '''The classifier properties as a dictionary.'''
-        data = {"model": self.model,
-                "training_features": self.training_features,
-                "training_labels": self.training_labels,
-                "trimmed_features": self.trimmed_features,
-                "structure_ids": self.structure_ids,
-                "drivers": self.drivers,
-                "reporters": self.reporters,
-                "other_appended_labels": self.other_appended_labels,
-                "sklearn_version": self.sklearn_version,
-                "cross_validation_scores": self.cross_validation_scores}
+        """The classifier properties as a dictionary."""
+        data = {
+            "model": self.model,
+            "training_features": self.training_features,
+            "training_labels": self.training_labels,
+            "trimmed_features": self.trimmed_features,
+            "structure_ids": self.structure_ids,
+            "drivers": self.drivers,
+            "reporters": self.reporters,
+            "other_appended_labels": self.other_appended_labels,
+            "sklearn_version": self.sklearn_version,
+            "cross_validation_scores": self.cross_validation_scores,
+        }
         return data
 
     @property
     def label_names(self):
-        '''Return label names for the classifier.'''
+        """Return label names for the classifier."""
         return self.training_labels.columns
 
-    def create_feature_array(self, object_data, depth, structure_id, drivers,
-                             reporters):
-        '''Creates feature array from input data.
+    def create_feature_array(self, object_data, depth, structure_id, drivers, reporters):
+        """Creates feature array from input data.
 
         See Also
         --------
         create_feature_array : Create a feature array given model and inputs
-        '''
+        """
         pass
 
-    def get_labels(self, object_data, depth, structure_id, drivers,
-                   reporters):
-        '''Generate labels from input data.
+    def get_labels(self, object_data, depth, structure_id, drivers, reporters):
+        """Generate labels from input data.
 
         See Also
         --------
         ROIClassifier.create_feature_array
-        '''
-        features = create_feature_array(self.model_data, object_data, depth,
-                                        structure_id, drivers, reporters)
+        """
+        features = create_feature_array(self.model_data, object_data, depth, structure_id, drivers, reporters)
         self.unexpected_features = get_unexpected_features(
-            self.model_data, object_data, structure_id, drivers, reporters)
+            self.model_data, object_data, structure_id, drivers, reporters
+        )
         return self.predict(features)
 
     def fit(self, features, labels):
-        '''Fit model to data.
+        """Fit model to data.
 
         Parameters
         ----------
@@ -115,21 +111,21 @@ class ROIClassifier(object):
             Training feature set.
         labels : pandas.DataFrame
             Training labels.
-        '''
+        """
         self.training_features = features
         self.training_labels = labels
         self.model.fit(features, labels)
 
     def score(self, features, labels):
-        '''Calculate classifier score on data.'''
+        """Calculate classifier score on data."""
         return self.model.score(features, labels)
 
     def predict(self, features):
-        '''Generate classification labels given features.'''
+        """Generate classification labels given features."""
         return self.model.predict(features)
 
     def cross_validate(self, features, labels, n_folds=5, n_jobs=1):
-        '''Generate cross-validation scores for the classifier.
+        """Generate cross-validation scores for the classifier.
 
         Parameters
         ----------
@@ -146,25 +142,24 @@ class ROIClassifier(object):
         -------
         numpy.ndarray
             `n_folds` cross-validation scores.
-        '''
-        self.cross_validation_scores = cross_val_score(
-            self.model, features, labels, cv=n_folds, n_jobs=n_jobs)
+        """
+        self.cross_validation_scores = cross_val_score(self.model, features, labels, cv=n_folds, n_jobs=n_jobs)
         return self.cross_validation_scores
 
     def save(self, filename):
-        '''Save the classifier to file by pickling.'''
+        """Save the classifier to file by pickling."""
         with open(filename, "wb") as f:
             pickle.dump(self.model_data, f)
 
     @staticmethod
     def from_file(filename):
-        '''Load an ROIClassifier from file.'''
+        """Load an ROIClassifier from file."""
         with open(filename, "rb") as f:
             return ROIClassifier(pickle.load(f))
 
 
 def mean_gray_to_sigma(meanInt0, snpoffsetstdv):
-    '''Calculate intensity variation used in prior code.
+    """Calculate intensity variation used in prior code.
 
     Parameters
     ----------
@@ -177,15 +172,14 @@ def mean_gray_to_sigma(meanInt0, snpoffsetstdv):
     -------
     pandas.Series
         meanInt0/snpoffsetstdv, preventing Inf (returns as 0).
-    '''
+    """
     mean_gray_to_sigma = meanInt0 / snpoffsetstdv.astype(float)
     mean_gray_to_sigma[snpoffsetstdv == 0.0] = 0
     return mean_gray_to_sigma
 
 
-def create_feature_array(model_data, object_data, depth, structure_id,
-                         drivers, reporters):
-    '''Create feature array from input data.
+def create_feature_array(model_data, object_data, depth, structure_id, drivers, reporters):
+    """Create feature array from input data.
 
     This creates the feature array with column ordering matching what
     the classifier was trained on.
@@ -205,12 +199,11 @@ def create_feature_array(model_data, object_data, depth, structure_id,
         List of drivers for the mouse.
     reporters : list
         List of reporters for the mouse.
-    '''
+    """
     training_features = model_data["training_features"].columns
     if np.isnan(depth):
         depth = 0
-    meanGrayToSigma = mean_gray_to_sigma(
-        object_data["meanInt0"], object_data["snpoffsetstdv"])
+    meanGrayToSigma = mean_gray_to_sigma(object_data["meanInt0"], object_data["snpoffsetstdv"])
     features = pd.DataFrame()
     for column in training_features:
         if column == "depth":
@@ -228,14 +221,12 @@ def create_feature_array(model_data, object_data, depth, structure_id,
             features[column] = object_data[column]
         else:
             logging.error("Feature %s missing from input data", column)
-            raise KeyError(
-                "Feature {} missing from input data".format(column))
+            raise KeyError("Feature {} missing from input data".format(column))
     return features
 
 
-def get_unexpected_features(model_data, object_data, structure_id, drivers,
-                            reporters):
-    '''Get list of incoming features that weren't in traning data.
+def get_unexpected_features(model_data, object_data, structure_id, drivers, reporters):
+    """Get list of incoming features that weren't in traning data.
 
     Parameters
     ----------
@@ -250,21 +241,19 @@ def get_unexpected_features(model_data, object_data, structure_id, drivers,
         List of drivers for the mouse.
     reporters : list
         List of reporters for the mouse.
-    '''
+    """
     training_features = model_data["training_features"].columns
     trimmed_features = model_data["trimmed_features"]
-    inputs = list(itertools.chain(object_data.columns, [structure_id],
-                                  drivers, reporters))
+    inputs = list(itertools.chain(object_data.columns, [structure_id], drivers, reporters))
     unexpected_features = []
     for feature in inputs:
-        if (feature not in training_features) and \
-           (feature not in trimmed_features):
+        if (feature not in training_features) and (feature not in trimmed_features):
             unexpected_features.append(feature)
     return unexpected_features
 
 
 def label_unions_and_duplicates(rois, overlap_threshold):
-    '''Detect unions and duplicates and label ROIs.'''
+    """Detect unions and duplicates and label ROIs."""
     masks = create_roi_mask_array(rois)
     valid_masks = np.ones(masks.shape[0]).astype(bool)
     ms = mask_set.MaskSet(masks=masks)
@@ -292,7 +281,7 @@ def label_unions_and_duplicates(rois, overlap_threshold):
 
 
 def apply_labels(rois, label_array, label_names):
-    '''Apply labels to rois.
+    """Apply labels to rois.
 
     Parameters
     ----------
@@ -307,10 +296,9 @@ def apply_labels(rois, label_array, label_names):
     -------
     list
         List of ROIs with labels appended.
-    '''
+    """
     label_df = pd.DataFrame(data=label_array, columns=label_names)
-    label_lists = label_df.apply(_column_match).apply(
-        _compress_to_list, args=(label_df.columns,), axis=1)
+    label_lists = label_df.apply(_column_match).apply(_compress_to_list, args=(label_df.columns,), axis=1)
     for i, roi in enumerate(rois):
         roi.labels.extend(label_lists[i])
     return rois
@@ -321,5 +309,5 @@ def _column_match(column):
 
 
 def _compress_to_list(row, names):
-    '''Get names that have value 1 in row.'''
+    """Get names that have value 1 in row."""
     return list(names[row.values])

@@ -6,14 +6,11 @@ from marshmallow.validate import OneOf
 
 
 class BaseMetadataWriterInputSchema(argschema.ArgSchema):
-
     behavior_nwb_dir = argschema.fields.InputDir(
         required=True,
         default=None,
         allow_none=True,
-        description=(
-            "The directory where behavior_nwb sessions are to be found."
-        ),
+        description=("The directory where behavior_nwb sessions are to be found."),
     )
     behavior_nwb_prefix = argschema.fields.Str(
         required=False,
@@ -27,16 +24,12 @@ class BaseMetadataWriterInputSchema(argschema.ArgSchema):
 
     output_dir = argschema.fields.OutputDir(
         required=True,
-        description=(
-            "Directory to output metadata tables."
-        ),
+        description=("Directory to output metadata tables."),
     )
 
     clobber = argschema.fields.Boolean(
         default=False,
-        description=(
-            "If false, throw an error if output files already exist."
-        ),
+        description=("If false, throw an error if output files already exist."),
     )
 
     on_missing_file = argschema.fields.Str(
@@ -57,7 +50,6 @@ class BaseMetadataWriterInputSchema(argschema.ArgSchema):
 
 
 class BehaviorOphysMetadataInputSchema(BaseMetadataWriterInputSchema):
-
     data_release_date = argschema.fields.List(
         argschema.fields.String,
         required=True,
@@ -72,9 +64,7 @@ class BehaviorOphysMetadataInputSchema(BaseMetadataWriterInputSchema):
         required=True,
         allow_none=True,
         default=None,
-        description=(
-            "The directory where ophys experiments are to be found."
-        ),
+        description=("The directory where ophys experiments are to be found."),
     )
     ophys_nwb_prefix = argschema.fields.Str(
         required=False,
@@ -89,10 +79,10 @@ class BehaviorOphysMetadataInputSchema(BaseMetadataWriterInputSchema):
     @post_load
     def validate_paths(self, data, **kwargs):
         fname_lookup = {
-            'behavior_session_table': 'behavior_session_table.csv',
-            'ophys_session_table': 'ophys_session_table.csv',
-            'ophys_experiment_table': 'ophys_experiment_table.csv',
-            'ophys_cells_table': 'ophys_cells_table.csv'
+            "behavior_session_table": "behavior_session_table.csv",
+            "ophys_session_table": "ophys_session_table.csv",
+            "ophys_experiment_table": "ophys_experiment_table.csv",
+            "ophys_cells_table": "ophys_cells_table.csv",
         }
 
         out_dir = pathlib.Path(data["output_dir"])
@@ -105,15 +95,12 @@ class BehaviorOphysMetadataInputSchema(BaseMetadataWriterInputSchema):
 
         if len(msg) > 0:
             raise RuntimeError(
-                "The following files already exist\n"
-                f"{msg}"
-                "Run with clobber=True if you want to overwrite"
+                f"The following files already exist\n{msg}Run with clobber=True if you want to overwrite"
             )
         return data
 
 
 class PipelineMetadataSchema(DefaultSchema):
-
     name = argschema.fields.Str(
         required=True,
         allow_none=False,
@@ -144,24 +131,17 @@ class DataReleaseToolsInputSchema(argschema.ArgSchema):
 
     metadata_files = argschema.fields.List(
         argschema.fields.InputFile,
-        description=(
-            "Paths to the metadata '.csv' files written by this modules."
-        ),
+        description=("Paths to the metadata '.csv' files written by this modules."),
     )
 
     data_pipeline_metadata = argschema.fields.Nested(
         PipelineMetadataSchema,
         many=True,
-        description=(
-            "Metadata about the pipeline used to create this data release."
-        ),
+        description=("Metadata about the pipeline used to create this data release."),
     )
 
     project_name = argschema.fields.Str(
         required=True,
         allow_none=False,
-        description=(
-            "The project name to be passed along to the data_release_tool "
-            "when uploading this dataset."
-        ),
+        description=("The project name to be passed along to the data_release_tool when uploading this dataset."),
     )

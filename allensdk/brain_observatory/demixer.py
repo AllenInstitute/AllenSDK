@@ -55,7 +55,7 @@ def identify_valid_masks(mask_array):
     duplicates = ms.detect_duplicates(overlap_threshold=0.9)
     if len(duplicates) > 0:
         valid_masks[duplicates.keys()] = False
-        
+
     # detect unions, only for remaining valid masks
     valid_idxs = np.where(valid_masks)
     ms = mask_set.MaskSet(masks=mask_array[valid_idxs].astype(bool))
@@ -68,9 +68,9 @@ def identify_valid_masks(mask_array):
     return valid_masks
 
 
-def _demix_point(source_frame: np.ndarray, mask_traces: np.ndarray,
-                 flat_masks: sparse,
-                 pixels_per_mask: np.ndarray) -> Optional[np.ndarray]:
+def _demix_point(
+    source_frame: np.ndarray, mask_traces: np.ndarray, flat_masks: sparse, pixels_per_mask: np.ndarray
+) -> Optional[np.ndarray]:
     """
     Helper function to run demixing for single point in time for a
     source with overlapping traces.
@@ -112,9 +112,9 @@ def _demix_point(source_frame: np.ndarray, mask_traces: np.ndarray,
     return demix_traces
 
 
-def demix_time_dep_masks(raw_traces: np.ndarray, stack: np.ndarray,
-                         masks: np.ndarray,
-                         max_block_size: int = 1000) -> Tuple[np.ndarray, list]:
+def demix_time_dep_masks(
+    raw_traces: np.ndarray, stack: np.ndarray, masks: np.ndarray, max_block_size: int = 1000
+) -> Tuple[np.ndarray, list]:
     """
     Demix traces of potentially overlapping masks extraced from a single
     2p recording.
@@ -139,9 +139,11 @@ def demix_time_dep_masks(raw_traces: np.ndarray, stack: np.ndarray,
     if max_block_size == -1:
         max_block_size = T
     elif max_block_size < 1:
-        raise ValueError("Invalid maximum block size {}. Must be strictly "
-                         "positive (>= 1), or -1 for full length block "
-                         "size.".format(max_block_size))
+        raise ValueError(
+            "Invalid maximum block size {}. Must be strictly positive (>= 1), or -1 for full length block size.".format(
+                max_block_size
+            )
+        )
 
     num_pixels_in_mask = np.sum(masks, axis=(1, 2))
 
@@ -152,15 +154,12 @@ def demix_time_dep_masks(raw_traces: np.ndarray, stack: np.ndarray,
     demix_traces = np.zeros((N, T))
 
     for t in range(T):
-
         block_t = t % max_block_size
         if block_t == 0:  # load next block into memory and reshape
             block_T = np.min([(T - t), max_block_size])
-            stack_block = stack[t : t+block_T].reshape(block_T, P)
+            stack_block = stack[t : t + block_T].reshape(block_T, P)
 
-        demixed_point = _demix_point(
-            stack_block[block_t], raw_traces[:, t], flat_masks,
-            num_pixels_in_mask)
+        demixed_point = _demix_point(stack_block[block_t], raw_traces[:, t], flat_masks, num_pixels_in_mask)
         if demixed_point is not None:
             demix_traces[:, t] = demixed_point
             drop_frames.append(False)
@@ -172,8 +171,8 @@ def demix_time_dep_masks(raw_traces: np.ndarray, stack: np.ndarray,
 def plot_traces(raw_trace, demix_trace, roi_id, roi_ind, save_file):
     fig, ax = plt.subplots()
 
-    ax.plot(raw_trace, label='Fluoresence')
-    ax.plot(demix_trace, label='Demixed')
+    ax.plot(raw_trace, label="Fluoresence")
+    ax.plot(demix_trace, label="Demixed")
     ax.set_title("ROI ID(%d) index (%d)" % (roi_id, roi_ind))
     ax.legend()
     plt.savefig(save_file)
@@ -183,27 +182,26 @@ def plot_traces(raw_trace, demix_trace, roi_id, roi_ind, save_file):
 def find_zero_baselines(traces):
     means = traces.mean(axis=1)
     stds = traces.std(axis=1)
-    return np.where((means-stds) < 0)
+    return np.where((means - stds) < 0)
 
 
-def plot_negative_baselines(raw_traces, demix_traces, mask_array, 
-                            roi_ids_mask, plot_dir, ext='png'):
+def plot_negative_baselines(raw_traces, demix_traces, mask_array, roi_ids_mask, plot_dir, ext="png"):
     N, T = raw_traces.shape
     _, x, y = mask_array.shape
 
     logging.debug("finding negative baselines")
     neg_inds = find_negative_baselines(demix_traces)[0]
-    
+
     overlap_inds = set()
     logging.debug("detected negative baselines: %s", str(neg_inds))
     for roi_ind in neg_inds:
         Manifest.safe_mkdir(plot_dir)
 
-        save_file = os.path.join(plot_dir, str(roi_ids_mask[roi_ind]) + '_negative.' + ext)
+        save_file = os.path.join(plot_dir, str(roi_ids_mask[roi_ind]) + "_negative." + ext)
         plot_traces(raw_traces[roi_ind], demix_traces[roi_ind], roi_ids_mask[roi_ind], roi_ind, save_file)
 
-        ''' plot overlapping masks '''
-        save_file = os.path.join(plot_dir, str(roi_ids_mask[roi_ind]) + '_negative_masks.' + ext)
+        """ plot overlapping masks """
+        save_file = os.path.join(plot_dir, str(roi_ids_mask[roi_ind]) + "_negative_masks." + ext)
         roi_overlap_inds = plot_overlap_masks_lengthOne(roi_ind, mask_array, save_file)
 
         overlap_inds.update(roi_overlap_inds)
@@ -215,9 +213,7 @@ def plot_negative_baselines(raw_traces, demix_traces, mask_array,
     return list(overlap_inds)
 
 
-def plot_negative_transients(raw_traces, demix_traces, valid_roi, mask_array,
-                             roi_ids_mask, plot_dir, ext='png'):
-
+def plot_negative_transients(raw_traces, demix_traces, valid_roi, mask_array, roi_ids_mask, plot_dir, ext="png"):
     N, T = raw_traces.shape
     _, x, y = mask_array.shape
 
@@ -229,24 +225,23 @@ def plot_negative_transients(raw_traces, demix_traces, valid_roi, mask_array,
 
     logging.debug("plotting negative transients")
 
-    flat_masks = mask_array.reshape(N, x*y)
+    flat_masks = mask_array.reshape(N, x * y)
     overlap = flat_masks.dot(flat_masks.T)
     overlap ^= np.diag(np.diag(overlap))
 
     for roi_ind in rois_with_trans:
-
-        ''' plot biggest negative transient of this roi '''
+        """ plot biggest negative transient of this roi """
         trans_ind_list = trans_ind_list1[roi_ind]
 
         trans_ind_list = trans_ind_list[0]
         trans_list = []
         for i in trans_ind_list:
             if i > 100 and i < T - 100:
-                trans_list.append(demix_traces[roi_ind, i - 100:i + 100])
+                trans_list.append(demix_traces[roi_ind, i - 100 : i + 100])
             elif i > 100 and i >= T - 100:
-                trans_list.append(demix_traces[roi_ind, i - 100:])
+                trans_list.append(demix_traces[roi_ind, i - 100 :])
             else:
-                trans_list.append(demix_traces[roi_ind, :i + 100])
+                trans_list.append(demix_traces[roi_ind, : i + 100])
 
         # trans_list = [demix_traces[roi_ind, i-100:i+100] for i in trans_ind_list if i > 100 and i < Nt]
         Ntrans = len(trans_list)
@@ -261,22 +256,20 @@ def plot_negative_transients(raw_traces, demix_traces, valid_roi, mask_array,
         # trans_list_min = np.where(demix_traces[roi_ind, trans_ind_list] == min(demix_traces[roi_ind, trans_ind_list]))[0]
 
         if np.sum(overlap[roi_ind]) > 0:
-
             if valid_roi[roi_ind]:
-
-                savefile = os.path.join(plot_dir, str(roi_ids_mask[roi_ind]) + '_transient_valid.' + ext)
+                savefile = os.path.join(plot_dir, str(roi_ids_mask[roi_ind]) + "_transient_valid." + ext)
                 plot_transients(roi_ind, trans_ind, mask_array, raw_traces, demix_traces, savefile)
 
-                ''' plot overlapping masks '''
-                savefile = os.path.join(plot_dir, str(roi_ids_mask[roi_ind]) + '_masks_valid.' + ext)
+                """ plot overlapping masks """
+                savefile = os.path.join(plot_dir, str(roi_ids_mask[roi_ind]) + "_masks_valid." + ext)
                 plot_overlap_masks_lengthOne(roi_ind, mask_array, savefile)
                 # plot_overlap_masks(roi_ind, mask_test, savefile)
             else:
-                savefile = os.path.join(plot_dir, str(roi_ids_mask[roi_ind]) + '_transient_invalid.' + ext)
+                savefile = os.path.join(plot_dir, str(roi_ids_mask[roi_ind]) + "_transient_invalid." + ext)
                 plot_transients(roi_ind, trans_ind, mask_array, raw_traces, demix_traces, savefile)
 
-                ''' plot overlapping masks '''
-                savefile = os.path.join(plot_dir, str(roi_ids_mask[roi_ind]) + '_masks_invalid.' + ext)
+                """ plot overlapping masks """
+                savefile = os.path.join(plot_dir, str(roi_ids_mask[roi_ind]) + "_masks_invalid." + ext)
                 plot_overlap_masks_lengthOne(roi_ind, mask_array, savefile)
                 # plot_overlap_masks(roi_ind, mask_test, savefile)
                 #
@@ -287,15 +280,15 @@ def plot_negative_transients(raw_traces, demix_traces, valid_roi, mask_array,
 
 
 def rolling_window(trace, window=500):
-    '''
+    """
 
     :param trace:
     :param window:
     :return:
-    '''
+    """
 
     shape = trace.shape[:-1] + (trace.shape[-1] - window + 1, window)
-    strides = trace.strides + (trace.strides[-1], )
+    strides = trace.strides + (trace.strides[-1],)
 
     return np.lib.stride_tricks.as_strided(trace, shape=shape, strides=strides)
 
@@ -303,18 +296,18 @@ def rolling_window(trace, window=500):
 def find_negative_baselines(trace):
     means = trace.mean(axis=1)
     stds = trace.std(axis=1)
-    return np.where((means+stds) < 0)
+    return np.where((means + stds) < 0)
 
 
 def find_negative_transients_threshold(trace, window=500, length=10, std_devs=3):
-    trace = np.pad(trace, pad_width=(window-1, 0), mode='constant', constant_values=[np.mean(trace[:window])])
+    trace = np.pad(trace, pad_width=(window - 1, 0), mode="constant", constant_values=[np.mean(trace[:window])])
     rolling_mean = np.mean(rolling_window(trace, window), -1)
     rolling_std = np.std(rolling_window(trace, window), -1)
 
-    below_thresh = (trace[window-1:] < rolling_mean - std_devs*rolling_std)
-    below_thresh = np.pad(below_thresh, pad_width=(window-1, 0), mode='constant')
+    below_thresh = trace[window - 1 :] < rolling_mean - std_devs * rolling_std
+    below_thresh = np.pad(below_thresh, pad_width=(window - 1, 0), mode="constant")
     trans_length = np.sum(rolling_window(below_thresh, length), -1)
-    trans_length = trans_length[window-length:]
+    trans_length = trans_length[window - length :]
 
     trans_ind = np.where(trans_length == length)
 
@@ -322,14 +315,13 @@ def find_negative_transients_threshold(trace, window=500, length=10, std_devs=3)
 
 
 def plot_overlap_masks_lengthOne(roi_ind, masks, savefile=None, weighted=False):
-
     masks = np.array(masks).astype(float)
     N, x, y = masks.shape
-    if np.sum(masks[-1])  == x*y:
+    if np.sum(masks[-1]) == x * y:
         masks = masks[:-1]
         N -= 1
 
-    flat_masks = masks.reshape(N, x*y)
+    flat_masks = masks.reshape(N, x * y)
     masks_overlap = flat_masks.dot(flat_masks.T)
 
     ind_plot = np.where(masks_overlap[roi_ind, :] > 0)[0]  # rois (k) that roi_ind overlaps with
@@ -338,31 +330,37 @@ def plot_overlap_masks_lengthOne(roi_ind, masks, savefile=None, weighted=False):
         ind_plot = np.concatenate((ind_plot, ind_k))
 
     ind_plot = np.unique(ind_plot)
-    ind_plot = np.concatenate(([roi_ind], ind_plot[ind_plot!=roi_ind]))
+    ind_plot = np.concatenate(([roi_ind], ind_plot[ind_plot != roi_ind]))
 
     plt.figure()
-    color_list = ['b', 'g', 'r', 'c', 'm', 'y', 'k']
+    color_list = ["b", "g", "r", "c", "m", "y", "k"]
     Ncol = len(color_list)
     for num, i in enumerate(ind_plot):
         mask_plot = masks[i]
         if not weighted:
-            mask_plot = ((num % Ncol)+1)*np.ma.array(masks[i], mask=(masks[i] == 0))
-            plt.imshow(mask_plot, clim=(1., Ncol+1), cmap=colors.ListedColormap(color_list), alpha=0.5, interpolation='nearest')
+            mask_plot = ((num % Ncol) + 1) * np.ma.array(masks[i], mask=(masks[i] == 0))
+            plt.imshow(
+                mask_plot,
+                clim=(1.0, Ncol + 1),
+                cmap=colors.ListedColormap(color_list),
+                alpha=0.5,
+                interpolation="nearest",
+            )
             # plt.imshow(mask_plot, clim=(1., len(ind_plot)), alpha=.5)
 
         elif weighted:
             mask_plot = np.ma.array(masks[i], mask=(masks[i] == 0))
-            plt.imshow(mask_plot, cmap='gray_r', alpha=.5, interpolation='nearest')
+            plt.imshow(mask_plot, cmap="gray_r", alpha=0.5, interpolation="nearest")
 
-        plt.text(np.mean(np.where(np.sum(mask_plot, axis=0))), np.mean(np.where(np.sum(mask_plot, axis=1))) ,str(i))
+        plt.text(np.mean(np.where(np.sum(mask_plot, axis=0))), np.mean(np.where(np.sum(mask_plot, axis=1))), str(i))
 
     mask_tot = np.sum(masks[ind_plot, :, :], axis=0)
     mask_x = np.sum(mask_tot, axis=0)
     mask_y = np.sum(mask_tot, axis=1)
 
-    plt.xlim((np.amin(np.where(mask_x))-5, np.amax(np.where(mask_x))+5))
-    plt.ylim((np.amin(np.where(mask_y))-5, np.amax(np.where(mask_y))+5))
-    plt.title('Masks')
+    plt.xlim((np.amin(np.where(mask_x)) - 5, np.amax(np.where(mask_x)) + 5))
+    plt.ylim((np.amin(np.where(mask_y)) - 5, np.amax(np.where(mask_y)) + 5))
+    plt.title("Masks")
 
     if savefile is not None:
         plt.savefig(savefile)
@@ -372,12 +370,11 @@ def plot_overlap_masks_lengthOne(roi_ind, masks, savefile=None, weighted=False):
 
 
 def plot_transients(roi_ind, t_trans, masks, traces, demix_traces, savefile):
-
     masks = np.array(masks).astype(float)
     N, x, y = masks.shape
     _, Nt = traces.shape
 
-    flat_masks = masks.reshape(N, x*y)
+    flat_masks = masks.reshape(N, x * y)
     masks_overlap = flat_masks.dot(flat_masks.T)
 
     ind_plot = np.where(masks_overlap[roi_ind, :] > 0)[0]  # rois (k) that roi_ind overlaps with
@@ -386,7 +383,7 @@ def plot_transients(roi_ind, t_trans, masks, traces, demix_traces, savefile):
         ind_plot = np.concatenate((ind_plot, ind_k))
 
     ind_plot = np.unique(ind_plot)
-    ind_plot = np.concatenate(([roi_ind], ind_plot[ind_plot!=roi_ind]))
+    ind_plot = np.concatenate(([roi_ind], ind_plot[ind_plot != roi_ind]))
 
     if t_trans > 150 and t_trans < Nt - 150:
         plot_t = range(t_trans - 150, t_trans + 150)
@@ -396,17 +393,17 @@ def plot_transients(roi_ind, t_trans, masks, traces, demix_traces, savefile):
         plot_t = range(0, t_trans + 150)
 
     fig, ax = plt.subplots(1, 2, figsize=(12, 6), sharex=True, sharey=True)
-    color_list = ['b', 'g', 'r', 'c', 'm', 'y', 'k']
+    color_list = ["b", "g", "r", "c", "m", "y", "k"]
     Ncol = len(color_list)
 
     for num, i in enumerate(ind_plot):
         ax[0].plot(plot_t, traces[i, plot_t], label=str(i), color=color_list[(num % Ncol)])
         ax[1].plot(plot_t, demix_traces[i, plot_t], label=str(i), color=color_list[(num % Ncol)])
 
-    ax[0].set_title('Raw')
-    ax[0].set_ylabel('Fluorescence')
-    ax[1].set_title('Demixed')
-    ax[1].set_xlabel('Time')
+    ax[0].set_title("Raw")
+    ax[0].set_ylabel("Fluorescence")
+    ax[1].set_title("Demixed")
+    ax[1].set_xlabel("Time")
     ax[0].legend(loc=0)
 
     plt.savefig(savefile)

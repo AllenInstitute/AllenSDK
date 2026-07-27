@@ -3,13 +3,13 @@ import numpy as np
 
 
 def medfilt_custom(x, kernel_size=3):
-    '''This median filter returns 'nan' whenever any value in the kernal width
-    is 'nan' and the median otherwise'''
+    """This median filter returns 'nan' whenever any value in the kernal width
+    is 'nan' and the median otherwise"""
     T = x.shape[0]
     delta = kernel_size // 2
 
     x_med = np.zeros(x.shape)
-    window = x[0:delta + 1]
+    window = x[0 : delta + 1]
     if np.any(np.isnan(window)):
         x_med[0] = np.nan
     else:
@@ -17,7 +17,7 @@ def medfilt_custom(x, kernel_size=3):
 
     # print window
     for t in range(1, T):
-        window = x[t - delta:t + delta + 1]
+        window = x[t - delta : t + delta + 1]
         # print window
         if np.any(np.isnan(window)):
             x_med[t] = np.nan
@@ -28,7 +28,7 @@ def medfilt_custom(x, kernel_size=3):
 
 
 def median_absolute_deviation(a, consistency_constant=1.4826):
-    '''Calculate the median absolute deviation of a univariate dataset.
+    """Calculate the median absolute deviation of a univariate dataset.
 
     Parameters
     ----------
@@ -42,7 +42,7 @@ def median_absolute_deviation(a, consistency_constant=1.4826):
     -------
     float
         Median absolute deviation of the data.
-    '''
+    """
     return consistency_constant * np.nanmedian(np.abs(a - np.nanmedian(a)))
 
 
@@ -69,8 +69,7 @@ def post_process_cr(cr_params):
     # compute a threshold on the area of the cr ellipse
     dev = median_absolute_deviation(area)
     if dev == 0:
-        logging.warning("Median absolute deviation is 0,"
-                        "falling back to standard deviation.")
+        logging.warning("Median absolute deviation is 0,falling back to standard deviation.")
         dev = np.nanstd(area)
     threshold = np.nanmedian(area) + 3 * dev
 
@@ -97,8 +96,8 @@ def post_process_cr(cr_params):
     std_y = np.std(y_center_med[y_mask_finite])
 
     # set these extreme values to nan
-    x_center_med[np.abs(x_center_med - mean_x) > 3*std_x] = np.nan
-    y_center_med[np.abs(y_center_med - mean_y) > 3*std_y] = np.nan
+    x_center_med[np.abs(x_center_med - mean_x) > 3 * std_x] = np.nan
+    y_center_med[np.abs(y_center_med - mean_y) > 3 * std_y] = np.nan
 
     either_nan_mask = np.isnan(x_center_med) | np.isnan(y_center_med)
     x_center_med[either_nan_mask] = np.nan
@@ -112,7 +111,7 @@ def post_process_cr(cr_params):
 
 
 def post_process_areas(areas: np.ndarray, percent_thresh: int = 99):
-    '''Filter pupil or eye area data by replacing outliers with nan
+    """Filter pupil or eye area data by replacing outliers with nan
 
     Parameters
     ----------
@@ -125,7 +124,7 @@ def post_process_areas(areas: np.ndarray, percent_thresh: int = 99):
     -------
     numpy.ndarray
         Eye/pupil areas with outliers replaced with nan
-    '''
+    """
     threshold = np.percentile(areas[np.isfinite(areas)], percent_thresh)
     outlier_indices = areas > threshold
     areas[outlier_indices] = np.nan

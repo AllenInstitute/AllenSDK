@@ -5,11 +5,10 @@ import numpy as np
 from scipy.interpolate import RegularGridInterpolator, griddata
 
 
-def regular_grid_extractor_factory(timestamps: np.ndarray,
-                                   lfp_raw: np.ndarray,
-                                   channel: int,
-                                   method: str = 'linear') -> np.ndarray:
-    '''Builds an LFP data extractor using interpolation on a regular grid
+def regular_grid_extractor_factory(
+    timestamps: np.ndarray, lfp_raw: np.ndarray, channel: int, method: str = "linear"
+) -> np.ndarray:
+    """Builds an LFP data extractor using interpolation on a regular grid
 
     Ignores timestamps less than zero (which result from unaligned
     data segments)
@@ -30,20 +29,21 @@ def regular_grid_extractor_factory(timestamps: np.ndarray,
     -------
     numpy.ndarray
         LFP data that has been interpolated to a regular grid.
-    '''
+    """
 
-    valid_timestamps = (timestamps >= 0)
+    valid_timestamps = timestamps >= 0
 
-    return RegularGridInterpolator((timestamps[valid_timestamps],),
-                                   lfp_raw[valid_timestamps, channel],
-                                   method=method,
-                                   bounds_error=False,
-                                   fill_value=np.nan)
+    return RegularGridInterpolator(
+        (timestamps[valid_timestamps],),
+        lfp_raw[valid_timestamps, channel],
+        method=method,
+        bounds_error=False,
+        fill_value=np.nan,
+    )
 
 
-def make_actual_channel_locations(min_chan: int = 0,
-                                  max_chan: int = 384) -> np.ndarray:
-    '''Generate x/y locations of Neuropixels recording sites.
+def make_actual_channel_locations(min_chan: int = 0, max_chan: int = 384) -> np.ndarray:
+    """Generate x/y locations of Neuropixels recording sites.
 
           0  8 16 24 32 40 48
     60    *  -  -  -  *  -  -
@@ -66,7 +66,7 @@ def make_actual_channel_locations(min_chan: int = 0,
     actual_channel_locations: numpy.ndarray
         column 1 = x positions in microns
         column 2 = y positions in microns
-    '''
+    """
 
     actual_channel_locations = np.zeros((max_chan, 2))
 
@@ -79,9 +79,8 @@ def make_actual_channel_locations(min_chan: int = 0,
     return actual_channel_locations[min_chan:, :]
 
 
-def make_interp_channel_locations(min_chan: int = 0,
-                                  max_chan: int = 384) -> np.ndarray:
-    '''Generate x/y locations for interpolated Neuropixels recording sites.
+def make_interp_channel_locations(min_chan: int = 0, max_chan: int = 384) -> np.ndarray:
+    """Generate x/y locations for interpolated Neuropixels recording sites.
 
     This version just returns the central column of interpolated sites.
 
@@ -108,7 +107,7 @@ def make_interp_channel_locations(min_chan: int = 0,
     interp_channel_locations: numpy.ndarray
         column 1 = interpolated x positions in microns
         column 2 = y positions in microns
-    '''
+    """
 
     interp_channel_locations = np.zeros((max_chan, 2))
 
@@ -119,11 +118,10 @@ def make_interp_channel_locations(min_chan: int = 0,
     return interp_channel_locations[min_chan:, :]
 
 
-def interp_channel_locs(lfp: np.ndarray,
-                        actual_locs: np.ndarray,
-                        interp_locs: np.ndarray,
-                        method: str = 'cubic') -> Tuple[np.ndarray, float]:
-    '''Interpolates single-trial lfp channel locations to account for
+def interp_channel_locs(
+    lfp: np.ndarray, actual_locs: np.ndarray, interp_locs: np.ndarray, method: str = "cubic"
+) -> Tuple[np.ndarray, float]:
+    """Interpolates single-trial lfp channel locations to account for
     channel stagger.
 
     Parameters
@@ -149,27 +147,30 @@ def interp_channel_locs(lfp: np.ndarray,
         spacing: float
             Distance between new interpolated virtual channel sites
             (in millimeters)
-    '''
+    """
 
     if lfp.shape[1] != actual_locs.shape[0]:
-        e_msg = (f"Number of 'lfp' channels ({lfp.shape[1]}) does not "
-                 f"match number of 'actual_locs' ({actual_locs.shape[0]})!")
+        e_msg = (
+            f"Number of 'lfp' channels ({lfp.shape[1]}) does not "
+            f"match number of 'actual_locs' ({actual_locs.shape[0]})!"
+        )
         raise RuntimeError(e_msg)
 
     spacing = np.mean(np.diff(interp_locs[:, 1])) / 1000
 
-    interp_lfp = np.zeros((lfp.shape[0],  # number of interp trials
-                           interp_locs.shape[0],  # number of interp channels
-                           lfp.shape[2]))  # number of interp samples
+    interp_lfp = np.zeros(
+        (
+            lfp.shape[0],  # number of interp trials
+            interp_locs.shape[0],  # number of interp channels
+            lfp.shape[2],
+        )
+    )  # number of interp samples
 
     for trial in range(lfp.shape[0]):  # trials
         trial_data = lfp[trial, :, :]
         for t in range(0, lfp.shape[2]):  # time samples
-            interp_lfp[trial, :, t] = griddata(points=actual_locs,
-                                               values=trial_data[:, t],
-                                               xi=interp_locs,
-                                               method=method,
-                                               fill_value=0,
-                                               rescale=False)
+            interp_lfp[trial, :, t] = griddata(
+                points=actual_locs, values=trial_data[:, t], xi=interp_locs, method=method, fill_value=0, rescale=False
+            )
 
     return (interp_lfp, spacing)

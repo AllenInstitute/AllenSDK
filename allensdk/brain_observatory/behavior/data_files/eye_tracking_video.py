@@ -11,10 +11,7 @@ class EyeTrackingVideo(DataFile):
 
     @classmethod
     def from_lims(
-            cls,
-            db: PostgresQueryMixin,
-            behavior_session_id: Union[int, str],
-            session_type: str = 'OphysSession'
+        cls, db: PostgresQueryMixin, behavior_session_id: Union[int, str], session_type: str = "OphysSession"
     ) -> "EyeTrackingVideo":
         """
 
@@ -29,10 +26,9 @@ class EyeTrackingVideo(DataFile):
         -------
         `EyeTrackingVideo` instance
         """
-        valid_session_types = ('OphysSession', 'EcephysSession')
+        valid_session_types = ("OphysSession", "EcephysSession")
         if session_type not in valid_session_types:
-            raise ValueError(f'Session type must be one of '
-                             f'{valid_session_types}')
+            raise ValueError(f"Session type must be one of {valid_session_types}")
         query = f"""
                 SELECT wkf.storage_directory || wkf.filename AS eye_tracking_file
                 FROM behavior_sessions bs

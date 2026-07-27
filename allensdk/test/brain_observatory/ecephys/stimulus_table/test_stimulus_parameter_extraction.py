@@ -21,7 +21,6 @@ def test_extract_const_params_from_stim_repr_duplicates(dup_stim_repr):
 
 
 def test_extract_const_params_from_stim_repr(stim_repr):
-
     expected = {
         "autoDraw": False,
         "autoLog": True,
@@ -40,7 +39,6 @@ def test_extract_const_params_from_stim_repr(stim_repr):
 
 
 def test_extract_stim_class_from_repr(stim_repr):
-
     expected = "GratingStim"
     obtained = spe.extract_stim_class_from_repr(stim_repr)
 

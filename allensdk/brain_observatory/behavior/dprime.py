@@ -21,37 +21,17 @@ def get_go_responses(hit=None, miss=None, aborted=None):
     return go_responses
 
 
-def get_hit_rate(
-    hit=None, miss=None, aborted=None, sliding_window=SLIDING_WINDOW
-):
+def get_hit_rate(hit=None, miss=None, aborted=None, sliding_window=SLIDING_WINDOW):
     go_responses = get_go_responses(hit=hit, miss=miss, aborted=aborted)
-    hit_rate = (
-        pd.Series(go_responses)
-        .rolling(window=sliding_window, min_periods=0)
-        .mean()
-        .values
-    )
+    hit_rate = pd.Series(go_responses).rolling(window=sliding_window, min_periods=0).mean().values
     return hit_rate
 
 
-def get_trial_count_corrected_hit_rate(
-    hit=None, miss=None, aborted=None, sliding_window=SLIDING_WINDOW
-):
+def get_trial_count_corrected_hit_rate(hit=None, miss=None, aborted=None, sliding_window=SLIDING_WINDOW):
     go_responses = get_go_responses(hit=hit, miss=miss, aborted=aborted)
-    go_responses_count = (
-        pd.Series(go_responses)
-        .rolling(window=sliding_window, min_periods=0)
-        .count()
-    )
-    hit_rate = (
-        pd.Series(go_responses)
-        .rolling(window=sliding_window, min_periods=0)
-        .mean()
-        .values
-    )
-    trial_count_corrected_hit_rate = np.vectorize(trial_number_limit)(
-        hit_rate, go_responses_count
-    )
+    go_responses_count = pd.Series(go_responses).rolling(window=sliding_window, min_periods=0).count()
+    hit_rate = pd.Series(go_responses).rolling(window=sliding_window, min_periods=0).mean().values
+    trial_count_corrected_hit_rate = np.vectorize(trial_number_limit)(hit_rate, go_responses_count)
     return trial_count_corrected_hit_rate
 
 
@@ -77,15 +57,8 @@ def get_false_alarm_rate(
     aborted=None,
     sliding_window=SLIDING_WINDOW,
 ):
-    catch_responses = get_catch_responses(
-        correct_reject=correct_reject, false_alarm=false_alarm, aborted=aborted
-    )
-    false_alarm_rate = (
-        pd.Series(catch_responses)
-        .rolling(window=sliding_window, min_periods=0)
-        .mean()
-        .values
-    )
+    catch_responses = get_catch_responses(correct_reject=correct_reject, false_alarm=false_alarm, aborted=aborted)
+    false_alarm_rate = pd.Series(catch_responses).rolling(window=sliding_window, min_periods=0).mean().values
     return false_alarm_rate
 
 
@@ -95,34 +68,16 @@ def get_trial_count_corrected_false_alarm_rate(
     aborted=None,
     sliding_window=SLIDING_WINDOW,
 ):
-    catch_responses = get_catch_responses(
-        correct_reject=correct_reject, false_alarm=false_alarm, aborted=aborted
-    )
-    catch_responses_count = (
-        pd.Series(catch_responses)
-        .rolling(window=sliding_window, min_periods=0)
-        .count()
-    )
-    false_alarm_rate = (
-        pd.Series(catch_responses)
-        .rolling(window=sliding_window, min_periods=0)
-        .mean()
-        .values
-    )
-    trial_count_corrected_false_alarm_rate = np.vectorize(trial_number_limit)(
-        false_alarm_rate, catch_responses_count
-    )
+    catch_responses = get_catch_responses(correct_reject=correct_reject, false_alarm=false_alarm, aborted=aborted)
+    catch_responses_count = pd.Series(catch_responses).rolling(window=sliding_window, min_periods=0).count()
+    false_alarm_rate = pd.Series(catch_responses).rolling(window=sliding_window, min_periods=0).mean().values
+    trial_count_corrected_false_alarm_rate = np.vectorize(trial_number_limit)(false_alarm_rate, catch_responses_count)
     return trial_count_corrected_false_alarm_rate
 
 
-def get_rolling_dprime(
-    rolling_hit_rate, rolling_fa_rate, sliding_window=SLIDING_WINDOW
-):
+def get_rolling_dprime(rolling_hit_rate, rolling_fa_rate, sliding_window=SLIDING_WINDOW):
     return np.array(
-        [
-            get_dprime(hr, far, sliding_window=SLIDING_WINDOW)
-            for hr, far in zip(rolling_hit_rate, rolling_fa_rate)
-        ]
+        [get_dprime(hr, far, sliding_window=SLIDING_WINDOW) for hr, far in zip(rolling_hit_rate, rolling_fa_rate)]
     )
 
 

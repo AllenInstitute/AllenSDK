@@ -285,9 +285,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         self.logger.debug(f"get_behavior_session_table query: \n{query}")
         return self.lims_engine.select(query)
 
-    def get_behavior_stage_parameters(
-        self, foraging_ids: List[str]
-    ) -> pd.Series:
+    def get_behavior_stage_parameters(self, foraging_ids: List[str]) -> pd.Series:
         """Gets the stage parameters for each foraging id from mtrain
 
         Parameters
@@ -300,9 +298,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         ---------
         Series with index of foraging id and values stage parameters
         """
-        foraging_ids_query = build_in_list_selector_query(
-            "bs.id", foraging_ids
-        )
+        foraging_ids_query = build_in_list_selector_query("bs.id", foraging_ids)
 
         query = f"""
             SELECT
@@ -316,18 +312,14 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         df = df.set_index("foraging_id")
         return df["stage_parameters"]
 
-    def get_behavior_ophys_experiment(
-        self, ophys_experiment_id: int
-    ) -> BehaviorOphysExperiment:
+    def get_behavior_ophys_experiment(self, ophys_experiment_id: int) -> BehaviorOphysExperiment:
         """Returns a BehaviorOphysExperiment object that contains methods
         to analyze a single behavior+ophys session.
         :param ophys_experiment_id: id that corresponds to an ophys experiment
         :type ophys_experiment_id: int
         :rtype: BehaviorOphysExperiment
         """
-        return BehaviorOphysExperiment.from_lims(
-            ophys_experiment_id=ophys_experiment_id
-        )
+        return BehaviorOphysExperiment.from_lims(ophys_experiment_id=ophys_experiment_id)
 
     def _get_ophys_experiment_table(self) -> pd.DataFrame:
         """
@@ -386,19 +378,12 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         # Hard type targeted_imaging_depth to int to match the data_object
         # type.
         targeted_imaging_depth = (
-            query_df[["ophys_container_id", "imaging_depth"]]
-            .groupby("ophys_container_id")
-            .mean()
-            .astype(int)
+            query_df[["ophys_container_id", "imaging_depth"]].groupby("ophys_container_id").mean().astype(int)
         )
         targeted_imaging_depth.columns = ["targeted_imaging_depth"]
         df = query_df.merge(targeted_imaging_depth, on="ophys_container_id")
-        df = enforce_df_int_typing(
-            input_df=df, int_columns=VBO_INTEGER_COLUMNS, use_pandas_type=True
-        )
-        df = enforce_df_column_order(
-            input_df=df, column_order=VBO_METADATA_COLUMN_ORDER
-        )
+        df = enforce_df_int_typing(input_df=df, int_columns=VBO_INTEGER_COLUMNS, use_pandas_type=True)
+        df = enforce_df_column_order(input_df=df, column_order=VBO_METADATA_COLUMN_ORDER)
         return df
 
     def _get_ophys_cells_table(self):
@@ -442,9 +427,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         df = self.lims_engine.select(query)
 
         # NaN's for invalid cells force this to float, push to int
-        df = enforce_df_int_typing(
-            input_df=df, int_columns=VBO_INTEGER_COLUMNS, use_pandas_type=True
-        )
+        df = enforce_df_int_typing(input_df=df, int_columns=VBO_INTEGER_COLUMNS, use_pandas_type=True)
         return df
 
     def get_ophys_cells_table(self):
@@ -506,13 +489,9 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         """
         # There is one ophys_session_id from 2018 that has multiple behavior
         # ids, causing duplicates -- drop all dupes for now; # TODO
-        table = self._get_ophys_session_table().drop_duplicates(
-            subset=["ophys_session_id"], keep=False
-        )
+        table = self._get_ophys_session_table().drop_duplicates(subset=["ophys_session_id"], keep=False)
         # Make date time explicitly UTC.
-        table["date_of_acquisition"] = pd.to_datetime(
-            table["date_of_acquisition"], format="ISO8601", utc=True
-        )
+        table["date_of_acquisition"] = pd.to_datetime(table["date_of_acquisition"], format="ISO8601", utc=True)
 
         # Fill NaN values of imaging_plane_group_count with zero to match
         # the behavior of the BehaviorOphysExperiment object.
@@ -521,23 +500,17 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             int_columns=VBO_INTEGER_COLUMNS,
             use_pandas_type=True,
         )
-        table = enforce_df_column_order(
-            input_df=table, column_order=VBO_METADATA_COLUMN_ORDER
-        )
+        table = enforce_df_column_order(input_df=table, column_order=VBO_METADATA_COLUMN_ORDER)
         return table.set_index("ophys_session_id")
 
-    def get_behavior_session(
-        self, behavior_session_id: int
-    ) -> BehaviorSession:
+    def get_behavior_session(self, behavior_session_id: int) -> BehaviorSession:
         """Returns a BehaviorSession object that contains methods to
         analyze a single behavior session.
         :param behavior_session_id: id that corresponds to a behavior session
         :type behavior_session_id: int
         :rtype: BehaviorSession
         """
-        return BehaviorSession.from_lims(
-            behavior_session_id=behavior_session_id
-        )
+        return BehaviorSession.from_lims(behavior_session_id=behavior_session_id)
 
     def get_ophys_experiment_table(self) -> pd.DataFrame:
         """Return a pd.Dataframe table with all ophys_experiment_ids and
@@ -553,17 +526,11 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         :rtype: pd.DataFrame
         """
         df = self._get_ophys_experiment_table()
-        df["date_of_acquisition"] = pd.to_datetime(
-            df["date_of_acquisition"], format="ISO8601", utc=True
-        )
+        df["date_of_acquisition"] = pd.to_datetime(df["date_of_acquisition"], format="ISO8601", utc=True)
         # Set type to pandas.Int64 to enforce integer typing and not revert to
         # float.
-        df = enforce_df_int_typing(
-            input_df=df, int_columns=VBO_INTEGER_COLUMNS, use_pandas_type=True
-        )
-        df = enforce_df_column_order(
-            input_df=df, column_order=VBO_METADATA_COLUMN_ORDER
-        )
+        df = enforce_df_int_typing(input_df=df, int_columns=VBO_INTEGER_COLUMNS, use_pandas_type=True)
+        df = enforce_df_column_order(input_df=df, column_order=VBO_METADATA_COLUMN_ORDER)
 
         return df.set_index("ophys_experiment_id")
 
@@ -590,9 +557,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             int_columns=VBO_INTEGER_COLUMNS,
             use_pandas_type=True,
         )
-        summary_tbl = enforce_df_column_order(
-            input_df=summary_tbl, column_order=VBO_METADATA_COLUMN_ORDER
-        )
+        summary_tbl = enforce_df_column_order(input_df=summary_tbl, column_order=VBO_METADATA_COLUMN_ORDER)
 
         return summary_tbl.set_index("behavior_session_id")
 
@@ -655,50 +620,31 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         """
 
         res = self.lims_engine.select(query)
-        res["isilon_filepath"] = res["storage_directory"].str.cat(
-            res["filename"]
-        )
+        res["isilon_filepath"] = res["storage_directory"].str.cat(res["filename"])
         res = res.drop(["filename", "storage_directory"], axis=1)
         return res.set_index(attachable_id_alias)
 
     def _get_behavior_session_release_filter(self):
         # 1) Get release behavior only session ids
-        behavior_only_release_files = self.get_release_files(
-            file_type="BehaviorNwb"
-        )
-        release_behavior_only_session_ids = (
-            behavior_only_release_files.index.tolist()
-        )
+        behavior_only_release_files = self.get_release_files(file_type="BehaviorNwb")
+        release_behavior_only_session_ids = behavior_only_release_files.index.tolist()
 
         # 2) Get release behavior with ophys session ids
-        ophys_release_files = self.get_release_files(
-            file_type="BehaviorOphysNwb"
-        )
-        release_behavior_with_ophys_session_ids = ophys_release_files[
-            "behavior_session_id"
-        ].tolist()
+        ophys_release_files = self.get_release_files(file_type="BehaviorOphysNwb")
+        release_behavior_with_ophys_session_ids = ophys_release_files["behavior_session_id"].tolist()
 
         # 3) release behavior session ids is combination
-        release_behavior_session_ids = (
-            release_behavior_only_session_ids
-            + release_behavior_with_ophys_session_ids
-        )
+        release_behavior_session_ids = release_behavior_only_session_ids + release_behavior_with_ophys_session_ids
 
-        return build_in_list_selector_query(
-            "bs.id", release_behavior_session_ids
-        )
+        return build_in_list_selector_query("bs.id", release_behavior_session_ids)
 
     def _get_ophys_session_release_filter(self):
         release_files = self.get_release_files(file_type="BehaviorOphysNwb")
-        return build_in_list_selector_query(
-            "bs.id", release_files["behavior_session_id"].tolist()
-        )
+        return build_in_list_selector_query("bs.id", release_files["behavior_session_id"].tolist())
 
     def _get_ophys_experiment_release_filter(self):
         release_files = self.get_release_files(file_type="BehaviorOphysNwb")
-        return build_in_list_selector_query(
-            "oe.id", release_files.index.tolist()
-        )
+        return build_in_list_selector_query("oe.id", release_files.index.tolist())
 
     def get_natural_movie_template(self, number: int) -> Iterable[bytes]:
         """Download a template for the natural movie stimulus. This is the

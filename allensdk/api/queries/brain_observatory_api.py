@@ -73,7 +73,7 @@ class BrainObservatoryApi(RmaTemplate):
                 "description": "see name",
                 "model": "IsiExperiment",
                 "criteria": "[id$in{{ isi_experiment_ids }}]",
-                "include": "experiment_container(ophys_experiments,targeted_structure)",    # noqa e501
+                "include": "experiment_container(ophys_experiments,targeted_structure)",  # noqa e501
                 "num_rows": "all",
                 "count": False,
                 "criteria_params": ["isi_experiment_ids"],
@@ -82,7 +82,7 @@ class BrainObservatoryApi(RmaTemplate):
                 "name": "ophys_experiment_by_ids",
                 "description": "see name",
                 "model": "OphysExperiment",
-                "criteria": "{% if ophys_experiment_ids is defined %}[id$in{{ ophys_experiment_ids }}]{%endif%}",   # noqa e501
+                "criteria": "{% if ophys_experiment_ids is defined %}[id$in{{ ophys_experiment_ids }}]{%endif%}",  # noqa e501
                 "include": "experiment_container,well_known_files(well_known_file_type),targeted_structure,specimen(donor(age,transgenic_lines))",  # noqa e501
                 "num_rows": "all",
                 "count": False,
@@ -92,7 +92,7 @@ class BrainObservatoryApi(RmaTemplate):
                 "name": "ophys_experiment_data",
                 "description": "see name",
                 "model": "WellKnownFile",
-                "criteria": "[attachable_id$eq{{ ophys_experiment_id }}],well_known_file_type[name$eq%s]"   # noqa e501
+                "criteria": "[attachable_id$eq{{ ophys_experiment_id }}],well_known_file_type[name$eq%s]"  # noqa e501
                 % NWB_FILE_TYPE,
                 "num_rows": "all",
                 "count": False,
@@ -102,7 +102,7 @@ class BrainObservatoryApi(RmaTemplate):
                 "name": "ophys_analysis_file",
                 "description": "see name",
                 "model": "WellKnownFile",
-                "criteria": "[attachable_id$eq{{ ophys_experiment_id }}],well_known_file_type[name$eq%s]"   # noqa e501
+                "criteria": "[attachable_id$eq{{ ophys_experiment_id }}],well_known_file_type[name$eq%s]"  # noqa e501
                 % OPHYS_ANALYSIS_FILE_TYPE,
                 "num_rows": "all",
                 "count": False,
@@ -112,7 +112,7 @@ class BrainObservatoryApi(RmaTemplate):
                 "name": "ophys_events_file",
                 "description": "see name",
                 "model": "WellKnownFile",
-                "criteria": "[attachable_id$eq{{ ophys_experiment_id }}],well_known_file_type[name$eq%s]"   # noqa e501
+                "criteria": "[attachable_id$eq{{ ophys_experiment_id }}],well_known_file_type[name$eq%s]"  # noqa e501
                 % OPHYS_EVENTS_FILE_TYPE,
                 "num_rows": "all",
                 "count": False,
@@ -139,7 +139,7 @@ class BrainObservatoryApi(RmaTemplate):
                 "name": "stimulus_mapping",
                 "description": "see name",
                 "model": "ApiCamStimulusMapping",
-                "criteria": "{% if stimulus_mapping_ids is defined %}[id$in{{ stimulus_mapping_ids }}]{%endif%}",   # noqa e501
+                "criteria": "{% if stimulus_mapping_ids is defined %}[id$in{{ stimulus_mapping_ids }}]{%endif%}",  # noqa e501
                 "num_rows": "all",
                 "count": False,
                 "criteria_params": ["stimulus_mapping_ids"],
@@ -148,7 +148,7 @@ class BrainObservatoryApi(RmaTemplate):
                 "name": "experiment_container",
                 "description": "see name",
                 "model": "ExperimentContainer",
-                "criteria": "{% if experiment_container_ids is defined %}[id$in{{ experiment_container_ids }}]{%endif%}",   # noqa e501
+                "criteria": "{% if experiment_container_ids is defined %}[id$in{{ experiment_container_ids }}]{%endif%}",  # noqa e501
                 "include": "ophys_experiments,isi_experiment,specimen(donor(conditions,age,transgenic_lines)),targeted_structure",  # noqa e501
                 "num_rows": "all",
                 "count": False,
@@ -158,7 +158,7 @@ class BrainObservatoryApi(RmaTemplate):
                 "name": "experiment_container_metric",
                 "description": "see name",
                 "model": "ApiCamExperimentContainerMetric",
-                "criteria": "{% if experiment_container_metric_ids is defined %}[id$in{{ experiment_container_metric_ids }}]{%endif%}", # noqa e501
+                "criteria": "{% if experiment_container_metric_ids is defined %}[id$in{{ experiment_container_metric_ids }}]{%endif%}",  # noqa e501
                 "num_rows": "all",
                 "count": False,
                 "criteria_params": ["experiment_container_metric_ids"],
@@ -167,23 +167,23 @@ class BrainObservatoryApi(RmaTemplate):
                 "name": "cell_metric",
                 "description": "see name",
                 "model": "ApiCamCellMetric",
-                "criteria": "{% if cell_specimen_ids is defined %}[cell_specimen_id$in{{ cell_specimen_ids }}]{%endif%}",   # noqa e501
+                "criteria": "{% if cell_specimen_ids is defined %}[cell_specimen_id$in{{ cell_specimen_ids }}]{%endif%}",  # noqa e501
                 "criteria_params": ["cell_specimen_ids"],
             },
             {
                 "name": "cell_specimen_id_mapping_table",
                 "description": "see name",
                 "model": "WellKnownFile",
-                "criteria": "[id$eq{{ mapping_table_id }}],well_known_file_type[name$eqOphysCellSpecimenIdMapping]",    # noqa e501
+                "criteria": "[id$eq{{ mapping_table_id }}],well_known_file_type[name$eqOphysCellSpecimenIdMapping]",  # noqa e501
                 "num_rows": "all",
                 "count": False,
                 "criteria_params": ["mapping_table_id"],
             },
             {
                 "name": "eye_gaze_mapping_file",
-                "description": "h5 file containing mouse eye gaze mapped onto screen coordinates (as well as pupil and eye sizes)", # noqa e501
+                "description": "h5 file containing mouse eye gaze mapped onto screen coordinates (as well as pupil and eye sizes)",  # noqa e501
                 "model": "WellKnownFile",
-                "criteria": "[attachable_id$eq{{ ophys_session_id }}],well_known_file_type[name$eqEyeDlcScreenMapping]",    # noqa e501
+                "criteria": "[attachable_id$eq{{ ophys_session_id }}],well_known_file_type[name$eqEyeDlcScreenMapping]",  # noqa e501
                 "num_rows": "all",
                 "count": False,
                 "criteria_params": ["ophys_session_id"],
@@ -194,7 +194,7 @@ class BrainObservatoryApi(RmaTemplate):
             # the relationship is added.
             {
                 "name": "all_eye_mapping_files",
-                "description": "Get a list of dictionaries for all eye mapping wkfs",   # noqa e501
+                "description": "Get a list of dictionaries for all eye mapping wkfs",  # noqa e501
                 "model": "WellKnownFile",
                 "criteria": "well_known_file_type[name$eqEyeDlcScreenMapping]",
                 "num_rows": "all",
@@ -215,9 +215,7 @@ class BrainObservatoryApi(RmaTemplate):
     }
 
     def __init__(self, base_uri=None, datacube_uri=None):
-        super(BrainObservatoryApi, self).__init__(
-            base_uri, query_manifest=BrainObservatoryApi.rma_templates
-        )
+        super(BrainObservatoryApi, self).__init__(base_uri, query_manifest=BrainObservatoryApi.rma_templates)
 
         self.datacube_uri = datacube_uri
 
@@ -274,8 +272,7 @@ class BrainObservatoryApi(RmaTemplate):
         -------
         dict : neuronal model metadata
         """
-        data = self.template_query(
-            "brain_observatory_queries", "list_isi_experiments")
+        data = self.template_query("brain_observatory_queries", "list_isi_experiments")
 
         return data
 
@@ -289,9 +286,7 @@ class BrainObservatoryApi(RmaTemplate):
         -------
         list : api class name strings
         """
-        data = self.template_query(
-            "brain_observatory_queries", "column_definition_class_names"
-        )
+        data = self.template_query("brain_observatory_queries", "column_definition_class_names")
 
         names = list(set([n["api_class_name"] for n in data]))
 
@@ -387,10 +382,7 @@ class BrainObservatoryApi(RmaTemplate):
 
         return data
 
-    def get_experiment_container_metrics(
-            self,
-            experiment_container_metric_ids=None
-    ):
+    def get_experiment_container_metrics(self, experiment_container_metric_ids=None):
         """Get experiment container metrics by id
 
         Parameters
@@ -412,8 +404,7 @@ class BrainObservatoryApi(RmaTemplate):
 
     @cacheable(
         strategy="create",
-        pathfinder=Cache.pathfinder(
-            file_name_position=2, path_keyword="file_name"),
+        pathfinder=Cache.pathfinder(file_name_position=2, path_keyword="file_name"),
     )
     def save_ophys_experiment_data(self, ophys_experiment_id, file_name):
         data = self.template_query(
@@ -425,25 +416,17 @@ class BrainObservatoryApi(RmaTemplate):
         try:
             file_url = data[0]["download_link"]
         except Exception:
-            raise Exception(
-                "ophys experiment %d has no data file" % ophys_experiment_id
-            )
+            raise Exception("ophys experiment %d has no data file" % ophys_experiment_id)
 
-        self._log.warning(
-            "Downloading ophys_experiment %d NWB. This can take some time."
-            % ophys_experiment_id
-        )
+        self._log.warning("Downloading ophys_experiment %d NWB. This can take some time." % ophys_experiment_id)
 
         self.retrieve_file_over_http(self.api_url + file_url, file_name)
 
     @cacheable(
         strategy="create",
-        pathfinder=Cache.pathfinder(
-            file_name_position=2, path_keyword="file_name"),
+        pathfinder=Cache.pathfinder(file_name_position=2, path_keyword="file_name"),
     )
-    def save_ophys_experiment_analysis_data(
-            self, ophys_experiment_id, file_name):
-
+    def save_ophys_experiment_analysis_data(self, ophys_experiment_id, file_name):
         data = self.template_query(
             "brain_observatory_queries",
             "ophys_analysis_file",
@@ -453,23 +436,17 @@ class BrainObservatoryApi(RmaTemplate):
         try:
             file_url = data[0]["download_link"]
         except Exception:
-            raise Exception(
-                "ophys experiment %d has no analysis file" %
-                (ophys_experiment_id,)
-            )
+            raise Exception("ophys experiment %d has no analysis file" % (ophys_experiment_id,))
 
         self._log.warning(
-            "Downloading ophys_experiment %d analysis file. This can take "
-            "some time."
-            % (ophys_experiment_id,)
+            "Downloading ophys_experiment %d analysis file. This can take some time." % (ophys_experiment_id,)
         )
 
         self.retrieve_file_over_http(self.api_url + file_url, file_name)
 
     @cacheable(
         strategy="create",
-        pathfinder=Cache.pathfinder(file_name_position=2,
-                                    path_keyword="file_name"),
+        pathfinder=Cache.pathfinder(file_name_position=2, path_keyword="file_name"),
     )
     def save_ophys_experiment_event_data(self, ophys_experiment_id, file_name):
         data = self.template_query(
@@ -480,21 +457,13 @@ class BrainObservatoryApi(RmaTemplate):
         try:
             file_url = data[0]["download_link"]
         except Exception:
-            raise Exception(
-                "ophys experiment %d has no events file" % ophys_experiment_id
-            )
-        self._log.warning(
-            "Downloading ophys_experiment %d events file. This can take "
-            "some time."
-            % ophys_experiment_id
-        )
+            raise Exception("ophys experiment %d has no events file" % ophys_experiment_id)
+        self._log.warning("Downloading ophys_experiment %d events file. This can take some time." % ophys_experiment_id)
 
         self.retrieve_file_over_http(self.api_url + file_url, file_name)
 
     @staticmethod
-    def save_ophys_experiment_eye_tracking_data(
-        ophys_experiment_id, cloud_cache: S3CloudCache
-    ) -> Path:
+    def save_ophys_experiment_eye_tracking_data(ophys_experiment_id, cloud_cache: S3CloudCache) -> Path:
         """
         Downloads eye tracking data for `ophys_experiment_id` using
             `S3CloudCache`
@@ -519,42 +488,29 @@ class BrainObservatoryApi(RmaTemplate):
         meta = cloud_cache.get_metadata(fname="metadata")
         meta = meta.set_index("ophys_experiment_id")
         if ophys_experiment_id not in meta.index:
-            raise ValueError(
-                f"No eye tracking data for ophys experiment id "
-                f"{ophys_experiment_id}"
-            )
+            raise ValueError(f"No eye tracking data for ophys experiment id {ophys_experiment_id}")
         file_id = meta.loc[ophys_experiment_id]["file_id"]
         file_path = cloud_cache.download_data(file_id=str(file_id))
         return file_path
 
     @cacheable(
         strategy="create",
-        pathfinder=Cache.pathfinder(file_name_position=3,
-                                    path_keyword="file_name"),
+        pathfinder=Cache.pathfinder(file_name_position=3, path_keyword="file_name"),
     )
-    def save_ophys_experiment_eye_gaze_data(
-        self, ophys_experiment_id: int, ophys_session_id: int, file_name: str
-    ):
+    def save_ophys_experiment_eye_gaze_data(self, ophys_experiment_id: int, ophys_session_id: int, file_name: str):
         data = self.template_query(
             "brain_observatory_queries",
             "eye_gaze_mapping_file",
             ophys_session_id=ophys_session_id,
         )
 
-        experiment_session_string = (
-            f"ophys_experiment '{ophys_experiment_id}' (session "
-            f"'{ophys_session_id}')"
-        )
+        experiment_session_string = f"ophys_experiment '{ophys_experiment_id}' (session '{ophys_session_id}')"
 
         try:
             file_url = data[0]["download_link"]
         except Exception:
-            raise Exception(f"{experiment_session_string} has no eye gaze "
-                            f"mapping file")
-        self._log.warning(
-            f"Downloading {experiment_session_string} gaze mapping file. "
-            f"This can take some time."
-        )
+            raise Exception(f"{experiment_session_string} has no eye gaze mapping file")
+        self._log.warning(f"Downloading {experiment_session_string} gaze mapping file. This can take some time.")
 
         self.retrieve_file_over_http(self.api_url + file_url, file_name)
 
@@ -569,7 +525,6 @@ class BrainObservatoryApi(RmaTemplate):
         transgenic_lines=None,
         include_failed=False,
     ):
-
         if not include_failed:
             objs = [o for o in objs if not o.get("failed", False)]
 
@@ -577,11 +532,7 @@ class BrainObservatoryApi(RmaTemplate):
             objs = [o for o in objs if o["id"] in ids]
 
         if targeted_structures is not None:
-            objs = [
-                o
-                for o in objs
-                if o["targeted_structure"]["acronym"] in targeted_structures
-            ]
+            objs = [o for o in objs if o["targeted_structure"]["acronym"] in targeted_structures]
 
         if imaging_depths is not None:
             objs = [o for o in objs if o["imaging_depth"] in imaging_depths]
@@ -594,26 +545,14 @@ class BrainObservatoryApi(RmaTemplate):
 
         if reporter_lines is not None:
             tls = [tl.lower() for tl in reporter_lines]
-            obj_tls = [find_specimen_reporter_line(o["specimen"])
-                       for o in objs]
+            obj_tls = [find_specimen_reporter_line(o["specimen"]) for o in objs]
             obj_tls = [o.lower() if o else None for o in obj_tls]
             objs = [o for i, o in enumerate(objs) if obj_tls[i] in tls]
 
         if transgenic_lines is not None:
             tls = set([tl.lower() for tl in transgenic_lines])
             objs = [
-                o
-                for o in objs
-                if len(
-                    tls
-                    & set(
-                        [
-                            tl.lower()
-                            for tl in find_specimen_transgenic_lines(
-                                o["specimen"])
-                        ]
-                    )
-                )
+                o for o in objs if len(tls & set([tl.lower() for tl in find_specimen_transgenic_lines(o["specimen"])]))
             ]
 
         return objs
@@ -630,7 +569,6 @@ class BrainObservatoryApi(RmaTemplate):
         include_failed=False,
         simple=False,
     ):
-
         containers = self.filter_experiments_and_containers(
             containers,
             ids=ids,
@@ -663,7 +601,6 @@ class BrainObservatoryApi(RmaTemplate):
         require_eye_tracking=False,
         simple=False,
     ):
-
         experiments = self.filter_experiments_and_containers(
             experiments,
             ids=ids,
@@ -675,38 +612,21 @@ class BrainObservatoryApi(RmaTemplate):
         )
 
         if require_eye_tracking:
-            experiments = [
-                e for e in experiments
-                if e.get("fail_eye_tracking", None) is False
-            ]
+            experiments = [e for e in experiments if e.get("fail_eye_tracking", None) is False]
         if not include_failed:
-            experiments = [
-                e
-                for e in experiments
-                if not e.get("experiment_container", {}).get("failed", False)
-            ]
+            experiments = [e for e in experiments if not e.get("experiment_container", {}).get("failed", False)]
 
         if experiment_container_ids is not None:
-            experiments = [
-                e
-                for e in experiments
-                if e["experiment_container_id"] in experiment_container_ids
-            ]
+            experiments = [e for e in experiments if e["experiment_container_id"] in experiment_container_ids]
 
         if session_types is not None:
-            experiments = [
-                e for e in experiments if e["stimulus_name"] in session_types
-            ]
+            experiments = [e for e in experiments if e["stimulus_name"] in session_types]
 
         if stimuli is not None:
             experiments = [
                 e
                 for e in experiments
-                if len(
-                    set(stimuli)
-                    & set(stimulus_info.stimuli_in_session(e["stimulus_name"]))
-                )
-                > 0
+                if len(set(stimuli) & set(stimulus_info.stimuli_in_session(e["stimulus_name"]))) > 0
             ]
 
         if simple:
@@ -753,27 +673,16 @@ class BrainObservatoryApi(RmaTemplate):
         """
 
         if not include_failed:
-            cell_specimens = [
-                c
-                for c in cell_specimens
-                if not c.get("failed_experiment_container", False)
-            ]
+            cell_specimens = [c for c in cell_specimens if not c.get("failed_experiment_container", False)]
 
         if ids is not None:
-            cell_specimens = [c for c in cell_specimens
-                              if c["cell_specimen_id"] in ids]
+            cell_specimens = [c for c in cell_specimens if c["cell_specimen_id"] in ids]
 
         if experiment_container_ids is not None:
-            cell_specimens = [
-                c
-                for c in cell_specimens
-                if c["experiment_container_id"] in experiment_container_ids
-            ]
+            cell_specimens = [c for c in cell_specimens if c["experiment_container_id"] in experiment_container_ids]
 
         if filters is not None:
-            cell_specimens = self.dataframe_query(
-                cell_specimens, filters, "cell_specimen_id"
-            )
+            cell_specimens = self.dataframe_query(cell_specimens, filters, "cell_specimen_id")
 
         return cell_specimens
 
@@ -801,9 +710,7 @@ class BrainObservatoryApi(RmaTemplate):
 
             return cluster_string
 
-        query_string = " & ".join(
-            _filter_clause(f["op"], f["field"], f["value"]) for f in filters
-        )
+        query_string = " & ".join(_filter_clause(f["op"], f["field"], f["value"]) for f in filters)
 
         return query_string
 
@@ -918,8 +825,7 @@ def find_specimen_cre_line(specimen):
         return next(
             tl["name"]
             for tl in specimen["donor"]["transgenic_lines"]
-            if tl["transgenic_line_type_name"] == "driver" and
-            "Cre" in tl["name"]
+            if tl["transgenic_line_type_name"] == "driver" and "Cre" in tl["name"]
         )
     except StopIteration:
         return None
@@ -928,9 +834,7 @@ def find_specimen_cre_line(specimen):
 def find_specimen_reporter_line(specimen):
     try:
         return next(
-            tl["name"]
-            for tl in specimen["donor"]["transgenic_lines"]
-            if tl["transgenic_line_type_name"] == "reporter"
+            tl["name"] for tl in specimen["donor"]["transgenic_lines"] if tl["transgenic_line_type_name"] == "reporter"
         )
     except StopIteration:
         return None
@@ -942,10 +846,7 @@ def find_specimen_transgenic_lines(specimen):
 
 def find_experiment_acquisition_age(exp):
     try:
-        return (
-            parse_date(exp["date_of_acquisition"])
-            - parse_date(exp["specimen"]["donor"]["date_of_birth"])
-        ).days
+        return (parse_date(exp["date_of_acquisition"]) - parse_date(exp["specimen"]["donor"]["date_of_birth"])).days
     except KeyError:
         return None
 
@@ -954,5 +855,4 @@ def find_container_tags(container):
     """Custom logic for extracting tags from donor conditions.  Filtering
     out tissuecyte tags."""
     conditions = container["specimen"]["donor"].get("conditions", [])
-    return [c["name"] for c in conditions if not c["name"].startswith(
-        "tissuecyte")]
+    return [c["name"] for c in conditions if not c["name"].startswith("tissuecyte")]

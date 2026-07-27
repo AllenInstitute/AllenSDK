@@ -1,8 +1,9 @@
 import numpy as np
 import pandas as pd
 
+
 def trial_types(trials, trial_types):
-    """ only include trials of certain trial types
+    """only include trials of certain trial types
 
     Parameters
     ----------
@@ -18,14 +19,13 @@ def trial_types(trials, trial_types):
     """
 
     if trial_types is not None and len(trial_types) > 0:
-        return trials['trial_type'].isin(trial_types)
+        return trials["trial_type"].isin(trial_types)
     else:
-        return pd.Series(np.ones((len(trials), ), dtype=bool), 
-                         name="trial_type", index=trials.index)
+        return pd.Series(np.ones((len(trials),), dtype=bool), name="trial_type", index=trials.index)
 
 
 def contingent_trials(trials):
-    """ GO & CATCH trials only
+    """GO & CATCH trials only
 
     Parameters
     ----------
@@ -37,11 +37,11 @@ def contingent_trials(trials):
     mask : pandas Series of booleans, indexed to trials DataFrame
 
     """
-    return trial_types(trials, ('go', 'catch'))
+    return trial_types(trials, ("go", "catch"))
 
 
 def reward_rate(trials, thresh=2.0):
-    """ masks trials where the reward rate (per minute) is below some threshold.
+    """masks trials where the reward rate (per minute) is below some threshold.
 
     This de facto omits trials in which the animal was not licking for extended periods
     or periods when they were licking indiscriminantly.
@@ -59,5 +59,5 @@ def reward_rate(trials, thresh=2.0):
 
     """
 
-    mask = trials['reward_rate'] > thresh
+    mask = trials["reward_rate"] > thresh
     return mask

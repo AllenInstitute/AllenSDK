@@ -38,8 +38,9 @@ import logging
 from allensdk.config.manifest import Manifest
 import pandas as pd
 
+
 class ManifestBuilder(object):
-    df_columns = ['key', 'parent_key', 'spec', 'type', 'format']
+    df_columns = ["key", "parent_key", "spec", "type", "format"]
 
     def __init__(self):
         self._log = logging.getLogger(__name__)
@@ -47,22 +48,16 @@ class ManifestBuilder(object):
         self.sections = {}
 
     def set_version(self, value):
-        self.path_info.append({'type': Manifest.VERSION, 'value': value})
+        self.path_info.append({"type": Manifest.VERSION, "value": value})
 
-    def add_path(self, key, spec,
-                 typename='dir',
-                 parent_key=None,
-                 format=None):
-        entry = {
-            'key': key,
-            'type': typename,
-            'spec': spec}
+    def add_path(self, key, spec, typename="dir", parent_key=None, format=None):
+        entry = {"key": key, "type": typename, "spec": spec}
 
         if format is not None:
-            entry['format'] = format
+            entry["format"] = format
 
         if parent_key is not None:
-            entry['parent_key'] = parent_key
+            entry["parent_key"] = parent_key
 
         self.path_info.append(entry)
 
@@ -70,18 +65,18 @@ class ManifestBuilder(object):
         self.sections[name] = contents
 
     def write_json_file(self, path, overwrite=False):
-        mode = 'wb'
+        mode = "wb"
 
         if overwrite is True:
-            mode = 'wb+'
+            mode = "wb+"
 
         json_string = self.write_json_string()
 
         with open(path, mode) as f:
             try:
-                f.write(json_string)   # Python 2.7
+                f.write(json_string)  # Python 2.7
             except TypeError:
-                f.write(bytes(json_string, 'utf-8'))  # Python 3
+                f.write(bytes(json_string, "utf-8"))  # Python 3
 
     def get_config(self):
         wrapper = {"manifest": self.path_info}
@@ -98,8 +93,7 @@ class ManifestBuilder(object):
         return ju.write_string(config)
 
     def as_dataframe(self):
-        return pd.DataFrame(self.path_info,
-                            columns=ManifestBuilder.df_columns)
+        return pd.DataFrame(self.path_info, columns=ManifestBuilder.df_columns)
 
     def from_dataframe(self, df):
         self.path_info = {}

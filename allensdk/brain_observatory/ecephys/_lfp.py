@@ -1,8 +1,7 @@
 import numpy as np
 from xarray import DataArray
 
-from allensdk.brain_observatory.ecephys.file_io.continuous_file import \
-    ContinuousFile
+from allensdk.brain_observatory.ecephys.file_io.continuous_file import ContinuousFile
 from allensdk.core import DataObject, JsonReadableInterface
 
 
@@ -10,13 +9,8 @@ class LFP(DataObject, JsonReadableInterface):
     """
     Probe LFP
     """
-    def __init__(
-            self,
-            data: np.ndarray,
-            timestamps: np.ndarray,
-            channels: np.ndarray,
-            sampling_rate: float
-    ):
+
+    def __init__(self, data: np.ndarray, timestamps: np.ndarray, channels: np.ndarray, sampling_rate: float):
         """
 
         Parameters
@@ -30,7 +24,7 @@ class LFP(DataObject, JsonReadableInterface):
         sampling_rate
             LFP sampling rate
         """
-        super().__init__(name='lfp', value=None, is_value_self=True)
+        super().__init__(name="lfp", value=None, is_value_self=True)
         self._data = data
         self._timestamps = timestamps
         self._channels = channels
@@ -53,11 +47,7 @@ class LFP(DataObject, JsonReadableInterface):
         return self._sampling_rate
 
     @classmethod
-    def from_json(
-            cls,
-            probe_meta: dict,
-            amplitude_scale_factor: float = 0.195e-6
-    ) -> "LFP":
+    def from_json(cls, probe_meta: dict, amplitude_scale_factor: float = 0.195e-6) -> "LFP":
         """
 
         Parameters
@@ -72,35 +62,23 @@ class LFP(DataObject, JsonReadableInterface):
         -------
         `LFP` instance
         """
-        lfp_meta = probe_meta['lfp']
-        lfp_channels = np.load(lfp_meta['input_channels_path'],
-                               allow_pickle=False)
+        lfp_meta = probe_meta["lfp"]
+        lfp_channels = np.load(lfp_meta["input_channels_path"], allow_pickle=False)
 
         lfp_data, lfp_timestamps = ContinuousFile(
-            data_path=lfp_meta['input_data_path'],
-            timestamps_path=lfp_meta['input_timestamps_path'],
-            total_num_channels=len(lfp_channels)
+            data_path=lfp_meta["input_data_path"],
+            timestamps_path=lfp_meta["input_timestamps_path"],
+            total_num_channels=len(lfp_channels),
         ).load(memmap=False)
 
         lfp_data = lfp_data.astype(np.float32)
-        lfp_data = lfp_data * probe_meta.get("amplitude_scale_factor",
-                                             amplitude_scale_factor)
+        lfp_data = lfp_data * probe_meta.get("amplitude_scale_factor", amplitude_scale_factor)
 
-        sampling_rate = (
-                probe_meta['lfp_sampling_rate'] /
-                probe_meta['temporal_subsampling_factor'])
+        sampling_rate = probe_meta["lfp_sampling_rate"] / probe_meta["temporal_subsampling_factor"]
 
-        return cls(
-            data=lfp_data,
-            timestamps=lfp_timestamps,
-            channels=lfp_channels,
-            sampling_rate=sampling_rate
-        )
+        return cls(data=lfp_data, timestamps=lfp_timestamps, channels=lfp_channels, sampling_rate=sampling_rate)
 
     def to_dataarray(self) -> DataArray:
         return DataArray(
-            name="LFP",
-            data=self._data,
-            dims=['time', 'channel'],
-            coords=[self._timestamps, self._channels]
+            name="LFP", data=self._data, dims=["time", "channel"], coords=[self._timestamps, self._channels]
         )

@@ -7,18 +7,19 @@ class TestDataObject:
     def test_to_dict_simple(self):
         class Simple(DataObject):
             def __init__(self):
-                super().__init__(name='simple', value=1)
+                super().__init__(name="simple", value=1)
+
         s = Simple()
-        assert s.to_dict() == {'simple': 1}
+        assert s.to_dict() == {"simple": 1}
 
     def test_to_dict_nested(self):
         class B(DataObject):
             def __init__(self):
-                super().__init__(name='b', value='!')
+                super().__init__(name="b", value="!")
 
         class A(DataObject):
             def __init__(self, b: B):
-                super().__init__(name='a', value=None, is_value_self=True)
+                super().__init__(name="a", value=None, is_value_self=True)
                 self._b = b
 
             @property
@@ -27,18 +28,19 @@ class TestDataObject:
 
             @property
             def prop2(self):
-                return '@'
+                return "@"
+
         a = A(b=B())
-        assert a.to_dict() == {'a': {'b': '!', 'prop2': '@'}}
+        assert a.to_dict() == {"a": {"b": "!", "prop2": "@"}}
 
     def test_to_dict_double_nested(self):
         class C(DataObject):
             def __init__(self):
-                super().__init__(name='c', value='!!!')
+                super().__init__(name="c", value="!!!")
 
         class B(DataObject):
             def __init__(self, c: C):
-                super().__init__(name='b', value=None, is_value_self=True)
+                super().__init__(name="b", value=None, is_value_self=True)
                 self._c = c
 
             @property
@@ -47,11 +49,11 @@ class TestDataObject:
 
             @property
             def prop2(self):
-                return '!!'
+                return "!!"
 
         class A(DataObject):
             def __init__(self, b: B):
-                super().__init__(name='a', value=None, is_value_self=True)
+                super().__init__(name="a", value=None, is_value_self=True)
                 self._b = b
 
             @property
@@ -60,22 +62,21 @@ class TestDataObject:
 
             @property
             def prop2(self):
-                return '@'
+                return "@"
 
         a = A(b=B(c=C()))
-        assert a.to_dict() == {'a': {'b': {'c': '!!!', 'prop2': '!!'},
-                                     'prop2': '@'}}
+        assert a.to_dict() == {"a": {"b": {"c": "!!!", "prop2": "!!"}, "prop2": "@"}}
 
     def test_not_equals(self):
-        s1 = DataObject(name='s1', value=1)
-        s2 = DataObject(name='s1', value='1')
+        s1 = DataObject(name="s1", value=1)
+        s2 = DataObject(name="s1", value="1")
         assert s1 != s2
 
     def test_exclude_equals(self):
-        s1 = DataObject(name='s1', value=1, exclude_from_equals={'s1'})
-        s2 = DataObject(name='s1', value='1')
+        s1 = DataObject(name="s1", value=1, exclude_from_equals={"s1"})
+        s2 = DataObject(name="s1", value="1")
         assert s1 == s2
 
     def test_cannot_compare(self):
         with pytest.raises(NotImplementedError):
-            assert DataObject(name='foo', value=1) == 1
+            assert DataObject(name="foo", value=1) == 1

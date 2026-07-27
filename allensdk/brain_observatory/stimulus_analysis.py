@@ -46,7 +46,7 @@ import matplotlib.pyplot as plt
 
 
 class StimulusAnalysis(object):
-    """ Base class for all response analysis code. Subclasses are responsible
+    """Base class for all response analysis code. Subclasses are responsible
     for computing metrics and traces relevant to a particular stimulus.
     The base class contains methods for organizing sweep responses row of
     a stimulus stable (get_sweep_response).  Subclasses implement the
@@ -61,7 +61,8 @@ class StimulusAnalysis(object):
        Whether or not to compute speed tuning histograms
 
     """
-    _log = logging.getLogger('allensdk.brain_observatory.stimulus_analysis')
+
+    _log = logging.getLogger("allensdk.brain_observatory.stimulus_analysis")
     _PRELOAD = "PRELOAD"
 
     def __init__(self, data_set):
@@ -103,24 +104,21 @@ class StimulusAnalysis(object):
     @property
     def sweep_response(self):
         if self._sweep_response is StimulusAnalysis._PRELOAD:
-            self._sweep_response, self._mean_sweep_response, self._pval = \
-                self.get_sweep_response()
+            self._sweep_response, self._mean_sweep_response, self._pval = self.get_sweep_response()
 
         return self._sweep_response
 
     @property
     def mean_sweep_response(self):
         if self._mean_sweep_response is StimulusAnalysis._PRELOAD:
-            self._sweep_response, self._mean_sweep_response, self._pval = \
-                self.get_sweep_response()
+            self._sweep_response, self._mean_sweep_response, self._pval = self.get_sweep_response()
 
         return self._mean_sweep_response
 
     @property
     def pval(self):
         if self._pval is StimulusAnalysis._PRELOAD:
-            self._sweep_response, self._mean_sweep_response, self._pval = \
-                self.get_sweep_response()
+            self._sweep_response, self._mean_sweep_response, self._pval = self.get_sweep_response()
 
         return self._pval
 
@@ -140,8 +138,7 @@ class StimulusAnalysis(object):
 
     def get_fluorescence(self):
         # get fluorescence
-        self._timestamps, self._celltraces = \
-            self.data_set.get_corrected_fluorescence_traces()
+        self._timestamps, self._celltraces = self.data_set.get_corrected_fluorescence_traces()
         self._acquisition_rate = 1 / (self.timestamps[1] - self.timestamps[0])
         self._numbercells = len(self.celltraces)  # number of cells in dataset
 
@@ -211,63 +208,62 @@ class StimulusAnalysis(object):
     @property
     def binned_dx_sp(self):
         if self._binned_dx_sp is StimulusAnalysis._PRELOAD:
-            (self._binned_dx_sp, self._binned_cells_sp, self._binned_dx_vis,
-             self._binned_cells_vis, self._peak_run) = \
+            (self._binned_dx_sp, self._binned_cells_sp, self._binned_dx_vis, self._binned_cells_vis, self._peak_run) = (
                 self.get_speed_tuning(binsize=self._binsize)
+            )
 
         return self._binned_dx_sp
 
     @property
     def binned_cells_sp(self):
         if self._binned_cells_sp is StimulusAnalysis._PRELOAD:
-            (self._binned_dx_sp, self._binned_cells_sp, self._binned_dx_vis,
-             self._binned_cells_vis, self._peak_run) = \
+            (self._binned_dx_sp, self._binned_cells_sp, self._binned_dx_vis, self._binned_cells_vis, self._peak_run) = (
                 self.get_speed_tuning(binsize=self._binsize)
+            )
 
         return self._binned_cells_sp
 
     @property
     def binned_dx_vis(self):
         if self._binned_dx_vis is StimulusAnalysis._PRELOAD:
-            (self._binned_dx_sp, self._binned_cells_sp, self._binned_dx_vis,
-             self._binned_cells_vis, self._peak_run) = \
+            (self._binned_dx_sp, self._binned_cells_sp, self._binned_dx_vis, self._binned_cells_vis, self._peak_run) = (
                 self.get_speed_tuning(binsize=self._binsize)
+            )
 
         return self._binned_dx_vis
 
     @property
     def binned_cells_vis(self):
         if self._binned_cells_vis is StimulusAnalysis._PRELOAD:
-            (self._binned_dx_sp, self._binned_cells_sp, self._binned_dx_vis,
-             self._binned_cells_vis, self._peak_run) = \
+            (self._binned_dx_sp, self._binned_cells_sp, self._binned_dx_vis, self._binned_cells_vis, self._peak_run) = (
                 self.get_speed_tuning(binsize=self._binsize)
+            )
 
         return self._binned_cells_vis
 
     @property
     def peak_run(self):
         if self._peak_run is StimulusAnalysis._PRELOAD:
-            (self._binned_dx_sp, self._binned_cells_sp, self._binned_dx_vis,
-             self._binned_cells_vis, self._peak_run) = \
+            (self._binned_dx_sp, self._binned_cells_sp, self._binned_dx_vis, self._binned_cells_vis, self._peak_run) = (
                 self.get_speed_tuning(binsize=self._binsize)
+            )
 
         return self._peak_run
 
     def populate_stimulus_table(self):
-        """ Implemented by subclasses. """
-        raise BrainObservatoryAnalysisException(
-            "populate_stimulus_table not implemented")
+        """Implemented by subclasses."""
+        raise BrainObservatoryAnalysisException("populate_stimulus_table not implemented")
 
     def get_response(self):
-        """ Implemented by subclasses. """
+        """Implemented by subclasses."""
         raise BrainObservatoryAnalysisException("get_response not implemented")
 
     def get_peak(self):
-        """ Implemented by subclasses. """
+        """Implemented by subclasses."""
         raise BrainObservatoryAnalysisException("get_peak not implemented")
 
     def get_speed_tuning(self, binsize):
-        """ Calculates speed tuning, spontaneous versus visually driven.
+        """Calculates speed tuning, spontaneous versus visually driven.
         The return is a 5-tuple
         of speed and dF/F histograms.
 
@@ -313,39 +309,42 @@ class StimulusAnalysis(object):
                 "outputs obtained under recent scipy versions!"
             )
 
-        StimulusAnalysis._log.info(
-            'Calculating speed tuning, spontaneous vs visually driven')
+        StimulusAnalysis._log.info("Calculating speed tuning, spontaneous vs visually driven")
 
-        celltraces_trimmed = np.delete(self.dfftraces, range(
-            len(self.dxcm), np.size(self.dfftraces, 1)), axis=1)
+        celltraces_trimmed = np.delete(self.dfftraces, range(len(self.dxcm), np.size(self.dfftraces, 1)), axis=1)
 
         # pull out spontaneous epoch(s)
-        spontaneous = self.data_set.get_stimulus_table('spontaneous')
+        spontaneous = self.data_set.get_stimulus_table("spontaneous")
 
-        peak_run = pd.DataFrame(index=range(self.numbercells), columns=(
-            'speed_max_sp', 'speed_min_sp', 'ptest_sp', 'mod_sp',
-            'speed_max_vis', 'speed_min_vis', 'ptest_vis', 'mod_vis'))
+        peak_run = pd.DataFrame(
+            index=range(self.numbercells),
+            columns=(
+                "speed_max_sp",
+                "speed_min_sp",
+                "ptest_sp",
+                "mod_sp",
+                "speed_max_vis",
+                "speed_min_vis",
+                "ptest_vis",
+                "mod_vis",
+            ),
+        )
 
-        dx_sp = self.dxcm[spontaneous.start.iloc[-1]:spontaneous.end.iloc[-1]]
-        celltraces_sp = celltraces_trimmed[
-                        :, spontaneous.start.iloc[-1]:spontaneous.end.iloc[-1]]
-        dx_vis = np.delete(self.dxcm, np.arange(
-            spontaneous.start.iloc[-1], spontaneous.end.iloc[-1]))
-        celltraces_vis = np.delete(celltraces_trimmed, np.arange(
-            spontaneous.start.iloc[-1], spontaneous.end.iloc[-1]), axis=1)
+        dx_sp = self.dxcm[spontaneous.start.iloc[-1] : spontaneous.end.iloc[-1]]
+        celltraces_sp = celltraces_trimmed[:, spontaneous.start.iloc[-1] : spontaneous.end.iloc[-1]]
+        dx_vis = np.delete(self.dxcm, np.arange(spontaneous.start.iloc[-1], spontaneous.end.iloc[-1]))
+        celltraces_vis = np.delete(
+            celltraces_trimmed, np.arange(spontaneous.start.iloc[-1], spontaneous.end.iloc[-1]), axis=1
+        )
         if len(spontaneous) > 1:
-            dx_sp = np.append(
-                dx_sp,
-                self.dxcm[spontaneous.start.iloc[-2]:spontaneous.end.iloc[-2]],
-                axis=0)
+            dx_sp = np.append(dx_sp, self.dxcm[spontaneous.start.iloc[-2] : spontaneous.end.iloc[-2]], axis=0)
             celltraces_sp = np.append(
-                celltraces_sp,
-                celltraces_trimmed[:, spontaneous.start.iloc[-2]:
-                                   spontaneous.end.iloc[-2]], axis=1)
-            dx_vis = np.delete(dx_vis, np.arange(
-                spontaneous.start.iloc[-2], spontaneous.end.iloc[-2]))
-            celltraces_vis = np.delete(celltraces_vis, np.arange(
-                spontaneous.start.iloc[-2], spontaneous.end.iloc[-2]), axis=1)
+                celltraces_sp, celltraces_trimmed[:, spontaneous.start.iloc[-2] : spontaneous.end.iloc[-2]], axis=1
+            )
+            dx_vis = np.delete(dx_vis, np.arange(spontaneous.start.iloc[-2], spontaneous.end.iloc[-2]))
+            celltraces_vis = np.delete(
+                celltraces_vis, np.arange(spontaneous.start.iloc[-2], spontaneous.end.iloc[-2]), axis=1
+            )
         celltraces_vis = celltraces_vis[:, ~np.isnan(dx_vis)]
         dx_vis = dx_vis[~np.isnan(dx_vis)]
 
@@ -356,64 +355,50 @@ class StimulusAnalysis(object):
         binned_dx_sp = np.zeros((nbins, 2))
         for i in range(nbins):
             if np.all(np.isnan(dx_sorted)):
-                raise BrainObservatoryAnalysisException(
-                    "dx is filled with NaNs")
+                raise BrainObservatoryAnalysisException("dx is filled with NaNs")
 
-            offset = findlevel(dx_sorted, 1, 'up')
+            offset = findlevel(dx_sorted, 1, "up")
 
             if offset is None:
-                StimulusAnalysis._log.info(
-                    "dx never crosses 1, all speed data going into single bin")
+                StimulusAnalysis._log.info("dx never crosses 1, all speed data going into single bin")
                 offset = len(dx_sorted)
 
             if i == 0:
                 binned_dx_sp[i, 0] = np.mean(dx_sorted[:offset])
-                binned_dx_sp[i, 1] = np.std(
-                    dx_sorted[:offset]) / np.sqrt(offset)
-                binned_cells_sp[:, i, 0] = np.mean(
-                    celltraces_sorted_sp[:, :offset], axis=1)
-                binned_cells_sp[:, i, 1] = np.std(
-                    celltraces_sorted_sp[:, :offset], axis=1) / np.sqrt(offset)
+                binned_dx_sp[i, 1] = np.std(dx_sorted[:offset]) / np.sqrt(offset)
+                binned_cells_sp[:, i, 0] = np.mean(celltraces_sorted_sp[:, :offset], axis=1)
+                binned_cells_sp[:, i, 1] = np.std(celltraces_sorted_sp[:, :offset], axis=1) / np.sqrt(offset)
             else:
                 start = offset + (i - 1) * binsize
-                binned_dx_sp[i, 0] = np.mean(dx_sorted[start:start + binsize])
-                binned_dx_sp[i, 1] = np.std(
-                    dx_sorted[start:start + binsize]) / np.sqrt(binsize)
-                binned_cells_sp[:, i, 0] = np.mean(
-                    celltraces_sorted_sp[:, start:start + binsize], axis=1)
-                binned_cells_sp[:, i, 1] = np.std(
-                    celltraces_sorted_sp[:, start:start + binsize],
-                    axis=1) / np.sqrt(binsize)
+                binned_dx_sp[i, 0] = np.mean(dx_sorted[start : start + binsize])
+                binned_dx_sp[i, 1] = np.std(dx_sorted[start : start + binsize]) / np.sqrt(binsize)
+                binned_cells_sp[:, i, 0] = np.mean(celltraces_sorted_sp[:, start : start + binsize], axis=1)
+                binned_cells_sp[:, i, 1] = np.std(celltraces_sorted_sp[:, start : start + binsize], axis=1) / np.sqrt(
+                    binsize
+                )
 
         binned_cells_shuffled_sp = np.empty((self.numbercells, nbins, 2, 200))
         for shuf in range(200):
-            celltraces_shuffled = \
-                celltraces_sp[:,
-                              np.random.permutation(np.size(celltraces_sp, 1))]
-            celltraces_shuffled_sorted = celltraces_shuffled[
-                                         :, np.argsort(dx_sp)]
+            celltraces_shuffled = celltraces_sp[:, np.random.permutation(np.size(celltraces_sp, 1))]
+            celltraces_shuffled_sorted = celltraces_shuffled[:, np.argsort(dx_sp)]
             for i in range(nbins):
-                offset = findlevel(dx_sorted, 1, 'up')
+                offset = findlevel(dx_sorted, 1, "up")
 
                 if offset is None:
-                    StimulusAnalysis._log.info(
-                        "dx never crosses 1, all speed data going into "
-                        "single bin")
+                    StimulusAnalysis._log.info("dx never crosses 1, all speed data going into single bin")
                     offset = celltraces_shuffled_sorted.shape[1]
 
                 if i == 0:
-                    binned_cells_shuffled_sp[:, i, 0, shuf] = np.mean(
-                        celltraces_shuffled_sorted[:, :offset], axis=1)
-                    binned_cells_shuffled_sp[:, i, 1, shuf] = np.std(
-                        celltraces_shuffled_sorted[:, :offset], axis=1)
+                    binned_cells_shuffled_sp[:, i, 0, shuf] = np.mean(celltraces_shuffled_sorted[:, :offset], axis=1)
+                    binned_cells_shuffled_sp[:, i, 1, shuf] = np.std(celltraces_shuffled_sorted[:, :offset], axis=1)
                 else:
                     start = offset + (i - 1) * binsize
                     binned_cells_shuffled_sp[:, i, 0, shuf] = np.mean(
-                        celltraces_shuffled_sorted[:, start:start + binsize],
-                        axis=1)
+                        celltraces_shuffled_sorted[:, start : start + binsize], axis=1
+                    )
                     binned_cells_shuffled_sp[:, i, 1, shuf] = np.std(
-                        celltraces_shuffled_sorted[:, start:start + binsize],
-                        axis=1)
+                        celltraces_shuffled_sorted[:, start : start + binsize], axis=1
+                    )
 
         nbins = 1 + len(np.where(dx_vis >= 1)[0]) // binsize
         dx_sorted = dx_vis[np.argsort(dx_vis)]
@@ -421,75 +406,56 @@ class StimulusAnalysis(object):
         binned_cells_vis = np.zeros((self.numbercells, nbins, 2))
         binned_dx_vis = np.zeros((nbins, 2))
         for i in range(nbins):
-            offset = findlevel(dx_sorted, 1, 'up')
+            offset = findlevel(dx_sorted, 1, "up")
 
             if offset is None:
-                StimulusAnalysis._log.info(
-                    "dx never crosses 1, all speed data going into single bin")
+                StimulusAnalysis._log.info("dx never crosses 1, all speed data going into single bin")
                 offset = len(dx_sorted)
 
             if i == 0:
                 binned_dx_vis[i, 0] = np.mean(dx_sorted[:offset])
-                binned_dx_vis[i, 1] = np.std(
-                    dx_sorted[:offset]) / np.sqrt(offset)
-                binned_cells_vis[:, i, 0] = np.mean(
-                    celltraces_sorted_vis[:, :offset], axis=1)
-                binned_cells_vis[:, i, 1] = (
-                        np.std(celltraces_sorted_vis[:, :offset], axis=1) /
-                        np.sqrt(offset))
+                binned_dx_vis[i, 1] = np.std(dx_sorted[:offset]) / np.sqrt(offset)
+                binned_cells_vis[:, i, 0] = np.mean(celltraces_sorted_vis[:, :offset], axis=1)
+                binned_cells_vis[:, i, 1] = np.std(celltraces_sorted_vis[:, :offset], axis=1) / np.sqrt(offset)
             else:
                 # TODO 9 lines of repeated code!!!!!!!!!!!!
                 start = offset + (i - 1) * binsize
-                binned_dx_vis[i, 0] = np.mean(dx_sorted[start:start + binsize])
-                binned_dx_vis[i, 1] = np.std(
-                    dx_sorted[start:start + binsize]) / np.sqrt(binsize)
-                binned_cells_vis[:, i, 0] = np.mean(
-                    celltraces_sorted_vis[:, start:start + binsize], axis=1)
-                binned_cells_vis[:, i, 1] = np.std(
-                    celltraces_sorted_vis[:, start:start + binsize],
-                    axis=1) / np.sqrt(binsize)
+                binned_dx_vis[i, 0] = np.mean(dx_sorted[start : start + binsize])
+                binned_dx_vis[i, 1] = np.std(dx_sorted[start : start + binsize]) / np.sqrt(binsize)
+                binned_cells_vis[:, i, 0] = np.mean(celltraces_sorted_vis[:, start : start + binsize], axis=1)
+                binned_cells_vis[:, i, 1] = np.std(celltraces_sorted_vis[:, start : start + binsize], axis=1) / np.sqrt(
+                    binsize
+                )
 
         binned_cells_shuffled_vis = np.empty((self.numbercells, nbins, 2, 200))
         for shuf in range(200):
-            celltraces_shuffled = \
-                celltraces_vis[:,
-                               np.random.permutation(
-                                   np.size(celltraces_vis, 1))]
-            celltraces_shuffled_sorted = celltraces_shuffled[
-                                         :, np.argsort(dx_vis)]
+            celltraces_shuffled = celltraces_vis[:, np.random.permutation(np.size(celltraces_vis, 1))]
+            celltraces_shuffled_sorted = celltraces_shuffled[:, np.argsort(dx_vis)]
             for i in range(nbins):
-                offset = findlevel(dx_sorted, 1, 'up')
+                offset = findlevel(dx_sorted, 1, "up")
 
                 if offset is None:
-                    StimulusAnalysis._log.info(
-                        "dx never crosses 1, all speed data going into "
-                        "single bin")
+                    StimulusAnalysis._log.info("dx never crosses 1, all speed data going into single bin")
                     offset = len(dx_sorted)
 
                 if i == 0:
-                    binned_cells_shuffled_vis[:, i, 0, shuf] = np.mean(
-                        celltraces_shuffled_sorted[:, :offset], axis=1)
-                    binned_cells_shuffled_vis[:, i, 1, shuf] = np.std(
-                        celltraces_shuffled_sorted[:, :offset], axis=1)
+                    binned_cells_shuffled_vis[:, i, 0, shuf] = np.mean(celltraces_shuffled_sorted[:, :offset], axis=1)
+                    binned_cells_shuffled_vis[:, i, 1, shuf] = np.std(celltraces_shuffled_sorted[:, :offset], axis=1)
                 else:
                     start = offset + (i - 1) * binsize
                     binned_cells_shuffled_vis[:, i, 0, shuf] = np.mean(
-                        celltraces_shuffled_sorted[:, start:start + binsize],
-                        axis=1)
+                        celltraces_shuffled_sorted[:, start : start + binsize], axis=1
+                    )
                     binned_cells_shuffled_vis[:, i, 1, shuf] = np.std(
-                        celltraces_shuffled_sorted[:, start:start + binsize],
-                        axis=1)
+                        celltraces_shuffled_sorted[:, start : start + binsize], axis=1
+                    )
 
-        shuffled_variance_sp = binned_cells_shuffled_sp[
-                               :, :, 0, :].std(axis=1) ** 2
-        variance_threshold_sp = np.percentile(
-            shuffled_variance_sp, 99.9, axis=1)
+        shuffled_variance_sp = binned_cells_shuffled_sp[:, :, 0, :].std(axis=1) ** 2
+        variance_threshold_sp = np.percentile(shuffled_variance_sp, 99.9, axis=1)
         response_variance_sp = binned_cells_sp[:, :, 0].std(axis=1) ** 2
 
-        shuffled_variance_vis = binned_cells_shuffled_vis[
-                                :, :, 0, :].std(axis=1) ** 2
-        variance_threshold_vis = np.percentile(
-            shuffled_variance_vis, 99.9, axis=1)
+        shuffled_variance_vis = binned_cells_shuffled_vis[:, :, 0, :].std(axis=1) ** 2
+        variance_threshold_vis = np.percentile(shuffled_variance_vis, 99.9, axis=1)
         response_variance_vis = binned_cells_vis[:, :, 0].std(axis=1) ** 2
 
         for nc in range(self.numbercells):
@@ -507,48 +473,37 @@ class StimulusAnalysis(object):
             start_min = temp.argmin()
             peak_run.speed_min_sp[nc] = binned_dx_sp[start_min, 0]
             if peak_run.speed_max_sp[nc] > peak_run.speed_min_sp[nc]:
-                test_values = celltraces_sorted_sp[
-                              nc,
-                              start_max * binsize:(start_max + 1) * binsize]
-                other_values = np.delete(celltraces_sorted_sp[nc, :], range(
-                    start_max * binsize, (start_max + 1) * binsize))
-                (_, peak_run.ptest_sp[nc]) = nonraising_ks_2samp(
-                    test_values, other_values)
+                test_values = celltraces_sorted_sp[nc, start_max * binsize : (start_max + 1) * binsize]
+                other_values = np.delete(
+                    celltraces_sorted_sp[nc, :], range(start_max * binsize, (start_max + 1) * binsize)
+                )
+                (_, peak_run.ptest_sp[nc]) = nonraising_ks_2samp(test_values, other_values)
             else:
-                test_values = celltraces_sorted_sp[
-                              nc,
-                              start_min * binsize:(start_min + 1) * binsize]
-                ind_max = min(celltraces_sorted_sp[nc, :].size,
-                              (start_min + 1) * binsize)
-                other_values = np.delete(celltraces_sorted_sp[nc, :], range(
-                    start_min * binsize, ind_max))
-                (_, peak_run.ptest_sp[nc]) = nonraising_ks_2samp(
-                    test_values, other_values)
+                test_values = celltraces_sorted_sp[nc, start_min * binsize : (start_min + 1) * binsize]
+                ind_max = min(celltraces_sorted_sp[nc, :].size, (start_min + 1) * binsize)
+                other_values = np.delete(celltraces_sorted_sp[nc, :], range(start_min * binsize, ind_max))
+                (_, peak_run.ptest_sp[nc]) = nonraising_ks_2samp(test_values, other_values)
             temp = binned_cells_vis[nc, :, 0]
             start_max = temp.argmax()
             peak_run.speed_max_vis[nc] = binned_dx_vis[start_max, 0]
             start_min = temp.argmin()
             peak_run.speed_min_vis[nc] = binned_dx_vis[start_min, 0]
             if peak_run.speed_max_vis[nc] > peak_run.speed_min_vis[nc]:
-                test_values = celltraces_sorted_vis[
-                              nc,
-                              start_max * binsize:(start_max + 1) * binsize]
-                other_values = np.delete(celltraces_sorted_vis[nc, :], range(
-                    start_max * binsize, (start_max + 1) * binsize))
+                test_values = celltraces_sorted_vis[nc, start_max * binsize : (start_max + 1) * binsize]
+                other_values = np.delete(
+                    celltraces_sorted_vis[nc, :], range(start_max * binsize, (start_max + 1) * binsize)
+                )
             else:
-                test_values = celltraces_sorted_vis[
-                              nc,
-                              start_min * binsize:(start_min + 1) * binsize]
-                other_values = np.delete(celltraces_sorted_vis[nc, :], range(
-                    start_min * binsize, (start_min + 1) * binsize))
-            (_, peak_run.ptest_vis[nc]) = nonraising_ks_2samp(
-                test_values, other_values)
+                test_values = celltraces_sorted_vis[nc, start_min * binsize : (start_min + 1) * binsize]
+                other_values = np.delete(
+                    celltraces_sorted_vis[nc, :], range(start_min * binsize, (start_min + 1) * binsize)
+                )
+            (_, peak_run.ptest_vis[nc]) = nonraising_ks_2samp(test_values, other_values)
 
-        return binned_dx_sp, binned_cells_sp, binned_dx_vis, \
-            binned_cells_vis, peak_run
+        return binned_dx_sp, binned_cells_sp, binned_dx_vis, binned_cells_vis, peak_run
 
     def get_sweep_response(self):
-        """ Calculates the response to each sweep in the stimulus table for
+        """Calculates the response to each sweep in the stimulus table for
         each cell and the mean response.
         The return is a 3-tuple of:
 
@@ -568,35 +523,29 @@ class StimulusAnalysis(object):
 
         def do_mean(x):
             # +1])
-            return np.mean(
-                x[self.interlength:
-                  self.interlength + self.sweeplength + self.extralength])
+            return np.mean(x[self.interlength : self.interlength + self.sweeplength + self.extralength])
 
         def do_p_value(x):
-            (_, p) = \
-                st.f_oneway(
-                    x[:self.interlength],
-                    x[self.interlength:
-                      self.interlength + self.sweeplength + self.extralength])
+            (_, p) = st.f_oneway(
+                x[: self.interlength], x[self.interlength : self.interlength + self.sweeplength + self.extralength]
+            )
             return p
 
-        StimulusAnalysis._log.info('Calculating responses for each sweep')
-        sweep_response = pd.DataFrame(index=self.stim_table.index.values,
-                                      columns=list(map(str, range(
-                                          self.numbercells + 1))))
+        StimulusAnalysis._log.info("Calculating responses for each sweep")
+        sweep_response = pd.DataFrame(
+            index=self.stim_table.index.values, columns=list(map(str, range(self.numbercells + 1)))
+        )
 
-        sweep_response.rename(
-            columns={str(self.numbercells): 'dx'}, inplace=True)
+        sweep_response.rename(columns={str(self.numbercells): "dx"}, inplace=True)
 
         for index, row in self.stim_table.iterrows():
-            start = int(row['start'] - self.interlength)
-            end = int(row['start'] + self.sweeplength + self.interlength)
+            start = int(row["start"] - self.interlength)
+            end = int(row["start"] + self.sweeplength + self.interlength)
 
             for nc in range(self.numbercells):
                 temp = self.celltraces[int(nc), start:end]
-                sweep_response[str(nc)][index] = \
-                    100 * ((temp / np.mean(temp[:self.interlength])) - 1)
-            sweep_response['dx'][index] = self.dxcm[start:end]
+                sweep_response[str(nc)][index] = 100 * ((temp / np.mean(temp[: self.interlength])) - 1)
+            sweep_response["dx"][index] = self.dxcm[start:end]
 
         mean_sweep_response = sweep_response.applymap(do_mean)
 
@@ -608,7 +557,7 @@ class StimulusAnalysis(object):
             pass
 
         ax = plt.gca()
-        ax.imshow(repsim, interpolation='nearest', cmap='plasma')
+        ax.imshow(repsim, interpolation="nearest", cmap="plasma")
 
     def plot_running_speed_histogram(self, xlim=None, nbins=None):
         if xlim is None:
@@ -622,10 +571,13 @@ class StimulusAnalysis(object):
         plt.xlabel("running speed (cm/s)")
         plt.ylabel("time points")
 
-    def plot_speed_tuning(self, cell_specimen_id=None,
-                          cell_index=None,
-                          evoked_color=oplots.EVOKED_COLOR,
-                          spontaneous_color=oplots.SPONTANEOUS_COLOR):
+    def plot_speed_tuning(
+        self,
+        cell_specimen_id=None,
+        cell_index=None,
+        evoked_color=oplots.EVOKED_COLOR,
+        spontaneous_color=oplots.SPONTANEOUS_COLOR,
+    ):
         cell_index = self.row_from_cell_id(cell_specimen_id, cell_index)
 
         oplots.plot_combined_speed(
@@ -633,24 +585,24 @@ class StimulusAnalysis(object):
             self.binned_dx_vis[:, :],
             self.binned_cells_sp[cell_index, :, :] * 100,
             self.binned_dx_sp[:, :],
-            evoked_color, spontaneous_color)
+            evoked_color,
+            spontaneous_color,
+        )
 
         plt.xlabel("running speed (cm/s)")
         plt.ylabel("percent dF/F")
 
     def row_from_cell_id(self, csid=None, idx=None):
-
         if csid is not None and not np.isnan(csid):
             return self.data_set.get_cell_specimen_ids().tolist().index(csid)
         elif idx is not None:
             return idx
         else:
-            raise Exception("Could not find row for csid(%s) idx(%s)"
-                            % (str(csid), str(idx)))
+            raise Exception("Could not find row for csid(%s) idx(%s)" % (str(csid), str(idx)))
 
 
 def nonraising_ks_2samp(data1, data2, **kwargs):
-    """ scipy.stats.ks_2samp now raises a ValueError if one of the input arrays
+    """scipy.stats.ks_2samp now raises a ValueError if one of the input arrays
     is of length 0. Previously it signaled this case by returning nans. This
     function restores the prior behavior.
     """

@@ -10,20 +10,16 @@ from allensdk.model.biophys_sim.config import Config
 
 BASEDIR = os.path.dirname(__file__)
 
+
 @neuron_utils.read_neuron_fit_stdout
-def neuron_passive_fit_elec(up_data,
-                            down_data,
-                            swc_path,
-                            limit,
-                            bridge,
-                            elec_cap):
+def neuron_passive_fit_elec(up_data, down_data, swc_path, limit, bridge, elec_cap):
     h = neuron_utils.get_h()
     h.load_file("stdgui.hoc")
     h.load_file("import3d.hoc")
     neuron_utils.load_morphology(swc_path)
 
     for sec in h.allsec():
-        sec.insert('pas')
+        sec.insert("pas")
         for seg in sec:
             seg.pas.e = 0
 
@@ -88,16 +84,12 @@ def neuron_passive_fit_elec(up_data,
             minerr = mrf.opt.minerr
 
     h.region_areas()
-    return {
-        'Ri': fit_Ri,
-        'Cm': fit_Cm,
-        'Rm': fit_Rm,
-        'err': minerr
-        }
+    return {"Ri": fit_Ri, "Cm": fit_Cm, "Rm": fit_Rm, "err": minerr}
+
 
 def main():
     import sys
-    
+
     manifest_path = sys.argv[-1]
     elec_cap = float(sys.argv[-2])
     bridge = float(sys.argv[-3])
@@ -106,17 +98,17 @@ def main():
     app_config = Config()
     description = app_config.load(manifest_path)
 
-    upfile = description.manifest.get_path('upfile')
-    up_data =  np.loadtxt(upfile)
-    downfile = description.manifest.get_path('downfile')
+    upfile = description.manifest.get_path("upfile")
+    up_data = np.loadtxt(upfile)
+    downfile = description.manifest.get_path("downfile")
     down_data = np.loadtxt(downfile)
-    swc_path = description.manifest.get_path('MORPHOLOGY')
+    swc_path = description.manifest.get_path("MORPHOLOGY")
 
     data = neuron_passive_fit_elec(up_data, down_data, swc_path, limit, bridge, elec_cap)
 
-    output_file = description.manifest.get_path('fit_3_file')
+    output_file = description.manifest.get_path("fit_3_file")
     json_utilities.write(output_file, data)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

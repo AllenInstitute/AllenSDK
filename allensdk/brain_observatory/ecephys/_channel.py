@@ -2,28 +2,27 @@ from typing import Optional
 import numpy as np
 
 from allensdk.core import DataObject
-from allensdk.brain_observatory.ecephys.utils import (
-    strip_substructure_acronym)
+from allensdk.brain_observatory.ecephys.utils import strip_substructure_acronym
 
 
 class Channel(DataObject):
     """Probe channel"""
+
     def __init__(
-            self,
-            id: int,
-            probe_id: int,
-            valid_data: bool,
-            probe_channel_number: int,
-            probe_vertical_position: int,
-            probe_horizontal_position: int,
-            structure_acronym: str = '',
-            anterior_posterior_ccf_coordinate: Optional[float] = None,
-            dorsal_ventral_ccf_coordinate: Optional[float] = None,
-            left_right_ccf_coordinate: Optional[float] = None,
-            impedance: float = np.nan,
-            filtering: str = 'AP band: 500 Hz high-pass; '
-                             'LFP band: 1000 Hz low-pass',
-            strip_structure_subregion: bool = True
+        self,
+        id: int,
+        probe_id: int,
+        valid_data: bool,
+        probe_channel_number: int,
+        probe_vertical_position: int,
+        probe_horizontal_position: int,
+        structure_acronym: str = "",
+        anterior_posterior_ccf_coordinate: Optional[float] = None,
+        dorsal_ventral_ccf_coordinate: Optional[float] = None,
+        left_right_ccf_coordinate: Optional[float] = None,
+        impedance: float = np.nan,
+        filtering: str = "AP band: 500 Hz high-pass; LFP band: 1000 Hz low-pass",
+        strip_structure_subregion: bool = True,
     ):
         """
 
@@ -34,9 +33,7 @@ class Channel(DataObject):
             parsed as "LGd". You might want to strip it if the subregion is
             beyond annotation accuracy.
         """
-        super().__init__(name='channel',
-                         value=None,
-                         is_value_self=True)
+        super().__init__(name="channel", value=None, is_value_self=True)
         self._id = id
         self._probe_id = probe_id
         self._valid_data = valid_data
@@ -44,8 +41,7 @@ class Channel(DataObject):
         self._probe_vertical_position = probe_vertical_position
         self._probe_horizontal_position = probe_horizontal_position
         self._structure_acronym = structure_acronym
-        self._anterior_posterior_ccf_coordinate = \
-            anterior_posterior_ccf_coordinate
+        self._anterior_posterior_ccf_coordinate = anterior_posterior_ccf_coordinate
         self._dorsal_ventral_ccf_coordinate = dorsal_ventral_ccf_coordinate
         self._left_right_ccf_coordinate = left_right_ccf_coordinate
         self._impedance = impedance

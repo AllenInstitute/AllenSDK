@@ -47,33 +47,15 @@ class CorrectedFluorescenceTraces(
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "CorrectedFluorescenceTraces":
-        corr_fluorescence_traces_nwb = nwbfile.processing[
-            "ophys"
-        ].data_interfaces["corrected_fluorescence"]
+        corr_fluorescence_traces_nwb = nwbfile.processing["ophys"].data_interfaces["corrected_fluorescence"]
         # f traces stored as timepoints x rois in NWB
         # We want rois x timepoints, hence the transpose
-        f_traces = (
-            corr_fluorescence_traces_nwb.roi_response_series["traces"]
-            .data[:]
-            .T.copy()
-        )
-        roi_ids = (
-            corr_fluorescence_traces_nwb.roi_response_series["traces"]
-            .rois.table.id[:]
-            .copy()
-        )
+        f_traces = corr_fluorescence_traces_nwb.roi_response_series["traces"].data[:].T.copy()
+        roi_ids = corr_fluorescence_traces_nwb.roi_response_series["traces"].rois.table.id[:].copy()
         # TODO: Remove try/except once VBO released.
         try:
-            r_values = (
-                corr_fluorescence_traces_nwb.roi_response_series["r"]
-                .data[:]
-                .copy()
-            )
-            rmse = (
-                corr_fluorescence_traces_nwb.roi_response_series["RMSE"]
-                .data[:]
-                .copy()
-            )
+            r_values = corr_fluorescence_traces_nwb.roi_response_series["r"].data[:].copy()
+            rmse = corr_fluorescence_traces_nwb.roi_response_series["RMSE"].data[:].copy()
             data_dict = {
                 "corrected_fluorescence": [x for x in f_traces],
                 "r": r_values,
@@ -88,9 +70,7 @@ class CorrectedFluorescenceTraces(
         return CorrectedFluorescenceTraces(traces=df)
 
     @classmethod
-    def from_data_file(
-        cls, neuropil_corrected_file: NeuropilCorrectedFile
-    ) -> "CorrectedFluorescenceTraces":
+    def from_data_file(cls, neuropil_corrected_file: NeuropilCorrectedFile) -> "CorrectedFluorescenceTraces":
         corrected_fluorescence_traces = neuropil_corrected_file.data
         return cls(traces=corrected_fluorescence_traces)
 
@@ -105,17 +85,8 @@ class CorrectedFluorescenceTraces(
         # Create/Add corrected_fluorescence_traces modules and interfaces:
         ophys_module = nwbfile.processing["ophys"]
 
-        roi_table_region = (
-            nwbfile.processing["ophys"]
-            .data_interfaces["dff"]
-            .roi_response_series["traces"]
-            .rois
-        )  # noqa: E501
-        ophys_timestamps = (
-            ophys_module.get_data_interface("dff")
-            .roi_response_series["traces"]
-            .timestamps
-        )
+        roi_table_region = nwbfile.processing["ophys"].data_interfaces["dff"].roi_response_series["traces"].rois  # noqa: E501
+        ophys_timestamps = ophys_module.get_data_interface("dff").roi_response_series["traces"].timestamps
         f_interface = Fluorescence(name="corrected_fluorescence")
         ophys_module.add_data_interface(f_interface)
 

@@ -44,16 +44,15 @@ from allensdk.brain_observatory.brain_observatory_exceptions import MissingStimu
 from test_h5_utilities import mem_h5  # noqa: F401 -- pytest fixture
 
 
-
 NWB_FLAVORS = []
 
-if 'TEST_NWB_FILES' in os.environ:
-    nwb_list_file = os.environ['TEST_NWB_FILES']
+if "TEST_NWB_FILES" in os.environ:
+    nwb_list_file = os.environ["TEST_NWB_FILES"]
 else:
-    nwb_list_file = str(files('allensdk.test.core').joinpath('nwb_files.txt'))
+    nwb_list_file = str(files("allensdk.test.core").joinpath("nwb_files.txt"))
 
-if os.environ.get('TEST_COMPLETE', None) == 'true':
-    with open(nwb_list_file, 'r') as f:
+if os.environ.get("TEST_COMPLETE", None) == "true":
+    with open(nwb_list_file, "r") as f:
         NWB_FLAVORS = [l.strip() for l in f]
 
 
@@ -68,26 +67,27 @@ def data_set(request):
 @pytest.fixture
 def stim_pres_h5(mem_h5):
     def make_stim_pres_h5(stimulus_name):
-        mem_h5.create_group('stimulus/presentation/{}'.format(stimulus_name))
-        mem_h5.create_group('stimulus/not_presentation/{}'.format(stimulus_name))
+        mem_h5.create_group("stimulus/presentation/{}".format(stimulus_name))
+        mem_h5.create_group("stimulus/not_presentation/{}".format(stimulus_name))
         return mem_h5
+
     return make_stim_pres_h5
 
 
 @pytest.fixture
 def abstract_feature_series_h5(mem_h5):
     def make_abstract_feature_series_h5(stimulus_name, stim_data, features, frame_dur):
-        
-        stimulus_path = 'stimulus/presentation/{}'.format(stimulus_name)
-        frame_dur_path = '{}/frame_duration'.format(stimulus_path)
-        features_path = '{}/features'.format(stimulus_path)
-        stim_data_path = '{}/data'.format(stimulus_path)
+        stimulus_path = "stimulus/presentation/{}".format(stimulus_name)
+        frame_dur_path = "{}/frame_duration".format(stimulus_path)
+        features_path = "{}/features".format(stimulus_path)
+        stim_data_path = "{}/data".format(stimulus_path)
 
         mem_h5[frame_dur_path] = frame_dur
         mem_h5[stim_data_path] = stim_data
         mem_h5[features_path] = features
 
         return mem_h5
+
     return make_abstract_feature_series_h5
 
 
@@ -103,21 +103,37 @@ def test_get_roi_ids(data_set):
     ids = data_set.get_roi_ids()
     assert len(ids) == len(data_set.get_cell_specimen_ids())
 
+
 def test_get_metadata(data_set):
     md = data_set.get_metadata()
 
-    valid_fields = [ 'genotype', 'cre_line', 'imaging_depth_um', 'ophys_experiment_id', 'experiment_container_id',
-                     'session_start_time', 'age_days', 'device', 'device_name', 'pipeline_version', 'sex',
-                     'targeted_structure', 'excitation_lambda', 'indicator', 'fov', 'session_type', 'specimen_name' ]
+    valid_fields = [
+        "genotype",
+        "cre_line",
+        "imaging_depth_um",
+        "ophys_experiment_id",
+        "experiment_container_id",
+        "session_start_time",
+        "age_days",
+        "device",
+        "device_name",
+        "pipeline_version",
+        "sex",
+        "targeted_structure",
+        "excitation_lambda",
+        "indicator",
+        "fov",
+        "session_type",
+        "specimen_name",
+    ]
 
-    invalid_fields = [ 'imaging_depth', 'age', 'device_string', 'generated_by' ]
+    invalid_fields = ["imaging_depth", "age", "device_string", "generated_by"]
 
     for field in valid_fields:
         assert md[field] is not None
 
     for field in invalid_fields:
         assert field not in md
-    
 
 
 def test_get_cell_specimen_indices(data_set):
@@ -174,8 +190,8 @@ def test_get_dff_traces(data_set):
     timestamps, traces = data_set.get_dff_traces([ids[0]])
     assert traces.shape[0] == 1
 
-def test_get_neuropil_r(data_set):
 
+def test_get_neuropil_r(data_set):
     ids = data_set.get_cell_specimen_ids()
     r = data_set.get_neuropil_r()
     assert len(ids) == len(r)
@@ -186,6 +202,7 @@ def test_get_neuropil_r(data_set):
     short_list = [ids[0]]
     r = data_set.get_neuropil_r(short_list)
     assert len(short_list) == len(r)
+
 
 def test_get_corrected_fluorescence_traces(data_set):
     ids = data_set.get_cell_specimen_ids()
@@ -231,7 +248,6 @@ def test_get_roi_mask_array(data_set):
 
 
 def test_get_stimulus_epoch_table(data_set):
-
     summary_df = data_set.get_stimulus_epoch_table()
 
     session_type = data_set.get_session_type()
@@ -242,11 +258,11 @@ def test_get_stimulus_epoch_table(data_set):
     elif session_type == si.THREE_SESSION_C2:
         assert len(summary_df) == 10
     else:
-        raise NotImplementedError('Code not tested for session of type: %s' % session_type)
+        raise NotImplementedError("Code not tested for session of type: %s" % session_type)
+
 
 def test_get_stimulus_table_master(data_set):
-
-    master_df = data_set.get_stimulus_table('master')
+    master_df = data_set.get_stimulus_table("master")
 
     session_type = data_set.get_session_type()
     if session_type == si.THREE_SESSION_A:
@@ -258,97 +274,89 @@ def test_get_stimulus_table_master(data_set):
     elif session_type == si.THREE_SESSION_C2:
         assert len(master_df) == 29398
     else:
-        raise NotImplementedError('Code not tested for session of type: %s' % session_type)
+        raise NotImplementedError("Code not tested for session of type: %s" % session_type)
 
 
 def test_make_indexed_time_series_stimulus_table():
-
     frame_dur_exp = np.arange(20).reshape((10, 2))
     inds_exp = np.arange(10)
 
     obt = bonds._make_indexed_time_series_stimulus_table(inds_exp, frame_dur_exp)
 
-    frame_dur_obt = np.array([ obt['start'].values, obt['end'].values ]).T
-    assert(np.allclose( frame_dur_obt, frame_dur_exp ))
+    frame_dur_obt = np.array([obt["start"].values, obt["end"].values]).T
+    assert np.allclose(frame_dur_obt, frame_dur_exp)
 
 
 def test_make_indexed_time_series_stimulus_table_out_of_order():
-
     frame_dur_exp = np.arange(20).reshape((10, 2))
     frame_dur_file = frame_dur_exp.copy()[::-1, :]
     inds_exp = np.arange(10)
 
     obt = bonds._make_indexed_time_series_stimulus_table(inds_exp, frame_dur_file)
 
-    frame_dur_obt = np.array([ obt['start'].values, obt['end'].values ]).T
-    assert(np.allclose( frame_dur_obt, frame_dur_exp ))
+    frame_dur_obt = np.array([obt["start"].values, obt["end"].values]).T
+    assert np.allclose(frame_dur_obt, frame_dur_exp)
 
 
 def test_make_abstract_feature_series_stimulus_table_out_of_order():
-
     frame_dur_exp = np.arange(20).reshape((10, 2))
     frame_dur_file = frame_dur_exp.copy()[::-1, :]
-    features_exp = ['orientation', 'spatial_frequency', 'phase']
+    features_exp = ["orientation", "spatial_frequency", "phase"]
     data_exp = np.arange(30).reshape((10, 3))
     data_file = data_exp.copy()[::-1, :]
 
     obt = bonds._make_abstract_feature_series_stimulus_table(data_file, features_exp, frame_dur_file)
 
-    frame_dur_obt = np.array([ obt['start'].values, obt['end'].values ]).T
-    assert(np.allclose( frame_dur_obt, frame_dur_exp ))
+    frame_dur_obt = np.array([obt["start"].values, obt["end"].values]).T
+    assert np.allclose(frame_dur_obt, frame_dur_exp)
 
-    data_obt = np.array([ obt['orientation'].values, obt['spatial_frequency'].values, obt['phase'].values ]).T
-    assert(np.allclose( data_obt, data_exp ))
+    data_obt = np.array([obt["orientation"].values, obt["spatial_frequency"].values, obt["phase"].values]).T
+    assert np.allclose(data_obt, data_exp)
 
 
 def test_make_spontanous_activity_stimulus_table():
-
     table_values_exp = [[0, 2], [4, 6]]
 
     frame_dur = np.arange(8).reshape((4, 2))
-    events = np.array([ 1, -1, 1, -1 ])
+    events = np.array([1, -1, 1, -1])
 
     obt = bonds._make_spontaneous_activity_stimulus_table(events, frame_dur)
-    assert(np.allclose( obt.values, table_values_exp ))
+    assert np.allclose(obt.values, table_values_exp)
 
 
 def test_make_repeated_indexed_time_series_stimulus_table():
-
     frame_dur_exp = np.arange(20).reshape((10, 2))
     inds_exp = np.array([0, 1, 2, 3, 4, 0, 1, 2, 3, 4])
     repeats_exp = np.array([0] * 5 + [1] * 5)
-    
+
     obt = bonds._make_repeated_indexed_time_series_stimulus_table(inds_exp, frame_dur_exp)
 
-    frame_dur_obt = np.array([ obt['start'].values, obt['end'].values ]).T
-    assert(np.allclose( frame_dur_obt, frame_dur_exp ))
-    assert(np.allclose( repeats_exp, obt['repeat'] ))
+    frame_dur_obt = np.array([obt["start"].values, obt["end"].values]).T
+    assert np.allclose(frame_dur_obt, frame_dur_exp)
+    assert np.allclose(repeats_exp, obt["repeat"])
 
 
 def test_find_stimulus_presentation_group(stim_pres_h5):
-
-    stimulus_name = 'fish'
+    stimulus_name = "fish"
     stim_pres_h5 = stim_pres_h5(stimulus_name)
 
     obt = bonds._find_stimulus_presentation_group(stim_pres_h5, stimulus_name)
 
-    assert( obt.name == '/stimulus/presentation/fish' )
+    assert obt.name == "/stimulus/presentation/fish"
 
 
 def test_find_stimulus_presentation_group_missing(stim_pres_h5):
-
-    stimulus_name = 'fish'
-    stim_pres_h5 = stim_pres_h5('fowl')
+    stimulus_name = "fish"
+    stim_pres_h5 = stim_pres_h5("fowl")
 
     with pytest.raises(MissingStimulusException):
         bonds._find_stimulus_presentation_group(stim_pres_h5, stimulus_name)
 
 
 def test_find_stimulus_presentation_group_duplicate(stim_pres_h5):
-
-    stimulus_name = 'fish'
-    stim_pres_h5 = stim_pres_h5('fish')
-    stim_pres_h5.create_group('/stimulus/presentation/fish_stimulus')
+    stimulus_name = "fish"
+    stim_pres_h5 = stim_pres_h5("fish")
+    stim_pres_h5.create_group("/stimulus/presentation/fish_stimulus")
 
     with pytest.raises(MissingStimulusException):
         bonds._find_stimulus_presentation_group(stim_pres_h5, stimulus_name)

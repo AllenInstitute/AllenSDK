@@ -2,23 +2,20 @@ from typing import Optional, Union, List
 from pathlib import Path
 import logging
 
-from allensdk.brain_observatory.behavior.behavior_project_cache.\
-    project_apis.data_io import ProjectCloudApiBase
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io import ProjectCloudApiBase
 from allensdk.core.authentication import DbCredentials
-from allensdk.brain_observatory.behavior.behavior_project_cache.\
-    project_apis.data_io import BehaviorProjectLimsApi
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io import BehaviorProjectLimsApi
 
 
 class ProjectCacheBase(object):
-
     BUCKET_NAME: str = None
     PROJECT_NAME: str = None
 
     def __init__(
-            self,
-            fetch_api: Union[ProjectCloudApiBase, BehaviorProjectLimsApi],
-            fetch_tries: int = 2,
-            ):
+        self,
+        fetch_api: Union[ProjectCloudApiBase, BehaviorProjectLimsApi],
+        fetch_tries: int = 2,
+    ):
         """
         Parameters
         ==========
@@ -41,17 +38,14 @@ class ProjectCacheBase(object):
     def manifest(self):
         if self.cache is None:
             api_name = type(self.fetch_api).__name__
-            raise NotImplementedError(f"A {type(self).__name__} "
-                                      f"based on {api_name} "
-                                      "does not have an accessible manifest "
-                                      "property")
+            raise NotImplementedError(
+                f"A {type(self).__name__} based on {api_name} does not have an accessible manifest property"
+            )
         return self.cache.manifest
 
     @classmethod
     def from_s3_cache(
-            cls,
-            cache_dir: Union[str, Path],
-            bucket_name_override: Optional[str] = None
+        cls, cache_dir: Union[str, Path], bucket_name_override: Optional[str] = None
     ) -> "ProjectCacheBase":
         """instantiates this object with a connection to an s3 bucket and/or
         a local cache related to that bucket.
@@ -76,20 +70,15 @@ class ProjectCacheBase(object):
 
         fetch_api = cls.cloud_api_class().from_s3_cache(
             cache_dir,
-            bucket_name=(
-                bucket_name_override if bucket_name_override is not None
-                else cls.BUCKET_NAME),
+            bucket_name=(bucket_name_override if bucket_name_override is not None else cls.BUCKET_NAME),
             project_name=cls.PROJECT_NAME,
-            ui_class_name=cls.__name__)
+            ui_class_name=cls.__name__,
+        )
 
         return cls(fetch_api=fetch_api)
 
     @classmethod
-    def from_local_cache(
-        cls,
-        cache_dir: Union[str, Path],
-        use_static_cache: bool = False
-    ) -> "ProjectCacheBase":
+    def from_local_cache(cls, cache_dir: Union[str, Path], use_static_cache: bool = False) -> "ProjectCacheBase":
         """instantiates this object with a local cache.
 
         Parameters
@@ -108,26 +97,25 @@ class ProjectCacheBase(object):
 
         """
         fetch_api = cls.cloud_api_class().from_local_cache(
-            cache_dir,
-            project_name=cls.PROJECT_NAME,
-            ui_class_name=cls.__name__,
-            use_static_cache=use_static_cache
+            cache_dir, project_name=cls.PROJECT_NAME, ui_class_name=cls.__name__, use_static_cache=use_static_cache
         )
         return cls(fetch_api=fetch_api)
 
     @classmethod
-    def from_lims(cls, manifest: Optional[Union[str, Path]] = None,
-                  version: Optional[str] = None,
-                  cache: bool = False,
-                  fetch_tries: int = 2,
-                  lims_credentials: Optional[DbCredentials] = None,
-                  mtrain_credentials: Optional[DbCredentials] = None,
-                  host: Optional[str] = None,
-                  scheme: Optional[str] = None,
-                  asynchronous: bool = True,
-                  data_release_date: Optional[Union[str, List[str]]] = None,
-                  passed_only: bool = True
-                  ) -> "ProjectCacheBase":
+    def from_lims(
+        cls,
+        manifest: Optional[Union[str, Path]] = None,
+        version: Optional[str] = None,
+        cache: bool = False,
+        fetch_tries: int = 2,
+        lims_credentials: Optional[DbCredentials] = None,
+        mtrain_credentials: Optional[DbCredentials] = None,
+        host: Optional[str] = None,
+        scheme: Optional[str] = None,
+        asynchronous: bool = True,
+        data_release_date: Optional[Union[str, List[str]]] = None,
+        passed_only: bool = True,
+    ) -> "ProjectCacheBase":
         """
         Construct a ProjectCacheBase with a lims api.
 
@@ -169,8 +157,7 @@ class ProjectCacheBase(object):
             ProjectCacheBase instance with a LIMS fetch API
         """
         if host and scheme:
-            app_kwargs = {"host": host, "scheme": scheme,
-                          "asynchronous": asynchronous}
+            app_kwargs = {"host": host, "scheme": scheme, "asynchronous": asynchronous}
         else:
             app_kwargs = None
         fetch_api = cls.lims_api_class().default(
@@ -178,10 +165,9 @@ class ProjectCacheBase(object):
             mtrain_credentials=mtrain_credentials,
             data_release_date=data_release_date,
             app_kwargs=app_kwargs,
-            passed_only=passed_only
+            passed_only=passed_only,
         )
-        return cls(fetch_api=fetch_api, manifest=manifest, version=version,
-                   cache=cache, fetch_tries=fetch_tries)
+        return cls(fetch_api=fetch_api, manifest=manifest, version=version, cache=cache, fetch_tries=fetch_tries)
 
     def _cache_not_implemented(self, method_name: str) -> None:
         """
@@ -202,13 +188,10 @@ class ProjectCacheBase(object):
         thinks that you need to run this method).
         """
         if not isinstance(self.fetch_api, self.cloud_api_class()):
-            self._cache_not_implemented('construct_local_manifest')
+            self._cache_not_implemented("construct_local_manifest")
         self.fetch_api.cache.construct_local_manifest()
 
-    def compare_manifests(self,
-                          manifest_0_name: str,
-                          manifest_1_name: str
-                          ) -> str:
+    def compare_manifests(self, manifest_0_name: str, manifest_1_name: str) -> str:
         """
         Compare two manifests from this dataset. Return a dict
         containing the list of metadata and data files that changed
@@ -229,9 +212,8 @@ class ProjectCacheBase(object):
             manifest_0 to manifest_1
         """
         if not isinstance(self.fetch_api, self.cloud_api_class()):
-            self._cache_not_implemented('compare_manifests')
-        return self.fetch_api.cache.compare_manifests(manifest_0_name,
-                                                      manifest_1_name)
+            self._cache_not_implemented("compare_manifests")
+        return self.fetch_api.cache.compare_manifests(manifest_0_name, manifest_1_name)
 
     def load_latest_manifest(self) -> None:
         """
@@ -239,7 +221,7 @@ class ProjectCacheBase(object):
         version of the dataset.
         """
         if not isinstance(self.fetch_api, self.cloud_api_class()):
-            self._cache_not_implemented('load_latest_manifest')
+            self._cache_not_implemented("load_latest_manifest")
         self.fetch_api.cache.load_latest_manifest()
         self.load_manifest(self.current_manifest())
 
@@ -249,7 +231,7 @@ class ProjectCacheBase(object):
         available on your local system.
         """
         if not isinstance(self.fetch_api, self.cloud_api_class()):
-            self._cache_not_implemented('latest_downloaded_manifest_file')
+            self._cache_not_implemented("latest_downloaded_manifest_file")
         return self.fetch_api.cache.latest_downloaded_manifest_file
 
     def latest_manifest_file(self) -> str:
@@ -259,7 +241,7 @@ class ProjectCacheBase(object):
         if this is a cloud-backed cache.
         """
         if not isinstance(self.fetch_api, self.cloud_api_class()):
-            self._cache_not_implemented('latest_manifest_file')
+            self._cache_not_implemented("latest_manifest_file")
         return self.fetch_api.cache.latest_manifest_file
 
     def load_manifest(self, manifest_name: str):
@@ -273,7 +255,7 @@ class ProjectCacheBase(object):
             self.manifest_file_names
         """
         if not isinstance(self.fetch_api, self.cloud_api_class()):
-            self._cache_not_implemented('load_manifest')
+            self._cache_not_implemented("load_manifest")
         self.fetch_api.load_manifest(manifest_name)
 
     def list_all_downloaded_manifests(self) -> list:
@@ -282,7 +264,7 @@ class ProjectCacheBase(object):
         that have been downloaded to this cache.
         """
         if not isinstance(self.fetch_api, self.cloud_api_class()):
-            self._cache_not_implemented('list_all_downloaded_manifests')
+            self._cache_not_implemented("list_all_downloaded_manifests")
         return self.fetch_api.cache.list_all_downloaded_manifests()
 
     def list_manifest_file_names(self) -> list:
@@ -291,7 +273,7 @@ class ProjectCacheBase(object):
         associated with this dataset.
         """
         if not isinstance(self.fetch_api, self.cloud_api_class()):
-            self._cache_not_implemented('list_manifest_file_names')
+            self._cache_not_implemented("list_manifest_file_names")
         return self.fetch_api.cache.manifest_file_names
 
     def current_manifest(self) -> Union[None, str]:
@@ -300,5 +282,5 @@ class ProjectCacheBase(object):
         used by this cache.
         """
         if not isinstance(self.fetch_api, self.cloud_api_class()):
-            self._cache_not_implemented('current_manifest')
+            self._cache_not_implemented("current_manifest")
         return self.fetch_api.cache.current_manifest

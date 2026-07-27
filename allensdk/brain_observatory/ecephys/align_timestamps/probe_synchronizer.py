@@ -6,7 +6,7 @@ import numpy as np
 class ProbeSynchronizer(object):
     @property
     def sampling_rate_scale(self):
-        """ The ratio of the probe's sampling rate assessed on the global clock to the
+        """The ratio of the probe's sampling rate assessed on the global clock to the
         probe's locally assessed sampling rate.
         """
 
@@ -69,21 +69,14 @@ class ProbeSynchronizer(object):
         )[0]
 
         if self.global_probe_sampling_rate > 0:
-
             if sync_condition == "probe":
-                samples[in_range] = samples[in_range] / \
-                                    self.local_probe_sampling_rate
+                samples[in_range] = samples[in_range] / self.local_probe_sampling_rate
 
             elif sync_condition == "master":
-                samples[in_range] = (
-                    samples[in_range] / self.global_probe_sampling_rate
-                    - self.total_time_shift
-                )
+                samples[in_range] = samples[in_range] / self.global_probe_sampling_rate - self.total_time_shift
 
             else:
-                raise ValueError(
-                    "unrecognized sync condition: {}".format(sync_condition)
-                )
+                raise ValueError("unrecognized sync condition: {}".format(sync_condition))
 
         else:
             samples[in_range] = -1
@@ -138,25 +131,22 @@ class ProbeSynchronizer(object):
         times_array = np.array(probe_barcode_times)
         barcodes_array = np.array(probe_barcodes)
 
-        ok_barcodes = np.where((times_array > min_time) *
-                               (times_array < max_time))[0]
+        ok_barcodes = np.where((times_array > min_time) * (times_array < max_time))[0]
         ok_barcodes = ok_barcodes[ok_barcodes < len(barcodes_array)]
         times_to_align = list(times_array[ok_barcodes])
         barcodes_to_align = list(barcodes_array[ok_barcodes])
 
         if len(barcodes_to_align) > 0:
-
             print("Num barcodes: " + str(len(barcodes_to_align)))
 
-            total_time_shift, global_probe_sampling_rate, _ = \
-                barcode.get_probe_time_offset(
-                    master_barcode_times,
-                    master_barcodes,
-                    times_to_align,
-                    barcodes_to_align,
-                    probe_start_index,
-                    local_probe_sampling_rate,
-                )
+            total_time_shift, global_probe_sampling_rate, _ = barcode.get_probe_time_offset(
+                master_barcode_times,
+                master_barcodes,
+                times_to_align,
+                barcodes_to_align,
+                probe_start_index,
+                local_probe_sampling_rate,
+            )
 
         else:
             print("Not enough barcodes...setting sampling rate to 0")

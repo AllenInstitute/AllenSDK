@@ -36,6 +36,7 @@
 
 import numpy as np
 import sys
+
 if sys.version_info < (3, 3):
     from collections import Iterable
 else:
@@ -47,9 +48,9 @@ import dateutil
 
 
 def dict_to_indexed_array(dc, order=None):
-    ''' Given a dictionary and an ordered arr, build a concatenation of the dictionary's values and an index describing
+    """Given a dictionary and an ordered arr, build a concatenation of the dictionary's values and an index describing
     how that concatenation can be unpacked
-    '''
+    """
 
     if order is None:
         order = dc.keys()
@@ -59,7 +60,6 @@ def dict_to_indexed_array(dc, order=None):
     counter = 0
 
     for key in order:
-
         if isinstance(dc[key], (np.ndarray, list)):
             extended = dc[key]
         if isinstance(dc[key], Iterable):
@@ -86,9 +86,9 @@ class JSONEncoder(json.JSONEncoder):
 
 def hook(json_dict):
     for key, value in json_dict.items():
-        if key == 'experiment_date':
+        if key == "experiment_date":
             json_dict[key] = dateutil.parser.parse(value)
-        elif key == 'behavior_session_uuid':
+        elif key == "behavior_session_uuid":
             json_dict[key] = uuid.UUID(value)
         else:
             pass

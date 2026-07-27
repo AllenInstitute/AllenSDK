@@ -4,28 +4,26 @@ from typing import Optional, List, Union
 from pynwb import NWBFile
 
 from allensdk.core import DataObject
-from allensdk.core import \
-    JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
-from allensdk.internal.api import PostgresQueryMixin, \
-    OneOrMoreResultExpectedError
+from allensdk.core import JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
+from allensdk.internal.api import PostgresQueryMixin, OneOrMoreResultExpectedError
 
 
-class ReporterLine(DataObject, LimsReadableInterface, JsonReadableInterface,
-                   NwbReadableInterface):
+class ReporterLine(DataObject, LimsReadableInterface, JsonReadableInterface, NwbReadableInterface):
     """the genotype name(s) of the reporter line(s)"""
+
     def __init__(self, reporter_line: Optional[str]):
         super().__init__(name="reporter_line", value=reporter_line)
 
     @classmethod
     def from_json(cls, dict_repr: dict) -> "ReporterLine":
-        reporter_line = dict_repr['reporter_line']
+        reporter_line = dict_repr["reporter_line"]
         reporter_line = cls.parse(reporter_line=reporter_line, warn=True)
         return cls(reporter_line=reporter_line)
 
     @classmethod
-    def from_lims(cls, behavior_session_id: int,
-                  lims_db: PostgresQueryMixin,
-                  allow_none: bool = True) -> "ReporterLine":
+    def from_lims(
+        cls, behavior_session_id: int, lims_db: PostgresQueryMixin, allow_none: bool = True
+    ) -> "ReporterLine":
         """
         Parameters
         ----------
@@ -57,9 +55,7 @@ class ReporterLine(DataObject, LimsReadableInterface, JsonReadableInterface,
             if allow_none:
                 return cls(reporter_line=None)
 
-            raise OneOrMoreResultExpectedError(
-                f"Expected one or more, but received: '{result}' "
-                f"from query:\n'{query}'")
+            raise OneOrMoreResultExpectedError(f"Expected one or more, but received: '{result}' from query:\n'{query}'")
         reporter_line = cls.parse(reporter_line=result, warn=True)
         return cls(reporter_line=reporter_line)
 
@@ -72,8 +68,7 @@ class ReporterLine(DataObject, LimsReadableInterface, JsonReadableInterface,
         return cls(reporter_line=reporter_line)
 
     @staticmethod
-    def parse(reporter_line: Union[Optional[List[str]], str],
-              warn=False) -> Optional[str]:
+    def parse(reporter_line: Union[Optional[List[str]], str], warn=False) -> Optional[str]:
         """There can be multiple reporter lines, so it is returned from LIMS
         as a list. But there shouldn't be more than 1 for behavior. This
         tries to convert to str
@@ -91,13 +86,12 @@ class ReporterLine(DataObject, LimsReadableInterface, JsonReadableInterface,
         """
         if reporter_line is None:
             if warn:
-                warnings.warn('Error parsing reporter line. It is null.')
+                warnings.warn("Error parsing reporter line. It is null.")
             return None
 
         if len(reporter_line) == 0:
             if warn:
-                warnings.warn('Error parsing reporter line. '
-                              'The array is empty')
+                warnings.warn("Error parsing reporter line. The array is empty")
             return None
 
         if isinstance(reporter_line, str):
@@ -105,24 +99,17 @@ class ReporterLine(DataObject, LimsReadableInterface, JsonReadableInterface,
 
         if len(reporter_line) > 1:
             if warn:
-                warnings.warn('More than 1 reporter line. Returning the first '
-                              'one')
+                warnings.warn("More than 1 reporter line. Returning the first one")
 
         return reporter_line[0]
 
     def parse_indicator(self, warn=False) -> Optional[str]:
         """Parses indicator from reporter"""
         reporter_line = self._value
-        reporter_substring_indicator_map = {
-            'GCaMP6f': 'GCaMP6f',
-            'GC6f': 'GCaMP6f',
-            'GCaMP6s': 'GCaMP6s'
-        }
+        reporter_substring_indicator_map = {"GCaMP6f": "GCaMP6f", "GC6f": "GCaMP6f", "GCaMP6s": "GCaMP6s"}
         if reporter_line is None:
             if warn:
-                warnings.warn(
-                    'Could not parse indicator from reporter because '
-                    'there is no reporter')
+                warnings.warn("Could not parse indicator from reporter because there is no reporter")
             return None
 
         for substr, indicator in reporter_substring_indicator_map.items():
@@ -131,6 +118,7 @@ class ReporterLine(DataObject, LimsReadableInterface, JsonReadableInterface,
 
         if warn:
             warnings.warn(
-                'Could not parse indicator from reporter because none'
-                'of the expected substrings were found in the reporter')
+                "Could not parse indicator from reporter because none"
+                "of the expected substrings were found in the reporter"
+            )
         return None

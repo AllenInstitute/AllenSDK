@@ -40,9 +40,7 @@ class MockCache:
         channel_table.to_csv(self.channel_table_path, index=False)
         probe_table.to_csv(self.probe_table_path, index=False)
         unit_table.to_csv(self.unit_table_path, index=False)
-        behavior_session_table.to_csv(
-            self.behavior_session_table_path, index=False
-        )
+        behavior_session_table.to_csv(self.behavior_session_table_path, index=False)
 
         self._manifest = MagicMock()
         self._manifest.metadata_file_names = [
@@ -83,17 +81,13 @@ def mock_cache(tmpdir):
         "behavior_sessions": pd.DataFrame(
             {
                 "behavior_session_id": [1, 2, 3, 4],
-                "ecephys_session_id": pd.Series(
-                    [10, 11, 12, 13], dtype="Int64"
-                ),
+                "ecephys_session_id": pd.Series([10, 11, 12, 13], dtype="Int64"),
                 "mouse_id": [4, 4, 2, 1],
             }
         ),
         "ecephys_sessions": pd.DataFrame(
             {
-                "ecephys_session_id": pd.Series(
-                    [10, 11, 12, 13], dtype="Int64"
-                ),
+                "ecephys_session_id": pd.Series([10, 11, 12, 13], dtype="Int64"),
                 "behavior_session_id": [1, 2, 3, 4],
                 "file_id": [10, 11, 12, 13],
             }
@@ -147,18 +141,12 @@ def mock_cache(tmpdir):
 
 
 @pytest.mark.parametrize("local", [True, False])
-def test_VisualBehaviorNeuropixelsProjectCloudApi(
-    mock_cache, monkeypatch, local
-):
+def test_VisualBehaviorNeuropixelsProjectCloudApi(mock_cache, monkeypatch, local):
     mocked_cache, expected = mock_cache
-    api = cloudapi.VisualBehaviorNeuropixelsProjectCloudApi(
-        mocked_cache, skip_version_check=True, local=False
-    )
+    api = cloudapi.VisualBehaviorNeuropixelsProjectCloudApi(mocked_cache, skip_version_check=True, local=False)
 
     if local:
-        api = cloudapi.VisualBehaviorNeuropixelsProjectCloudApi(
-            mocked_cache, skip_version_check=True, local=True
-        )
+        api = cloudapi.VisualBehaviorNeuropixelsProjectCloudApi(mocked_cache, skip_version_check=True, local=True)
 
     # behavior session table as expected
     bst = api.get_behavior_session_table()
@@ -197,9 +185,7 @@ def test_VisualBehaviorNeuropixelsProjectCloudApi(
     def mock_nwb(nwb_path, probe_meta):
         return nwb_path
 
-    monkeypatch.setattr(
-        cloudapi.BehaviorEcephysSession, "from_nwb_path", mock_nwb
-    )
+    monkeypatch.setattr(cloudapi.BehaviorEcephysSession, "from_nwb_path", mock_nwb)
     assert api.get_ecephys_session(12) == "12"
 
 
@@ -212,31 +198,23 @@ def test_probe_meta(mock_cache, monkeypatch, has_lfp_data):
     probe_meta_table["has_lfp_data"] = has_lfp_data
     probe_meta_table.to_csv(mocked_cache.probe_table_path, index=False)
 
-    api = cloudapi.VisualBehaviorNeuropixelsProjectCloudApi(
-        mocked_cache, skip_version_check=True, local=False
-    )
+    api = cloudapi.VisualBehaviorNeuropixelsProjectCloudApi(mocked_cache, skip_version_check=True, local=False)
 
     def mock_from_nwb_path(nwb_path, probe_meta):
         return probe_meta
 
     ecephys_session_id = 10
-    with patch.object(
-        BehaviorEcephysSession, "from_nwb_path", wraps=mock_from_nwb_path
-    ):
+    with patch.object(BehaviorEcephysSession, "from_nwb_path", wraps=mock_from_nwb_path):
         probe_meta = api.get_ecephys_session(ecephys_session_id)
 
     probe_meta_table = api.get_probe_table()
-    probes = probe_meta_table.loc[
-        probe_meta_table["ecephys_session_id"] == ecephys_session_id
-    ]
+    probes = probe_meta_table.loc[probe_meta_table["ecephys_session_id"] == ecephys_session_id]
 
     if has_lfp_data:
         for probe_name in probes["name"].unique():
             obtained_probe_nwb_path = probe_meta[probe_name].lfp_csd_filepath()
             expected_probe_nwb_path = str(
-                probe_meta_table.loc[
-                    (probe_meta_table["name"] == probe_name)
-                ].iloc[0]["file_id"]
+                probe_meta_table.loc[(probe_meta_table["name"] == probe_name)].iloc[0]["file_id"]
             )
             assert obtained_probe_nwb_path == expected_probe_nwb_path
     else:
@@ -250,9 +228,7 @@ def test_probe_meta(mock_cache, monkeypatch, has_lfp_data):
         ("1.0.1", "2.9.0", "0.0.0", "1.0.0", True),
     ],
 )
-def test_version_check(
-    manifest_version, data_pipeline_version, cmin, cmax, exception
-):
+def test_version_check(manifest_version, data_pipeline_version, cmin, cmax, exception):
     if exception:
         with pytest.raises(
             BehaviorCloudCacheVersionException,
@@ -300,9 +276,7 @@ def test_from_local_cache(monkeypatch):
         except (TypeError, FileNotFoundError):
             pass
 
-        mock_local_cache.assert_called_once_with(
-            "first_cache_dir", "project_1", "ui_1"
-        )
+        mock_local_cache.assert_called_once_with("first_cache_dir", "project_1", "ui_1")
 
         # Test from_local_cache with use_static_cache=True
         try:
@@ -312,6 +286,4 @@ def test_from_local_cache(monkeypatch):
         except (TypeError, FileNotFoundError):
             pass
 
-        mock_static_local_cache.assert_called_once_with(
-            "second_cache_dir", "project_2", "ui_2"
-        )
+        mock_static_local_cache.assert_called_once_with("second_cache_dir", "project_2", "ui_2")

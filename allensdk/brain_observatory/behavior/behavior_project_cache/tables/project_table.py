@@ -6,8 +6,8 @@ import pandas as pd
 
 class ProjectTable(ABC):
     """Class for storing and manipulating project-level data"""
-    def __init__(self, df: pd.DataFrame,
-                 suppress: Optional[Iterable[str]] = None):
+
+    def __init__(self, df: pd.DataFrame, suppress: Optional[Iterable[str]] = None):
         """
         Parameters
         ----------
@@ -40,8 +40,7 @@ class ProjectTable(ABC):
         self.postprocess_additional()
 
         if self._suppress:
-            self._df.drop(columns=self._suppress, inplace=True,
-                          errors="ignore")
+            self._df.drop(columns=self._suppress, inplace=True, errors="ignore")
 
     @abstractmethod
     def postprocess_additional(self):

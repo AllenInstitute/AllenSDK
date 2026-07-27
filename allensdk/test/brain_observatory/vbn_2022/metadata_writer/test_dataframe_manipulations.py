@@ -76,9 +76,7 @@ def test_add_images_from_behavior():
     ecephys_data.append({"ecephys_session_id": 3, "figure": 8})
 
     ecephys_table = pd.DataFrame(data=ecephys_data)
-    ecephys_table = _add_images_from_behavior(
-        ecephys_table=ecephys_table, behavior_table=beh_table
-    )
+    ecephys_table = _add_images_from_behavior(ecephys_table=ecephys_table, behavior_table=beh_table)
 
     expected_data = []
     expected_data.append(
@@ -184,17 +182,11 @@ def test_add_experience_level():
     """
 
     input_data = []
-    input_data.append({"session": 1,
-                       "prior_exposures_to_image_set": 2,
-                       'session_type': 'ECEPHYS_1'})
+    input_data.append({"session": 1, "prior_exposures_to_image_set": 2, "session_type": "ECEPHYS_1"})
 
-    input_data.append({"session": 2,
-                       "prior_exposures_to_image_set": None,
-                       'session_type': 'ECEPHYS_2'})
+    input_data.append({"session": 2, "prior_exposures_to_image_set": None, "session_type": "ECEPHYS_2"})
 
-    input_data.append({"session": 1,
-                       "prior_exposures_to_image_set": 0,
-                       'session_type': 'ECEPHYS_1'})
+    input_data.append({"session": 1, "prior_exposures_to_image_set": 0, "session_type": "ECEPHYS_1"})
 
     input_df = pd.DataFrame(data=input_data)
     actual = add_experience_level_simple(input_df=input_df)
@@ -287,9 +279,7 @@ def test_add_experience_level():
         ),
     ],
 )
-def test_patch_date_and_stage_from_pickle_file(
-    patching_pickle_file_fixture, flag_columns, ids_to_fix, cols_to_fix
-):
+def test_patch_date_and_stage_from_pickle_file(patching_pickle_file_fixture, flag_columns, ids_to_fix, cols_to_fix):
     """
     Test that _patch_date_and_stage_from_pickle_file
     correctly patches sessions that are missing
@@ -578,11 +568,7 @@ class TestDataframeManipulations(LimsTest):
                 behavior_session_id=BehaviorSessionId(x),
                 equipment=None,
                 stimulus_frame_rate=None,
-                session_type=(
-                    SessionType(
-                        self.behavior_sessions_df.loc[x]["session_type"]
-                    )
-                ),
+                session_type=(SessionType(self.behavior_sessions_df.loc[x]["session_type"])),
                 behavior_session_uuid=None,
                 session_duration=self.session_durations.loc[x],
             )
@@ -595,6 +581,4 @@ class TestDataframeManipulations(LimsTest):
             remove_sessions_after_mouse_death_date=False,
         )
         expected = [behavior_sessions[1], behavior_sessions[3]]
-        assert sorted([x.behavior_session_id for x in actual]) == sorted(
-            [x.behavior_session_id for x in expected]
-        )
+        assert sorted([x.behavior_session_id for x in actual]) == sorted([x.behavior_session_id for x in expected])

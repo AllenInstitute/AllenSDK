@@ -55,11 +55,7 @@ def polygon_params():
         "in_dims": np.array([30000, 40000]),
         "in_spacing": np.array([0.35, 0.35]),
         "coarse_spacing": np.array([16.8, 16.8]),
-        "polygon_info": {
-            "hello_am_square": [
-                [(8000, 8000), (16000, 8000), (16000, 16000), (8000, 16000)]
-            ]
-        },
+        "polygon_info": {"hello_am_square": [[(8000, 8000), (16000, 8000), (16000, 16000), (8000, 16000)]]},
     }
 
 
@@ -68,14 +64,12 @@ def polygon_params():
 
 
 def test_init_base(base_params):
-
     si = SubImage(**base_params)
 
     assert np.allclose(si.coarse_dims, [625, 834])
 
 
 def test_binarize(base_params):
-
     si = SubImage(**base_params)
 
     si.images["fish"] = np.arange(25).reshape([5, 5])
@@ -89,7 +83,6 @@ def test_binarize(base_params):
 
 @pytest.mark.parametrize("positive", [(True), (False)])
 def test_apply_mask(base_params, positive):
-
     si = SubImage(**base_params)
 
     si.images["submarine"] = np.arange(25).reshape([5, 5])
@@ -106,7 +99,6 @@ def test_apply_mask(base_params, positive):
 
 
 def test_make_pixel_counter(base_params):
-
     si = SubImage(**base_params)
     reducer = si.make_pixel_counter()
 
@@ -131,7 +123,6 @@ def test_init_segmentation(segmentation_params):
 
 
 def test_extract_signal_from_segmentation(segmentation_params):
-
     si = SegmentationSubImage(**segmentation_params)
 
     segmentation_name = "fish"
@@ -145,7 +136,6 @@ def test_extract_signal_from_segmentation(segmentation_params):
 
 
 def test_extract_injection_from_segmentation(segmentation_params):
-
     si = SegmentationSubImage(**segmentation_params)
 
     segmentation_name = "fish"
@@ -162,7 +152,6 @@ def test_extract_injection_from_segmentation(segmentation_params):
 
 
 def test_read_segmentation_image(segmentation_params):
-
     si = SegmentationSubImage(**segmentation_params)
     arr = np.zeros((32, 32))
     arr[:16, :] = 1
@@ -170,8 +159,7 @@ def test_read_segmentation_image(segmentation_params):
     exp = np.array([[1, 1], [0, 0]])
 
     with mock.patch(
-        "allensdk.mouse_connectivity.grid.utilities.image_utilities"
-        ".read_segmentation_image",
+        "allensdk.mouse_connectivity.grid.utilities.image_utilities.read_segmentation_image",
         return_value=arr,
     ) as p:
         si.read_segmentation_image("name_one")
@@ -185,7 +173,6 @@ def test_read_segmentation_image(segmentation_params):
 
 
 def test_init_intensity(intensity_params):
-
     si = IntensitySubImage(**intensity_params)
 
     assert si.intensity_paths["name_one"]["path"] == "path_one"
@@ -193,22 +180,19 @@ def test_init_intensity(intensity_params):
 
 
 def test_get_intensity(intensity_params):
-
     arr = np.eye(1000)
     arr[999, 0] = 1
 
     si = IntensitySubImage(**intensity_params)
 
     with mock.patch(
-        "allensdk.mouse_connectivity.grid.subimage.base_subimage"
-        ".IntensitySubImage.required_intensities",
+        "allensdk.mouse_connectivity.grid.subimage.base_subimage.IntensitySubImage.required_intensities",
         new_callable=mock.PropertyMock,
     ) as a:
         a.return_value = ["name_one"]
 
         with mock.patch(
-            "allensdk.mouse_connectivity.grid.utilities.image_utilities"
-            ".read_intensity_image",
+            "allensdk.mouse_connectivity.grid.utilities.image_utilities.read_intensity_image",
             return_value=arr,
         ) as p:
             si.get_intensity()
@@ -222,27 +206,22 @@ def test_get_intensity(intensity_params):
 
 
 def test_init_polygon(polygon_params):
-
     si = PolygonSubImage(**polygon_params)
 
     assert np.allclose(
         si.polygon_info["hello_am_square"],
-        np.array(
-            [[(8000, 8000), (16000, 8000), (16000, 16000), (8000, 16000)]]
-        ),
+        np.array([[(8000, 8000), (16000, 8000), (16000, 16000), (8000, 16000)]]),
     )
 
 
 def test_get_polygons(polygon_params):
-
     si = PolygonSubImage(**polygon_params)
 
     arr = np.zeros([1875, 2500])
     arr[500:1001, 500:1001] = 1
 
     with mock.patch(
-        "allensdk.mouse_connectivity.grid.subimage.base_subimage"
-        ".PolygonSubImage.required_polys",
+        "allensdk.mouse_connectivity.grid.subimage.base_subimage.PolygonSubImage.required_polys",
         new_callable=mock.PropertyMock,
     ) as a:
         a.return_value = ["hello_am_square"]

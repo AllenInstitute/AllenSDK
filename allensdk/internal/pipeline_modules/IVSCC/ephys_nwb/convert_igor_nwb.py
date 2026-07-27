@@ -134,8 +134,7 @@ def main():
             t1 = t0 + PULSE_LEN
             ep = nd.create_epoch("TestPulse_" + num, t0, t1)
             ep.add_timeseries("stimulus", "stimulus/presentation/Sweep_" + num)
-            ep.add_timeseries("response",
-                              "acquisition/timeseries/Sweep_" + num)
+            ep.add_timeseries("response", "acquisition/timeseries/Sweep_" + num)
             ep.finalize()
             # experiment epoch
             t0 = ts["starting_time"][()]
@@ -143,8 +142,7 @@ def main():
             t0 += EXPERIMENT_START_TIME
             ep = nd.create_epoch("Experiment_" + num, t0, t1)
             ep.add_timeseries("stimulus", "stimulus/presentation/Sweep_" + num)
-            ep.add_timeseries("response",
-                              "acquisition/timeseries/Sweep_" + num)
+            ep.add_timeseries("response", "acquisition/timeseries/Sweep_" + num)
             ep.finalize()
     nd.close()
 
@@ -152,9 +150,7 @@ def main():
     # execute hdf5-repack to get it back to its original size
     try:
         print("Repacking hdf5 file with compression")
-        process = subprocess.Popen(
-            ["h5repack", "-f", "GZIP=4", tmpfile, outfile],
-            stdout=subprocess.PIPE)
+        process = subprocess.Popen(["h5repack", "-f", "GZIP=4", tmpfile, outfile], stdout=subprocess.PIPE)
         process.wait()
     except Exception:
         print("Unable to run h5repack on temporary nwb file")
@@ -172,5 +168,5 @@ def main():
     module.write_output_data({})
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -9,17 +9,12 @@ from argschema import ArgSchemaParser
 
 
 import allensdk
-from allensdk.brain_observatory.argschema_utilities import (
-    write_or_print_outputs
-)
-from allensdk.brain_observatory.gaze_mapping._schemas import (
-    InputSchema,
-    OutputSchema
-)
+from allensdk.brain_observatory.argschema_utilities import write_or_print_outputs
+from allensdk.brain_observatory.gaze_mapping._schemas import InputSchema, OutputSchema
 from allensdk.brain_observatory.gaze_mapping._gaze_mapper import (
     compute_circular_areas,
     compute_elliptical_areas,
-    GazeMapper
+    GazeMapper,
 )
 from allensdk.brain_observatory.gaze_mapping._filter_utils import (
     post_process_areas,
@@ -58,18 +53,17 @@ def load_ellipse_fit_params(input_file: Path) -> Dict[str, pd.DataFrame]:
     cr_params = pd.read_hdf(input_file, key="cr").astype(float)
     eye_params = pd.read_hdf(input_file, key="eye").astype(float)
 
-    num_frames_match = ((pupil_params.shape[0] == cr_params.shape[0])
-                        and (cr_params.shape[0] == eye_params.shape[0]))
+    num_frames_match = (pupil_params.shape[0] == cr_params.shape[0]) and (cr_params.shape[0] == eye_params.shape[0])
     if not num_frames_match:
-        raise RuntimeError("The number of frames for ellipse fits don't "
-                           "match when they should: "
-                           f"pupil_params ({pupil_params.shape[0]}), "
-                           f"cr_params ({cr_params.shape[0]}), "
-                           f"eye_params ({eye_params.shape[0]}).")
+        raise RuntimeError(
+            "The number of frames for ellipse fits don't "
+            "match when they should: "
+            f"pupil_params ({pupil_params.shape[0]}), "
+            f"cr_params ({cr_params.shape[0]}), "
+            f"eye_params ({eye_params.shape[0]})."
+        )
 
-    return {"pupil_params": pupil_params,
-            "cr_params": cr_params,
-            "eye_params": eye_params}
+    return {"pupil_params": pupil_params, "cr_params": cr_params, "eye_params": eye_params}
 
 
 def preprocess_input_args(parser_args: dict) -> dict:
@@ -95,29 +89,52 @@ def preprocess_input_args(parser_args: dict) -> dict:
     new_args["session_sync_file"] = parser_args["session_sync_file"]
     new_args["output_file"] = parser_args["output_file"]
 
-    monitor_position = np.array([parser_args["monitor_position_x_mm"],
-                                 parser_args["monitor_position_y_mm"],
-                                 parser_args["monitor_position_z_mm"]]) / 10
+    monitor_position = (
+        np.array(
+            [
+                parser_args["monitor_position_x_mm"],
+                parser_args["monitor_position_y_mm"],
+                parser_args["monitor_position_z_mm"],
+            ]
+        )
+        / 10
+    )
     new_args["monitor_position"] = monitor_position
 
-    monitor_rotations_deg = np.array([parser_args["monitor_rotation_x_deg"],
-                                      parser_args["monitor_rotation_y_deg"],
-                                      parser_args["monitor_rotation_z_deg"]])
+    monitor_rotations_deg = np.array(
+        [
+            parser_args["monitor_rotation_x_deg"],
+            parser_args["monitor_rotation_y_deg"],
+            parser_args["monitor_rotation_z_deg"],
+        ]
+    )
     new_args["monitor_rotations"] = np.radians(monitor_rotations_deg)
 
-    camera_position = np.array([parser_args["camera_position_x_mm"],
-                                parser_args["camera_position_y_mm"],
-                                parser_args["camera_position_z_mm"]]) / 10
+    camera_position = (
+        np.array(
+            [
+                parser_args["camera_position_x_mm"],
+                parser_args["camera_position_y_mm"],
+                parser_args["camera_position_z_mm"],
+            ]
+        )
+        / 10
+    )
     new_args["camera_position"] = camera_position
 
-    camera_rotations_deg = np.array([parser_args["camera_rotation_x_deg"],
-                                     parser_args["camera_rotation_y_deg"],
-                                     parser_args["camera_rotation_z_deg"]])
+    camera_rotations_deg = np.array(
+        [
+            parser_args["camera_rotation_x_deg"],
+            parser_args["camera_rotation_y_deg"],
+            parser_args["camera_rotation_z_deg"],
+        ]
+    )
     new_args["camera_rotations"] = np.radians(camera_rotations_deg)
 
-    led_position = np.array([parser_args["led_position_x_mm"],
-                             parser_args["led_position_y_mm"],
-                             parser_args["led_position_z_mm"]]) / 10
+    led_position = (
+        np.array([parser_args["led_position_x_mm"], parser_args["led_position_y_mm"], parser_args["led_position_z_mm"]])
+        / 10
+    )
     new_args["led_position"] = led_position
     new_args["eye_radius_cm"] = parser_args["eye_radius_cm"]
     new_args["cm_per_pixel"] = parser_args["cm_per_pixel"]
@@ -128,16 +145,18 @@ def preprocess_input_args(parser_args: dict) -> dict:
     return new_args
 
 
-def run_gaze_mapping(pupil_parameters: pd.DataFrame,
-                     cr_parameters: pd.DataFrame,
-                     eye_parameters: pd.DataFrame,
-                     monitor_position: np.ndarray,
-                     monitor_rotations: np.ndarray,
-                     camera_position: np.ndarray,
-                     camera_rotations: np.ndarray,
-                     led_position: np.ndarray,
-                     eye_radius_cm: float,
-                     cm_per_pixel: float) -> dict:
+def run_gaze_mapping(
+    pupil_parameters: pd.DataFrame,
+    cr_parameters: pd.DataFrame,
+    eye_parameters: pd.DataFrame,
+    monitor_position: np.ndarray,
+    monitor_rotations: np.ndarray,
+    camera_position: np.ndarray,
+    camera_rotations: np.ndarray,
+    led_position: np.ndarray,
+    eye_radius_cm: float,
+    cm_per_pixel: float,
+) -> dict:
     """Map gaze positions onto monitor coordinates and
        calculate eye/pupil areas
 
@@ -178,13 +197,15 @@ def run_gaze_mapping(pupil_parameters: pd.DataFrame,
     """
     output = {}
 
-    gaze_mapper = GazeMapper(monitor_position=monitor_position,
-                             monitor_rotations=monitor_rotations,
-                             led_position=led_position,
-                             camera_position=camera_position,
-                             camera_rotations=camera_rotations,
-                             eye_radius=eye_radius_cm,
-                             cm_per_pixel=cm_per_pixel)
+    gaze_mapper = GazeMapper(
+        monitor_position=monitor_position,
+        monitor_rotations=monitor_rotations,
+        led_position=led_position,
+        camera_position=camera_position,
+        camera_rotations=camera_rotations,
+        eye_radius=eye_radius_cm,
+        cm_per_pixel=cm_per_pixel,
+    )
 
     pupil_params_in_cm = pupil_parameters * cm_per_pixel
     raw_pupil_areas = compute_circular_areas(pupil_params_in_cm)
@@ -194,7 +215,7 @@ def run_gaze_mapping(pupil_parameters: pd.DataFrame,
 
     raw_pupil_on_monitor_cm = gaze_mapper.pupil_position_on_monitor_in_cm(
         cam_pupil_params=pupil_parameters[["center_x", "center_y"]].values,
-        cam_cr_params=cr_parameters[["center_x", "center_y"]].values
+        cam_cr_params=cr_parameters[["center_x", "center_y"]].values,
     )
 
     raw_pupil_on_monitor_deg = gaze_mapper.pupil_position_on_monitor_in_degrees(
@@ -203,9 +224,7 @@ def run_gaze_mapping(pupil_parameters: pd.DataFrame,
 
     # Make bool mask for all time indices where
     # pupil_area or eye_area or pupil_on_monitor_* is np.nan
-    raw_nan_mask = (raw_pupil_areas.isna()
-                    | raw_eye_areas.isna()
-                    | np.isnan(raw_pupil_on_monitor_deg.T[0]))
+    raw_nan_mask = raw_pupil_areas.isna() | raw_eye_areas.isna() | np.isnan(raw_pupil_on_monitor_deg.T[0])
     raw_pupil_areas[raw_nan_mask] = np.nan
     raw_eye_areas[raw_nan_mask] = np.nan
     raw_pupil_on_monitor_cm[raw_nan_mask, :] = np.nan
@@ -224,15 +243,9 @@ def run_gaze_mapping(pupil_parameters: pd.DataFrame,
 
     new_pupil_areas = post_process_areas(new_pupil_areas.values)
     new_eye_areas = post_process_areas(new_eye_areas.values)
-    _, filtered_pos_indices = post_process_cr(cr_parameters[["center_x",
-                                                             "center_y",
-                                                             "phi",
-                                                             "width",
-                                                             "height"]].values)
+    _, filtered_pos_indices = post_process_cr(cr_parameters[["center_x", "center_y", "phi", "width", "height"]].values)
 
-    new_nan_mask = (np.isnan(new_pupil_areas)
-                    | np.isnan(new_eye_areas)
-                    | filtered_pos_indices)
+    new_nan_mask = np.isnan(new_pupil_areas) | np.isnan(new_eye_areas) | filtered_pos_indices
     new_pupil_areas[new_nan_mask] = np.nan
     new_eye_areas[new_nan_mask] = np.nan
     new_pupil_on_monitor_cm[new_nan_mask, :] = np.nan
@@ -246,8 +259,7 @@ def run_gaze_mapping(pupil_parameters: pd.DataFrame,
     return output
 
 
-def write_gaze_mapping_output_to_h5(output_savepath: Path,
-                                    gaze_map_output: dict):
+def write_gaze_mapping_output_to_h5(output_savepath: Path, gaze_map_output: dict):
     """Write output of gaze mapping to an h5 file.
 
     Args:
@@ -260,12 +272,16 @@ def write_gaze_mapping_output_to_h5(output_savepath: Path,
     gaze_map_output["raw_eye_areas"].to_hdf(output_savepath, key="raw_eye_areas", mode="w")
     gaze_map_output["raw_pupil_areas"].to_hdf(output_savepath, key="raw_pupil_areas", mode="a")
     gaze_map_output["raw_pupil_on_monitor_cm"].to_hdf(output_savepath, key="raw_screen_coordinates", mode="a")
-    gaze_map_output["raw_pupil_on_monitor_deg"].to_hdf(output_savepath, key="raw_screen_coordinates_spherical", mode="a")
+    gaze_map_output["raw_pupil_on_monitor_deg"].to_hdf(
+        output_savepath, key="raw_screen_coordinates_spherical", mode="a"
+    )
 
     gaze_map_output["new_eye_areas"].to_hdf(output_savepath, key="new_eye_areas", mode="a")
     gaze_map_output["new_pupil_areas"].to_hdf(output_savepath, key="new_pupil_areas", mode="a")
     gaze_map_output["new_pupil_on_monitor_cm"].to_hdf(output_savepath, key="new_screen_coordinates", mode="a")
-    gaze_map_output["new_pupil_on_monitor_deg"].to_hdf(output_savepath, key="new_screen_coordinates_spherical", mode="a")
+    gaze_map_output["new_pupil_on_monitor_deg"].to_hdf(
+        output_savepath, key="new_screen_coordinates_spherical", mode="a"
+    )
 
     gaze_map_output["synced_frame_timestamps_sec"].to_hdf(output_savepath, key="synced_frame_timestamps", mode="a")
 
@@ -273,9 +289,7 @@ def write_gaze_mapping_output_to_h5(output_savepath: Path,
     version.to_hdf(output_savepath, key="version", mode="a")
 
 
-def load_sync_file_timings(sync_file: Path,
-                           pupil_params_rows: int,
-                           truncate_timestamps: bool) -> pd.Series:
+def load_sync_file_timings(sync_file: Path, pupil_params_rows: int, truncate_timestamps: bool) -> pd.Series:
     """Load sync file timings from .h5 file.
 
     Parameters
@@ -300,42 +314,44 @@ def load_sync_file_timings(sync_file: Path,
         up with number of new frame times from the sync file.
     """
     # Add synchronized frame times
-    frame_times = su.get_synchronized_frame_times(session_sync_file=sync_file,
-                                                  sync_line_label_keys=Dataset.EYE_TRACKING_KEYS,
-                                                  trim_after_spike=truncate_timestamps)
-    if (pupil_params_rows != len(frame_times)):
-        raise RuntimeError("The number of camera sync pulses in the "
-                           f"sync file ({len(frame_times)}) do not match "
-                           "with the number of eye tracking frames "
-                           f"({pupil_params_rows})!!!")
+    frame_times = su.get_synchronized_frame_times(
+        session_sync_file=sync_file,
+        sync_line_label_keys=Dataset.EYE_TRACKING_KEYS,
+        trim_after_spike=truncate_timestamps,
+    )
+    if pupil_params_rows != len(frame_times):
+        raise RuntimeError(
+            "The number of camera sync pulses in the "
+            f"sync file ({len(frame_times)}) do not match "
+            "with the number of eye tracking frames "
+            f"({pupil_params_rows})!!!"
+        )
     return frame_times
 
 
 def main():
+    logging.basicConfig(format=("%(asctime)s:%(funcName)s:%(levelname)s:%(message)s"))
 
-    logging.basicConfig(format=('%(asctime)s:%(funcName)s'
-                                ':%(levelname)s:%(message)s'))
-
-    parser = ArgSchemaParser(args=sys.argv[1:],
-                             schema_type=InputSchema,
-                             output_schema_type=OutputSchema)
+    parser = ArgSchemaParser(args=sys.argv[1:], schema_type=InputSchema, output_schema_type=OutputSchema)
 
     args = preprocess_input_args(parser.args)
 
-    output = run_gaze_mapping(pupil_parameters=args["pupil_params"],
-                              cr_parameters=args["cr_params"],
-                              eye_parameters=args["eye_params"],
-                              monitor_position=args["monitor_position"],
-                              monitor_rotations=args["monitor_rotations"],
-                              camera_position=args["camera_position"],
-                              camera_rotations=args["camera_rotations"],
-                              led_position=args["led_position"],
-                              eye_radius_cm=args["eye_radius_cm"],
-                              cm_per_pixel=args["cm_per_pixel"])
+    output = run_gaze_mapping(
+        pupil_parameters=args["pupil_params"],
+        cr_parameters=args["cr_params"],
+        eye_parameters=args["eye_params"],
+        monitor_position=args["monitor_position"],
+        monitor_rotations=args["monitor_rotations"],
+        camera_position=args["camera_position"],
+        camera_rotations=args["camera_rotations"],
+        led_position=args["led_position"],
+        eye_radius_cm=args["eye_radius_cm"],
+        cm_per_pixel=args["cm_per_pixel"],
+    )
 
-    output["synced_frame_timestamps_sec"] = load_sync_file_timings(args["session_sync_file"],
-                                                                   args["pupil_params"].shape[0],
-                                                                   parser.args["truncate_timestamps"])
+    output["synced_frame_timestamps_sec"] = load_sync_file_timings(
+        args["session_sync_file"], args["pupil_params"].shape[0], parser.args["truncate_timestamps"]
+    )
 
     write_gaze_mapping_output_to_h5(args["output_file"], output)
     module_output = {"screen_mapping_file": str(args["output_file"])}

@@ -15,7 +15,7 @@ class EyeTrackingMetadataFile(DataFile):
 
     @staticmethod
     def load_data(filepath: Union[str, pathlib.Path]) -> dict:
-        with open(filepath, 'rb') as in_file:
+        with open(filepath, "rb") as in_file:
             return json.load(in_file)
 
     @classmethod
@@ -24,12 +24,9 @@ class EyeTrackingMetadataFile(DataFile):
 
     @classmethod
     def from_lims(cls):
-        raise NotImplementedError(
-                "from_lims not yet supported for EyeTrackingMetadataFile")
+        raise NotImplementedError("from_lims not yet supported for EyeTrackingMetadataFile")
 
     @classmethod
-    def from_json(
-            cls,
-            dict_repr: dict) -> "EyeTrackingMetadataFile":
+    def from_json(cls, dict_repr: dict) -> "EyeTrackingMetadataFile":
         filepath = dict_repr[cls.file_path_key()]
         return cls(filepath=filepath)

@@ -20,17 +20,18 @@ class FileIDGenerator(object):
         """
         return self._dummy_value
 
-    def id_from_path(self,
-                     file_path: pathlib.Path) -> int:
+    def id_from_path(self, file_path: pathlib.Path) -> int:
         """
         Get the unique ID for a file path. If the file has already
         been assigned a unique ID, return that. Otherwise, assign
         a unique ID to the file path and return it
         """
         if not isinstance(file_path, pathlib.Path):
-            msg = ("file_path must be a pathlib.Path (this is so "
-                   "we can resolve it into an absolute path). You passed "
-                   f"in a {type(file_path)}")
+            msg = (
+                "file_path must be a pathlib.Path (this is so "
+                "we can resolve it into an absolute path). You passed "
+                f"in a {type(file_path)}"
+            )
             raise ValueError(msg)
 
         if not file_path.is_file():

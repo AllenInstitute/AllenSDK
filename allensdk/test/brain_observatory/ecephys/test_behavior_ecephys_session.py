@@ -5,55 +5,45 @@ import pytest
 import numpy as np
 import copy
 
-from allensdk.brain_observatory.ecephys.behavior_ecephys_session import \
-    BehaviorEcephysSession
+from allensdk.brain_observatory.ecephys.behavior_ecephys_session import BehaviorEcephysSession
 from allensdk.brain_observatory.ecephys._probe import ProbeWithLFPMeta
 
 
-@pytest.fixture(scope='module')
-def behavior_ecephys_session_fixture(
-        behavior_ecephys_session_config_fixture):
+@pytest.fixture(scope="module")
+def behavior_ecephys_session_fixture(behavior_ecephys_session_config_fixture):
     """
     Return a BehaviorEcephysSession for testing
     """
     config = copy.deepcopy(behavior_ecephys_session_config_fixture)
 
     # Don't load LFP here to speed up the tests
-    for probe in config['probes']:
-        probe['lfp'] = None
+    for probe in config["probes"]:
+        probe["lfp"] = None
     return BehaviorEcephysSession.from_json(
-        session_data=config,
-        skip_probes=['probeB', 'probeC', 'probeD', 'probeE', 'probeF']
+        session_data=config, skip_probes=["probeB", "probeC", "probeD", "probeE", "probeF"]
     )
 
 
-@pytest.fixture(scope='module')
-def behavior_ecephys_session_with_lfp_fixture(
-        behavior_ecephys_session_config_fixture):
+@pytest.fixture(scope="module")
+def behavior_ecephys_session_with_lfp_fixture(behavior_ecephys_session_config_fixture):
     """
     Return a BehaviorEcephysSession for testing
     """
     config = copy.deepcopy(behavior_ecephys_session_config_fixture)
 
     return BehaviorEcephysSession.from_json(
-        session_data=config,
-        skip_probes=['probeB', 'probeC', 'probeD', 'probeE', 'probeF']
+        session_data=config, skip_probes=["probeB", "probeC", "probeD", "probeE", "probeF"]
     )
 
 
 @pytest.mark.requires_bamboo
-@pytest.mark.parametrize('roundtrip', [True, False])
-def test_read_write_session_nwb(
-        roundtrip,
-        data_object_roundtrip_fixture,
-        behavior_ecephys_session_fixture):
+@pytest.mark.parametrize("roundtrip", [True, False])
+def test_read_write_session_nwb(roundtrip, data_object_roundtrip_fixture, behavior_ecephys_session_fixture):
     """Tests roundtrip of the session data"""
     nwbfile, _ = behavior_ecephys_session_fixture.to_nwb()
 
     if roundtrip:
-        obt = data_object_roundtrip_fixture(
-            nwbfile=nwbfile,
-            data_object_cls=BehaviorEcephysSession)
+        obt = data_object_roundtrip_fixture(nwbfile=nwbfile, data_object_cls=BehaviorEcephysSession)
     else:
         obt = BehaviorEcephysSession.from_nwb(nwbfile=nwbfile)
 
@@ -62,34 +52,24 @@ def test_read_write_session_nwb(
 
 @pytest.mark.requires_bamboo
 def test_read_write_session_with_probe_nwb(
-        data_object_roundtrip_fixture,
-        behavior_ecephys_session_with_lfp_fixture,
-        tmpdir
+    data_object_roundtrip_fixture, behavior_ecephys_session_with_lfp_fixture, tmpdir
 ):
     """Tests roundtrip of a session with separate probe nwb files that store
     LFP and CSD data"""
-    nwbfile, probe_nwbfile_map = \
-        behavior_ecephys_session_with_lfp_fixture.to_nwb()
+    nwbfile, probe_nwbfile_map = behavior_ecephys_session_with_lfp_fixture.to_nwb()
 
     probe_meta = dict()
     for probe_name, probe_nwbfile in probe_nwbfile_map.items():
-        path = Path(tmpdir) / f'probe_{probe_name}_lfp.nwb'
-        with pynwb.NWBHDF5IO(path, 'w') as write_io:
+        path = Path(tmpdir) / f"probe_{probe_name}_lfp.nwb"
+        with pynwb.NWBHDF5IO(path, "w") as write_io:
             write_io.write(probe_nwbfile)
-        probe_meta[probe_name] = ProbeWithLFPMeta(
-            lfp_csd_filepath=path,
-            lfp_sampling_rate=1
-        )
+        probe_meta[probe_name] = ProbeWithLFPMeta(lfp_csd_filepath=path, lfp_sampling_rate=1)
 
-    obt = data_object_roundtrip_fixture(
-        nwbfile=nwbfile,
-        data_object_cls=BehaviorEcephysSession,
-        probe_meta=probe_meta
-    )
+    obt = data_object_roundtrip_fixture(nwbfile=nwbfile, data_object_cls=BehaviorEcephysSession, probe_meta=probe_meta)
 
     # check that the lfp metadata fields are set before loading lfp
-    assert obt.probes['has_lfp_data'].all()
-    assert not obt.probes['lfp_sampling_rate'].isnull().any()
+    assert obt.probes["has_lfp_data"].all()
+    assert not obt.probes["lfp_sampling_rate"].isnull().any()
 
     # Load the LFP data into memory
     for probe in obt._probes:
@@ -100,8 +80,7 @@ def test_read_write_session_with_probe_nwb(
 
 
 @pytest.mark.requires_bamboo
-def test_session_consistency(
-        behavior_ecephys_session_fixture):
+def test_session_consistency(behavior_ecephys_session_fixture):
     """
     This method will test the self-consistency of
     the BehaviorEcephysSession
@@ -113,13 +92,11 @@ def test_session_consistency(
     trials = behavior_ecephys_session_fixture.trials
     stim_frames = stim[stim.is_change & stim.active].start_frame
     trials_frames = trials[trials.is_change].change_frame
-    delta = stim_frames.values-trials_frames.values
-    np.testing.assert_array_equal(
-        delta,
-        np.zeros(len(delta), dtype=int))
+    delta = stim_frames.values - trials_frames.values
+    np.testing.assert_array_equal(delta, np.zeros(len(delta), dtype=int))
 
     # make sure that response_latency is not in the trials table
-    assert 'response_latency' not in trials.columns
+    assert "response_latency" not in trials.columns
 
 
 @pytest.mark.requires_bamboo
@@ -133,8 +110,7 @@ def test_getters_sanity(behavior_ecephys_session_fixture):
 
 
 @pytest.mark.requires_bamboo
-def test_getters_sanity_from_nwb(
-        behavior_ecephys_session_fixture):
+def test_getters_sanity_from_nwb(behavior_ecephys_session_fixture):
     """Sanity check to make sure that the BehaviorEcephysSession
     can use the BehaviorSession base class getter methods when read from nwb
     """

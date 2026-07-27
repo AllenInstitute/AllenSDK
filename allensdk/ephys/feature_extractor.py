@@ -45,8 +45,9 @@ import logging
 #   must have all features in the file. If one is absent, a penalty
 #   of TODO ??? will be assessed
 
+
 # set of features
-class EphysFeatures( object ):
+class EphysFeatures(object):
     def __init__(self, name):
         # feature mean and standard deviations
         self.mean = {}
@@ -67,15 +68,15 @@ class EphysFeatures( object ):
 
         self.name = name
 
-                ################################################################
+        ################################################################
         # ignore scores
-        ignore_score = { "hit": "ignore" }
+        ignore_score = {"hit": "ignore"}
         self.glossary["n_spikes"] = "Number of spikes"
         self.scoring["n_spikes"] = ignore_score
 
         ################################################################
         # ignore misses
-        ignore_miss = { "hit":"stdev", "miss":"const", "const":0 }
+        ignore_miss = {"hit": "stdev", "miss": "const", "const": 0}
         self.glossary["adapt"] = "Adaptation index"
         self.scoring["adapt"] = ignore_miss
         self.glossary["latency"] = "Time to first spike (ms)"
@@ -83,13 +84,13 @@ class EphysFeatures( object ):
 
         ################################################################
         # base miss off mean
-        mean_score = { "hit":"stdev", "miss":"mean_mult", "mean_mult":2 }
+        mean_score = {"hit": "stdev", "miss": "mean_mult", "mean_mult": 2}
         self.glossary["ISICV"] = "ISI-CV"
         self.scoring["ISICV"] = mean_score
 
         ################################################################
         # normal scoring
-        normal_score = { "hit":"stdev", "miss":"const", "const":20 }
+        normal_score = {"hit": "stdev", "miss": "const", "const": 20}
         self.glossary["isi_avg"] = "Average ISI (ms)"
         self.scoring["isi_avg"] = ignore_score
         self.glossary["doublet"] = "Doublet ISI (ms)"
@@ -102,13 +103,13 @@ class EphysFeatures( object ):
         self.scoring["f_slow_ahp_time"] = normal_score
         self.glossary["base_v"] = "Baseline voltage (mV)"
         self.scoring["base_v"] = normal_score
-        #self.glossary["base_v2"] = "Baseline voltage 2 (mV)"
-        #self.scoring["base_v2"] = normal_score
-        #self.glossary["base_v3"] = "Baseline voltage 3 (mV)"
-        #self.scoring["base_v3"] = normal_score
+        # self.glossary["base_v2"] = "Baseline voltage 2 (mV)"
+        # self.scoring["base_v2"] = normal_score
+        # self.glossary["base_v3"] = "Baseline voltage 3 (mV)"
+        # self.scoring["base_v3"] = normal_score
         ################################################################
         # per spike scoring
-        perspike_score = { "hit":"perspike", "miss":"const", "const":20, "skip_last_n":0 }
+        perspike_score = {"hit": "perspike", "miss": "const", "const": 20, "skip_last_n": 0}
         self.glossary["f_peak"] = "Spike height (mV)"
         self.scoring["f_peak"] = perspike_score.copy()
         self.glossary["f_trough"] = "Spike depth (mV)"
@@ -132,10 +133,9 @@ class EphysFeatures( object ):
         self.glossary["thresh_ramp"] = "Change in dv/dt over first 5 mV past threshold (mV/ms)"
         self.scoring["thresh_ramp"] = perspike_score.copy()
 
-
         ################################################################
         # heavily penalize when there are no spikes
-        spike_score = { "hit":"stdev", "miss":"const", "const":250 }
+        spike_score = {"hit": "stdev", "miss": "const", "const": 250}
         self.glossary["rate"] = "Firing rate (Hz)"
         self.scoring["rate"] = spike_score
 
@@ -158,7 +158,8 @@ class EphysFeatures( object ):
             self.mean[k] = param_dict[k]["mean"]
             self.stdev[k] = param_dict[k]["stdev"]
 
-class EphysFeatureExtractor( object ):
+
+class EphysFeatureExtractor(object):
     def __init__(self):
         # list of feature set instances
         self.feature_list = []
@@ -178,8 +179,8 @@ class EphysFeatureExtractor( object ):
         start = onset
         stop = onset + dur
         # detect spikes for all of sweep
-        #start = 0
-        #stop = t[-1]
+        # start = 0
+        # stop = t[-1]
         ################################################################
         # pull out spike times
 
@@ -195,21 +196,23 @@ class EphysFeatureExtractor( object ):
             dv = np.diff(smooth_v)
         else:
             dv = np.diff(v_target)
-        dvdt = dv / (np.diff(t[start_idx:stop_idx]) * 1e3) # in mV/ms
+        dvdt = dv / (np.diff(t[start_idx:stop_idx]) * 1e3)  # in mV/ms
 
         dv_cutoff = 20
         thresh_pct = 0.05
         spikes = []
-        temp_spk_idxs = np.where(np.diff(np.greater_equal(dvdt, dv_cutoff).astype(int)) == 1)[0] # find positive-going crossings of 100 mV/ms
+        temp_spk_idxs = np.where(np.diff(np.greater_equal(dvdt, dv_cutoff).astype(int)) == 1)[
+            0
+        ]  # find positive-going crossings of 100 mV/ms
         spk_idxs = []
         for i, temp in enumerate(temp_spk_idxs):
             if i == 0:
                 spk_idxs.append(temp)
-            elif np.any(dvdt[temp_spk_idxs[i - 1]:temp] < 0):
+            elif np.any(dvdt[temp_spk_idxs[i - 1] : temp] < 0):
                 # check if the dvdt has gone back down below zero between presumed spike times
                 # sometimes the dvdt bobbles around detection threshold and produces spurious guesses at spike times
                 spk_idxs.append(temp)
-        spk_idxs += start_idx # set back to the "index space" of the original trace
+        spk_idxs += start_idx  # set back to the "index space" of the original trace
 
         # recalculate full dv/dt for feature analysis (vs spike detection)
         if np.abs(t[1] - t[0] - 5e-6) < 1e-7 and np.var(np.diff(t)) < 1e-6:
@@ -218,7 +221,7 @@ class EphysFeatureExtractor( object ):
             dv = np.diff(smooth_v)
         else:
             dv = np.diff(v)
-        dvdt = dv / (np.diff(t) * 1e3) # in mV/ms
+        dvdt = dv / (np.diff(t) * 1e3)  # in mV/ms
 
         # First time through, accumulate upstrokes to calculate average threshold target
         for spk_n, spk_idx in enumerate(spk_idxs):
@@ -244,18 +247,20 @@ class EphysFeatureExtractor( object ):
             spk["f_peak_t"] = t[peak_idx]
 
             # Check if end of stimulus interval cuts off spike - if so, don't process spike
-            if spk_n == len(spk_idxs) - 1 and peak_idx == next_idx-1:
+            if spk_n == len(spk_idxs) - 1 and peak_idx == next_idx - 1:
                 continue
             if spk_idx == peak_idx:
-                continue    # this was bugfix, but why? ramp?
+                continue  # this was bugfix, but why? ramp?
 
             # Determine maximum upstroke of spike
             upstroke_idx = np.argmax(dvdt[spk_idx:peak_idx]) + spk_idx
 
             spk["upstroke"] = dvdt[upstroke_idx]
-            if np.isnan(spk["upstroke"]): # sometimes dvdt will be NaN because of multiple cvode points at same time step
+            if np.isnan(
+                spk["upstroke"]
+            ):  # sometimes dvdt will be NaN because of multiple cvode points at same time step
                 close_idx = upstroke_idx + 1
-                while (np.isnan(dvdt[close_idx])):
+                while np.isnan(dvdt[close_idx]):
                     close_idx += 1
                 spk["upstroke_idx"] = close_idx
                 spk["upstroke"] = dvdt[close_idx]
@@ -271,7 +276,7 @@ class EphysFeatureExtractor( object ):
             # Preliminarily define threshold where dvdt = 5% * max upstroke
             thresh_pct = 0.05
             find_thresh_idxs = np.where(dvdt[prev_idx:upstroke_idx] <= thresh_pct * spk["upstroke"])[0]
-            if len(find_thresh_idxs) < 1: # Can't find a good threshold value - probably a bad simulation case
+            if len(find_thresh_idxs) < 1:  # Can't find a good threshold value - probably a bad simulation case
                 # Fall back to the upstroke value
                 threshold_idx = upstroke_idx
             else:
@@ -324,7 +329,7 @@ class EphysFeatureExtractor( object ):
 
             # Restore variables from before
             # peak_idx = spk['peak_idx']
-            peak_idx = np.argmax(v[spk['threshold_idx']:next_idx]) + spk['threshold_idx']
+            peak_idx = np.argmax(v[spk["threshold_idx"] : next_idx]) + spk["threshold_idx"]
 
             spk["peak_idx"] = peak_idx
             spk["f_peak"] = v[peak_idx]
@@ -333,12 +338,14 @@ class EphysFeatureExtractor( object ):
 
             # Determine maximum upstroke of spike
             # upstroke_idx = spk['upstroke_idx']
-            upstroke_idx = np.argmax(dvdt[spk['threshold_idx']:peak_idx]) + spk['threshold_idx']
+            upstroke_idx = np.argmax(dvdt[spk["threshold_idx"] : peak_idx]) + spk["threshold_idx"]
 
             spk["upstroke"] = dvdt[upstroke_idx]
-            if np.isnan(spk["upstroke"]): # sometimes dvdt will be NaN because of multiple cvode points at same time step
+            if np.isnan(
+                spk["upstroke"]
+            ):  # sometimes dvdt will be NaN because of multiple cvode points at same time step
                 close_idx = upstroke_idx + 1
-                while (np.isnan(dvdt[close_idx])):
+                while np.isnan(dvdt[close_idx]):
                     close_idx += 1
                 spk["upstroke_idx"] = close_idx
                 spk["upstroke"] = dvdt[close_idx]
@@ -353,7 +360,7 @@ class EphysFeatureExtractor( object ):
 
             # Find threshold based on average target
             find_thresh_idxs = np.where(dvdt[prev_idx:upstroke_idx] <= threshold_target)[0]
-            if len(find_thresh_idxs) < 1: # Can't find a good threshold value - probably a bad simulation case
+            if len(find_thresh_idxs) < 1:  # Can't find a good threshold value - probably a bad simulation case
                 # Fall back to the upstroke value
                 threshold_idx = upstroke_idx
             else:
@@ -372,7 +379,7 @@ class EphysFeatureExtractor( object ):
             overn30_idxs = np.where(v[threshold_idx:peak_idx] >= -30)[0]
             if len(overn30_idxs) > 0:
                 spk["t_idx_n30"] = overn30_idxs[0] + threshold_idx
-            else: # fall back to threshold definition if spike doesn't cross -30 mV
+            else:  # fall back to threshold definition if spike doesn't cross -30 mV
                 spk["t_idx_n30"] = threshold_idx
             spk["t_n30"] = t[spk["t_idx_n30"]]
 
@@ -391,13 +398,17 @@ class EphysFeatureExtractor( object ):
             spk["downstroke_i"] = curr[downstroke_idx]
             spk["downstroke_t"] = t[downstroke_idx]
             spk["downstroke"] = dvdt[downstroke_idx]
-            if np.isnan(spk["downstroke"]): # sometimes dvdt will be NaN because of multiple cvode points at same time step
+            if np.isnan(
+                spk["downstroke"]
+            ):  # sometimes dvdt will be NaN because of multiple cvode points at same time step
                 close_idx = downstroke_idx + 1
-                while (np.isnan(dvdt[close_idx])):
+                while np.isnan(dvdt[close_idx]):
                     close_idx += 1
                 spk["downstroke"] = dvdt[close_idx]
 
-        feature.mean["base_v"] = v[np.where((t > onset - 0.1) & (t < onset - 0.001))].mean() # baseline voltage, 100ms before stim
+        feature.mean["base_v"] = v[
+            np.where((t > onset - 0.1) & (t < onset - 0.001))
+        ].mean()  # baseline voltage, 100ms before stim
         feature.mean["spikes"] = spikes
         isi_cv = self.isicv(spikes)
         if isi_cv is not None:
@@ -413,18 +424,20 @@ class EphysFeatureExtractor( object ):
                 idx_next = spikes[i + 1]["t_idx"] if i < len(spikes) - 1 else stop_idx
                 self.calculate_trough(spk, v, curr, t, idx_next)
                 half_max_v = (spk["f_peak"] - spk["f_trough"]) / 2.0 + spk["f_trough"]
-                over_half_max_v_idxs = np.where(v[spk["t_idx"]:spk["trough_idx"]] > half_max_v)[0]
+                over_half_max_v_idxs = np.where(v[spk["t_idx"] : spk["trough_idx"]] > half_max_v)[0]
                 if len(over_half_max_v_idxs) > 0:
-                    spk["width"] = 1000. * (t[over_half_max_v_idxs[-1] + spk["t_idx"]] - t[over_half_max_v_idxs[0] + spk["t_idx"]])
-            feature.mean["latency"] = 1000. * (spikes[0]["t"] - onset)
-            feature.mean["latency_n30"] = 1000. * (spikes[0]["t_n30"] - onset)
+                    spk["width"] = 1000.0 * (
+                        t[over_half_max_v_idxs[-1] + spk["t_idx"]] - t[over_half_max_v_idxs[0] + spk["t_idx"]]
+                    )
+            feature.mean["latency"] = 1000.0 * (spikes[0]["t"] - onset)
+            feature.mean["latency_n30"] = 1000.0 * (spikes[0]["t_n30"] - onset)
             # extract properties for each spike
             isicnt = 0
             isitot = 0
-            for i in range(0, len(spikes)-1):
+            for i in range(0, len(spikes) - 1):
                 spk = spikes[i]
-                idx_next = spikes[i+1]["t_idx"]
-                isitot += spikes[i+1]["t"] - spikes[i]["t"]
+                idx_next = spikes[i + 1]["t_idx"]
+                isitot += spikes[i + 1]["t"] - spikes[i]["t"]
                 isicnt += 1
             if isicnt > 0:
                 feature.mean["isi_avg"] = 1000 * isitot / isicnt
@@ -470,19 +483,19 @@ class EphysFeatureExtractor( object ):
         isi_mean = 0
         lst = []
         for i in range(len(spikes) - 1):
-            isi = spikes[i+1]["t"] - spikes[i]["t"]
-            #print("\t%g" % isi)
+            isi = spikes[i + 1]["t"] - spikes[i]["t"]
+            # print("\t%g" % isi)
             isi_mean += isi
             lst.append(isi)
         isi_mean /= 1.0 * len(lst)
-        #print(isi_mean)
+        # print(isi_mean)
         var = 0
         for i in range(len(lst)):
             dif = isi_mean - lst[i]
             var += dif * dif
         var /= len(lst)
-        #var /= len(lst) - 1
-        #print(math.sqrt(var))
+        # var /= len(lst) - 1
+        # print(math.sqrt(var))
         if isi_mean > 0:
             return math.sqrt(var) / isi_mean
         return None
@@ -493,19 +506,19 @@ class EphysFeatureExtractor( object ):
         adi = 0
         cnt = 0
         isi = []
-        for i in range(len(spikes)-1):
-            isi.append(spikes[i+1]["t"] - spikes[i]["t"])
+        for i in range(len(spikes) - 1):
+            isi.append(spikes[i + 1]["t"] - spikes[i]["t"])
         # act as though time between last spike and stim end is another ISI per Etay's code
         # l = stim_end - spikes[-1]["t"]
         # if l > 0 and l > isi[-1]:
         #     isi.append(l)
-        for i in range(len(isi)-1):
-            adi += 1.0 * (isi[i+1] - isi[i]) / (isi[i+1] + isi[i])
+        for i in range(len(isi) - 1):
+            adi += 1.0 * (isi[i + 1] - isi[i]) / (isi[i + 1] + isi[i])
             cnt += 1
         adi /= cnt
         return adi
 
-    ##----------------------------------------------------------------------
+    # ----------------------------------------------------------------------
 
     # trough (AHP) is presently defined as the minimum voltage level
     #   observed between successive spikes in a burst
@@ -516,7 +529,7 @@ class EphysFeatureExtractor( object ):
         peak_idx = spike["peak_idx"]
 
         if peak_idx >= next_idx:
-            logging.warning("next index (%d) before peak index (%d) calculating trough" % ( next_idx, peak_idx ))
+            logging.warning("next index (%d) before peak index (%d) calculating trough" % (next_idx, peak_idx))
             trough_idx = next_idx
         else:
             trough_idx = np.argmin(v[peak_idx:next_idx]) + peak_idx
@@ -582,7 +595,7 @@ class EphysFeatureExtractor( object ):
                         val = cand.mean[k]
                         inc = abs(mean - val) / stdev
                         scores.append(inc)
-#                        print("Hit %s, %g+/-%g (%g) = %g" % (k, mean, stdev, val, inc))
+                    #                        print("Hit %s, %g+/-%g (%g) = %g" % (k, mean, stdev, val, inc))
                     else:
                         resp = cand.scoring[k]["miss"]
                         if resp == "const":
@@ -593,7 +606,7 @@ class EphysFeatureExtractor( object ):
                             assert False
                         miss = float(miss)
                         scores.append(miss)
-#                        print("Missed %s, penalty = %g" % (k, miss))
+                #                        print("Missed %s, penalty = %g" % (k, miss))
                 elif response == "perspike":
                     mean = self.summary.mean[k]
                     stdev = self.summary.stdev[k]
@@ -602,7 +615,7 @@ class EphysFeatureExtractor( object ):
                         val = 0
                         n_spikes = len(cand.mean["spikes"])
                         skip_last_n = self.summary.scoring[k]["skip_last_n"]
-                        for spike in cand.mean["spikes"][:n_spikes-skip_last_n]:
+                        for spike in cand.mean["spikes"][: n_spikes - skip_last_n]:
                             val += abs(spike[k] - mean)
                         val /= n_spikes - skip_last_n
                         inc = val / stdev
@@ -617,7 +630,7 @@ class EphysFeatureExtractor( object ):
                             assert False
                         miss = float(miss)
                         scores.append(miss)
-#                        print("Missed %s, penalty = %g" % (k, miss))
+                #                        print("Missed %s, penalty = %g" % (k, miss))
                 else:
                     assert False
                 if abs(sum(scores)) > 1e10:
@@ -690,4 +703,3 @@ class EphysFeatureExtractor( object ):
                 val /= 1.0 * len(self.feature_list)
                 self.summary.stdev[k] = math.sqrt(val)
         return self
-

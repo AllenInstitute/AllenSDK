@@ -37,21 +37,17 @@ from ..api import Api
 
 
 class TreeSearchApi(Api):
-    '''
+    """
 
     See `Searching a Specimen or Structure Tree <http://help.brain-map.org/display/api/Image-to-Image+Synchronization>`_
     for additional documentation.
-    '''
+    """
 
     def __init__(self, base_uri=None):
         super(TreeSearchApi, self).__init__(base_uri)
 
-    def get_tree(self,
-                 kind,
-                 db_id,
-                 ancestors=None,
-                 descendants=None):
-        '''Fetch meta data for the specified structure or specimen.
+    def get_tree(self, kind, db_id, ancestors=None, descendants=None):
+        """Fetch meta data for the specified structure or specimen.
 
         Parameters
         ----------
@@ -68,31 +64,25 @@ class TreeSearchApi(Api):
         -------
         dict
             parsed json response data
-        '''
+        """
         params = []
-        url_params = ''
+        url_params = ""
 
         if ancestors is True:
-            params.append('ancestors=true')
+            params.append("ancestors=true")
         elif ancestors is False:
-            params.append('ancestors=false')
+            params.append("ancestors=false")
 
         if descendants is True:
-            params.append('descendants=true')
+            params.append("descendants=true")
         elif descendants is False:
-            params.append('descendants=false')
+            params.append("descendants=false")
 
         if len(params) > 0:
-            url_params = '?' + '&'.join(params)
+            url_params = "?" + "&".join(params)
         else:
-            url_params = ''
+            url_params = ""
 
-        url = ''.join([self.tree_search_endpoint,
-                       '/',
-                       kind,
-                       '/',
-                       str(db_id),
-                       '.json',
-                       url_params])
+        url = "".join([self.tree_search_endpoint, "/", kind, "/", str(db_id), ".json", url_params])
 
         return self.json_msg_query(url)

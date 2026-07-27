@@ -4,22 +4,21 @@ from allensdk.model.biophysical.utils import Utils
 from allensdk.model.biophys_sim.config import Config
 import os
 from unittest import mock
+
 try:
     import __builtin__ as builtins
 except Exception:
     import builtins
-from allensdk.internal.model.biophysical.run_optimize \
-    import RunOptimize
-from allensdk.internal.api.queries.optimize_config_reader \
-    import OptimizeConfigReader
+from allensdk.internal.model.biophysical.run_optimize import RunOptimize
+from allensdk.internal.api.queries.optimize_config_reader import OptimizeConfigReader
 from allensdk.model.biophys_sim.neuron.hoc_utils import HocUtils
 
 real_import = __import__
 
-#import allensdk.eclipse_debug
+# import allensdk.eclipse_debug
 
 
-MANIFEST_JSON = '''
+MANIFEST_JSON = """
 {
   "biophys": [
     {
@@ -551,9 +550,9 @@ MANIFEST_JSON = '''
     }
   ]
 }
-'''
+"""
 
-LIMS_MESSAGE = '''
+LIMS_MESSAGE = """
 {
   "created_at": "2015-02-13T16:52:57-08:00", 
   "id": 329322394, 
@@ -6784,7 +6783,7 @@ LIMS_MESSAGE = '''
   ], 
   "workflow_state": "has_been_fit"
 }
-'''
+"""
 
 
 def mock_import(mod, *args):
@@ -6801,30 +6800,29 @@ def mock_read_lims_file(self, lims_path):
 
 @pytest.fixture
 def run_optimize():
-    rs = RunOptimize('manifest_sdk.json', 'out.json')
-    
-    mock.patch.object(OptimizeConfigReader,
-                      'read_lims_file',
-                      mock_read_lims_file)
-    
+    rs = RunOptimize("manifest_sdk.json", "out.json")
+
+    mock.patch.object(OptimizeConfigReader, "read_lims_file", mock_read_lims_file)
+
     return rs
 
 
 def xtest_init(run_optimize):
-    assert run_optimize.input_json == 'manifest_sdk.json'
-    assert run_optimize.output_json == 'out.json'
+    assert run_optimize.input_json == "manifest_sdk.json"
+    assert run_optimize.output_json == "out.json"
     assert run_optimize.app_config is None
     assert run_optimize.manifest is None
 
 
 orig_open = open
 
+
 def open_configs(n, *args):
     (_, fn) = os.path.split(n)
 
-    if fn == 'manifest_sdk.json':
+    if fn == "manifest_sdk.json":
         data_string = MANIFEST_JSON
-    elif fn == 'lims_message_optimize.json':
+    elif fn == "lims_message_optimize.json":
         data_string = LIMS_MESSAGE
     else:
         return orig_open(n, *args)
@@ -6837,7 +6835,7 @@ def open_configs(n, *args):
 @patch("shutil.copy")
 @patch("allensdk.model.biophysical.runner.save_nwb")
 @patch.object(HocUtils, "__init__")
-@patch(builtins.__name__+".__import__", side_effect=mock_import)
+@patch(builtins.__name__ + ".__import__", side_effect=mock_import)
 @patch("allensdk.core.json_utilities.write")
 @patch("allensdk.internal.model.biophysical.fit_stage_2.run_stage_2")
 @patch("allensdk.internal.model.biophysical.fit_stage_2.prepare_stage_2")
@@ -6845,22 +6843,24 @@ def open_configs(n, *args):
 @patch("allensdk.internal.model.biophysical.fit_stage_1.prepare_stage_1")
 @patch("allensdk.internal.model.biophysical.run_passive_fit.run_passive_fit")
 @patch("allensdk.core.nwb_data_set.NwbDataSet")
-def test_start_specimen(nwb_data_set,
-                        passive_fit,
-                        prepare_stage_1,
-                        run_stage_1,
-                        prepare_stage_2,
-                        run_stage_2,
-                        json_utilities_write,
-                        import_mock,
-                        hoc_init,
-                        save_nwb,
-                        shutil_copy,
-                        path_exists,
-                        run_optimize):
-    with patch(builtins.__name__+".open", open_configs):
-        fit_description = Config().load('manifest_sdk.json')
+def test_start_specimen(
+    nwb_data_set,
+    passive_fit,
+    prepare_stage_1,
+    run_stage_1,
+    prepare_stage_2,
+    run_stage_2,
+    json_utilities_write,
+    import_mock,
+    hoc_init,
+    save_nwb,
+    shutil_copy,
+    path_exists,
+    run_optimize,
+):
+    with patch(builtins.__name__ + ".open", open_configs):
+        fit_description = Config().load("manifest_sdk.json")
         Utils.description = fit_description
         run_optimize.start_specimen()
-        
+
         assert True

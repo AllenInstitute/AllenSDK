@@ -36,10 +36,7 @@ class RigidMotionTransformFile(DataFile):
 
     @classmethod
     @cached(cache=LRUCache(maxsize=10), key=from_lims_cache_key)
-    def from_lims(
-        cls, db: PostgresQueryMixin,
-        ophys_experiment_id: Union[int, str]
-    ) -> "RigidMotionTransformFile":
+    def from_lims(cls, db: PostgresQueryMixin, ophys_experiment_id: Union[int, str]) -> "RigidMotionTransformFile":
         query = """
                 SELECT wkf.storage_directory || wkf.filename AS transform_file
                 FROM ophys_experiments oe
@@ -56,4 +53,4 @@ class RigidMotionTransformFile(DataFile):
     @staticmethod
     def load_data(filepath: Union[str, Path]) -> pd.DataFrame:
         motion_correction = pd.read_csv(filepath)
-        return motion_correction[['x', 'y']]
+        return motion_correction[["x", "y"]]

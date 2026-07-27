@@ -53,8 +53,8 @@ def specimen_id():
 def glif_api():
     endpoint = None
 
-    if 'TEST_API_ENDPOINT' in os.environ:
-        endpoint = os.environ['TEST_API_ENDPOINT']
+    if "TEST_API_ENDPOINT" in os.environ:
+        endpoint = os.environ["TEST_API_ENDPOINT"]
         return GlifApi(endpoint)
     else:
         return None
@@ -66,24 +66,22 @@ def test_get_neuronal_model_templates(glif_api):
     assert len(glif_api.get_neuronal_model_templates()) == 7
 
     for template in glif_api.get_neuronal_model_templates():
-
-        if template['id'] == 329230710:
-            assert 'perisomatic' in template['name']
-        elif template['id'] == 395310498:
-            assert '(LIF-R-ASC-A)' in template['name']
-        elif template['id'] == 395310469:
-            assert '(LIF)' in template['name']
-        elif template['id'] == 395310475:
-            assert '(LIF-ASC)' in template['name']
-        elif template['id'] == 395310479:
-            assert '(LIF-R)' in template['name']
-        elif template['id'] == 471355161:
-            assert '(LIF-R-ASC)' in template['name']
-        elif template['id'] == 491455321:
-            assert 'Biophysical - all active' in template['name']
+        if template["id"] == 329230710:
+            assert "perisomatic" in template["name"]
+        elif template["id"] == 395310498:
+            assert "(LIF-R-ASC-A)" in template["name"]
+        elif template["id"] == 395310469:
+            assert "(LIF)" in template["name"]
+        elif template["id"] == 395310475:
+            assert "(LIF-ASC)" in template["name"]
+        elif template["id"] == 395310479:
+            assert "(LIF-R)" in template["name"]
+        elif template["id"] == 471355161:
+            assert "(LIF-R-ASC)" in template["name"]
+        elif template["id"] == 491455321:
+            assert "Biophysical - all active" in template["name"]
         else:
-            raise Exception('Unrecognized template: %s (%s)' % (
-                template['id'], template['name']))
+            raise Exception("Unrecognized template: %s (%s)" % (template["id"], template["name"]))
 
 
 @pytest.mark.requires_api_endpoint
@@ -92,7 +90,7 @@ def test_get_neuronal_models(glif_api, specimen_id):
     cells = glif_api.get_neuronal_models([specimen_id])
 
     assert len(cells) == 1
-    assert len(cells[0]['neuronal_models']) == 2
+    assert len(cells[0]["neuronal_models"]) == 2
 
 
 @pytest.mark.requires_api_endpoint
@@ -107,14 +105,12 @@ def test_get_neuronal_models_no_ids(glif_api):
 def test_get_neuron_configs(glif_api, specimen_id):
     model = glif_api.get_neuronal_models([specimen_id])
 
-    neuronal_model_ids = [nm['id'] for nm in model[0]['neuronal_models']]
+    neuronal_model_ids = [nm["id"] for nm in model[0]["neuronal_models"]]
     assert set(neuronal_model_ids) == set((566283950, 566283946))
 
     test_id = 566283950
 
-    np.testing.assert_almost_equal(
-        glif_api.get_neuron_configs([test_id])[test_id]['th_inf'],
-        0.024561992461740227)
+    np.testing.assert_almost_equal(glif_api.get_neuron_configs([test_id])[test_id]["th_inf"], 0.024561992461740227)
 
 
 @pytest.mark.requires_api_endpoint
@@ -131,6 +127,6 @@ def test_deprecated(fn_temp_dir, glif_api, neuronal_model_id):
     glif_api.get_neuronal_model(neuronal_model_id)
     glif_api.get_neuron_config()
 
-    nwb_path = os.path.join(fn_temp_dir, 'tmp.nwb')
+    nwb_path = os.path.join(fn_temp_dir, "tmp.nwb")
     glif_api.get_neuronal_model(neuronal_model_id)
     glif_api.cache_stimulus_file(nwb_path)

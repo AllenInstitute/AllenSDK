@@ -83,20 +83,14 @@ def chi_square_binary(events, LSN_template):
     # smooth stimulus-triggered average spatially with a gaussian
     for n in range(num_cells):
         for on_off in range(2):
-            events_per_pixel[n, :, :, on_off] = smooth_STA(
-                events_per_pixel[n, :, :, on_off]
-            )
+            events_per_pixel[n, :, :, on_off] = smooth_STA(events_per_pixel[n, :, :, on_off])
 
     # calculate the p_value for each exclusion region
     chi_square_grid = np.zeros((num_cells, num_y, num_x))
     for y in range(num_y):
         for x in range(num_x):
-            exclusion_mask = np.ones((num_y, num_x, 2)) * disc_masks[
-                y, x, :, :
-            ].reshape(num_y, num_x, 1)
-            p_vals, __ = chi_square_within_mask(
-                exclusion_mask, events_per_pixel, trials_per_pixel
-            )
+            exclusion_mask = np.ones((num_y, num_x, 2)) * disc_masks[y, x, :, :].reshape(num_y, num_x, 1)
+            p_vals, __ = chi_square_within_mask(exclusion_mask, events_per_pixel, trials_per_pixel)
             chi_square_grid[:, y, x] = p_vals
 
     return chi_square_grid
@@ -128,29 +122,21 @@ def get_peak_significance(chi_square_grid_NLL, LSN_template, alpha=0.05):
     # find the smallest p-value and determine if it's significant
     significant_cells = np.zeros((num_cells)).astype(bool)
     best_p = np.zeros((num_cells))
-    p_value_correction_factor_per_pixel = (
-        1.0 * num_y * num_x / pixels_per_mask_per_pixel
-    )
+    p_value_correction_factor_per_pixel = 1.0 * num_y * num_x / pixels_per_mask_per_pixel
 
     best_exclusion_region_list = []
     corrected_p_value_array_list = []
     for n in range(num_cells):
         # Sidak correction:
-        p_value_corrected_per_pixel = 1 - np.power(
-            (1 - chi_square_grid[n, :, :]), p_value_correction_factor_per_pixel
-        )
+        p_value_corrected_per_pixel = 1 - np.power((1 - chi_square_grid[n, :, :]), p_value_correction_factor_per_pixel)
         corrected_p_value_array_list.append(p_value_corrected_per_pixel)
 
-        y, x = np.unravel_index(
-            p_value_corrected_per_pixel.argmin(), (num_y, num_x)
-        )
+        y, x = np.unravel_index(p_value_corrected_per_pixel.argmin(), (num_y, num_x))
 
         # if more than one p-value that maxes out, use the median location
         if np.sum(p_value_corrected_per_pixel == 0.0) > 1:
             y, x = np.unravel_index(
-                np.argwhere(p_value_corrected_per_pixel.flatten() == 0.0)[
-                    :, 0
-                ],
+                np.argwhere(p_value_corrected_per_pixel.flatten() == 0.0)[:, 0],
                 (num_y, num_x),
             )
             center_y, center_x = locate_median(y, x)
@@ -158,15 +144,9 @@ def get_peak_significance(chi_square_grid_NLL, LSN_template, alpha=0.05):
         best_p[n] = p_value_corrected_per_pixel[y, x]
         if best_p[n] < alpha:
             significant_cells[n] = True
-            best_exclusion_region_list.append(
-                disc_masks[y, x, :, :].astype(bool)
-            )
+            best_exclusion_region_list.append(disc_masks[y, x, :, :].astype(bool))
         else:
-            best_exclusion_region_list.append(
-                np.zeros(
-                    (disc_masks.shape[0], disc_masks.shape[1]), dtype=bool
-                )
-            )
+            best_exclusion_region_list.append(np.zeros((disc_masks.shape[0], disc_masks.shape[1]), dtype=bool))
 
     return (
         significant_cells,
@@ -233,9 +213,7 @@ def get_events_per_pixel(responses_np, trial_matrix):
         for x in range(num_x):
             for on_off in range(2):
                 frames = np.argwhere(trial_matrix[y, x, on_off, :])[:, 0]
-                events_per_pixel[:, y, x, on_off] = np.sum(
-                    responses_np[frames, :], axis=0
-                )
+                events_per_pixel[:, y, x, on_off] = np.sum(responses_np[frames, :], axis=0)
 
     return events_per_pixel
 
@@ -262,12 +240,8 @@ def smooth_STA(STA, gauss_std=0.75, total_degrees=64):
 
     deg_per_pnt = total_degrees // STA.shape[0]
     STA_interpolated = interpolate_RF(STA, deg_per_pnt)
-    STA_interpolated_smoothed = filt.gaussian_filter(
-        STA_interpolated, gauss_std
-    )
-    STA_smoothed = deinterpolate_RF(
-        STA_interpolated_smoothed, STA.shape[1], STA.shape[0], deg_per_pnt
-    )
+    STA_interpolated_smoothed = filt.gaussian_filter(STA_interpolated, gauss_std)
+    STA_smoothed = deinterpolate_RF(STA_interpolated_smoothed, STA.shape[1], STA.shape[0], deg_per_pnt)
 
     return STA_smoothed
 
@@ -396,12 +370,8 @@ def chi_square_within_mask(exclusion_mask, events_per_pixel, trials_per_pixel):
     degrees_of_freedom = int(np.sum(exclusion_mask)) - 1
 
     #   observed_by_pixel has shape (num_cells,num_y,num_x,2)
-    expected_by_pixel = get_expected_events_by_pixel(
-        exclusion_mask, events_per_pixel, trials_per_pixel
-    )
-    observed_by_pixel = (
-        events_per_pixel * exclusion_mask.reshape(1, num_y, num_x, 2)
-    ).astype(float)
+    expected_by_pixel = get_expected_events_by_pixel(exclusion_mask, events_per_pixel, trials_per_pixel)
+    observed_by_pixel = (events_per_pixel * exclusion_mask.reshape(1, num_y, num_x, 2)).astype(float)
 
     # calculate test statistic given observed and expected
     residual_by_pixel = observed_by_pixel - expected_by_pixel
@@ -414,9 +384,7 @@ def chi_square_within_mask(exclusion_mask, events_per_pixel, trials_per_pixel):
     return p_vals, chi
 
 
-def get_expected_events_by_pixel(
-    exclusion_mask, events_per_pixel, trials_per_pixel
-):
+def get_expected_events_by_pixel(exclusion_mask, events_per_pixel, trials_per_pixel):
     """Calculate expected number of events per pixel
 
     Parameters
@@ -453,14 +421,10 @@ def get_expected_events_by_pixel(
     total_events_by_cell = np.sum(masked_events, axis=(1, 2, 3)).astype(float)
 
     expected_by_cell_per_trial = total_events_by_cell / total_trials
-    return masked_trials * expected_by_cell_per_trial.reshape(
-        num_cells, 1, 1, 1
-    )
+    return masked_trials * expected_by_cell_per_trial.reshape(num_cells, 1, 1, 1)
 
 
-def build_trial_matrix(
-    LSN_template, num_trials, on_off_luminance=(ON_LUMINANCE, OFF_LUMINANCE)
-):
+def build_trial_matrix(LSN_template, num_trials, on_off_luminance=(ON_LUMINANCE, OFF_LUMINANCE)):
     """Construct indicator arrays for on/off pixels across trials.
 
     Parameters
@@ -489,9 +453,7 @@ def build_trial_matrix(
     for y in range(num_y):
         for x in range(num_x):
             for oo, on_off in enumerate(on_off_luminance):
-                frame = np.argwhere(LSN_template[:num_trials, y, x] == on_off)[
-                    :, 0
-                ]
+                frame = np.argwhere(LSN_template[:num_trials, y, x] == on_off)[:, 0]
                 trial_mat[y, x, oo, frame] = True
 
     return trial_mat
@@ -544,13 +506,9 @@ def get_disc_masks(
     for y in range(num_y):
         for x in range(num_x):
             trials_not_gray = np.argwhere(LSN_binary[:, y, x] > 0)[:, 0]
-            raw_mask = np.divide(
-                LSN_binary[trials_not_gray, :, :].sum(axis=0), on_trials
-            )
+            raw_mask = np.divide(LSN_binary[trials_not_gray, :, :].sum(axis=0), on_trials)
 
-            center_y, center_x = np.unravel_index(
-                raw_mask.argmax(), (num_y, num_x)
-            )
+            center_y, center_x = np.unravel_index(raw_mask.argmax(), (num_y, num_x))
 
             # include center pixel in mask
             raw_mask[center_y, center_x] = 0.0
@@ -571,9 +529,7 @@ def get_disc_masks(
             # don't include far away pixels that just happen
             # to not have any trials in common with center pixel
             clean_mask = np.ones(np.shape(raw_mask))
-            clean_mask[y_min:y_max, x_min:x_max] = raw_mask[
-                y_min:y_max, x_min:x_max
-            ]
+            clean_mask[y_min:y_max, x_min:x_max] = raw_mask[y_min:y_max, x_min:x_max]
 
             masks[y, x, :, :] = clean_mask
 

@@ -1,4 +1,4 @@
-from mpi4py import MPI # needed for NEURON parallel execution
+from mpi4py import MPI  # needed for NEURON parallel execution
 import os
 from allensdk.internal.model.biophysical.deap_utils import Utils
 from . import neuron_parallel
@@ -17,7 +17,7 @@ DEFAULT_NGEN = 500
 DEFAULT_MU = 1200
 
 
-_optimize_log = logging.getLogger('allensdk.model.biophysical.optimize')
+_optimize_log = logging.getLogger("allensdk.model.biophysical.optimize")
 
 
 utils = None
@@ -42,15 +42,13 @@ def eval_param_set(params):
         if check_for_block():
             feature_errors = min_fail_penalty * np.ones_like(feature_errors)
         # Reset the stimulus back
-        utils.set_iclamp_params(stim_params["amplitude"], stim_params["delay"],
-            stim_params["duration"])
+        utils.set_iclamp_params(stim_params["amplitude"], stim_params["delay"], stim_params["duration"])
 
     return [np.sum(feature_errors)]
 
 
 def check_for_block():
-    utils.set_iclamp_params(max_stim_amp, stim_params["delay"],
-        stim_params["duration"])
+    utils.set_iclamp_params(max_stim_amp, stim_params["delay"], stim_params["duration"])
     h.finitialize()
     h.run()
 
@@ -58,9 +56,9 @@ def check_for_block():
     t = t_vec.as_numpy()
     stim_start_idx = np.flatnonzero(t >= utils.stim.delay)[0]
     stim_end_idx = np.flatnonzero(t >= utils.stim.delay + utils.stim.dur)[0]
-    depol_block_threshold = -50.0 # mV
-    block_min_duration = 50.0 # ms
-    long_hyperpol_threshold = -75.0 # mV
+    depol_block_threshold = -50.0  # mV
+    block_min_duration = 50.0  # ms
+    long_hyperpol_threshold = -75.0  # mV
 
     bool_v = np.array(v > depol_block_threshold, dtype=int)
     up_indexes = np.flatnonzero(np.diff(bool_v) == 1)
@@ -81,7 +79,9 @@ def check_for_block():
     down_indexes = np.flatnonzero(np.diff(bool_v) == -1)
     down_indexes = down_indexes[(down_indexes > stim_start_idx) & (down_indexes < stim_end_idx)]
     if len(down_indexes) != 0:
-        up_indexes = up_indexes[(up_indexes > stim_start_idx) & (up_indexes < stim_end_idx) & (up_indexes > down_indexes[0])]
+        up_indexes = up_indexes[
+            (up_indexes > stim_start_idx) & (up_indexes < stim_end_idx) & (up_indexes > down_indexes[0])
+        ]
         if len(up_indexes) < len(down_indexes):
             up_indexes = np.append(up_indexes, [stim_end_idx])
         max_hyperpol_duration = np.max([t[up_indexes[k]] - t[down_idx] for k, down_idx in enumerate(down_indexes)])
@@ -108,22 +108,22 @@ def initPopulation(pcls, ind_init, popfile):
 
 def main():
     global utils, h, v_vec, i_vec, t_vec, do_block_check, max_stim_amp, stim_params, config, seed
-    parser = argparse.ArgumentParser(description='Start a DEAP testing run.')
-    parser.add_argument('seed', type=int)
-    parser.add_argument('config_path')
-    parser.add_argument('ngen', type=int)
-    parser.add_argument('mu', type=int)
+    parser = argparse.ArgumentParser(description="Start a DEAP testing run.")
+    parser.add_argument("seed", type=int)
+    parser.add_argument("config_path")
+    parser.add_argument("ngen", type=int)
+    parser.add_argument("mu", type=int)
     args = parser.parse_args()
     seed = args.seed
 
     # Set up NEURON
     config = Config().load(args.config_path)
 
-    if 'LOG_CFG' in os.environ:
-        log_config = os.environ['LOG_CFG']
+    if "LOG_CFG" in os.environ:
+        log_config = os.environ["LOG_CFG"]
     else:
-        log_config = str(files('allensdk.model.biophysical').joinpath('logging.conf'))
-        os.environ['LOG_CFG'] = log_config
+        log_config = str(files("allensdk.model.biophysical").joinpath("logging.conf"))
+        os.environ["LOG_CFG"] = log_config
     lc.fileConfig(log_config)
 
     stim_params = config.data["stimulus"][0]
@@ -140,12 +140,11 @@ def main():
     h = utils.h
 
     manifest = config.manifest
-    morphology_path = manifest.get_path('MORPHOLOGY')
-    utils.generate_morphology(morphology_path.encode('ascii', 'ignore'))
+    morphology_path = manifest.get_path("MORPHOLOGY")
+    utils.generate_morphology(morphology_path.encode("ascii", "ignore"))
     utils.load_cell_parameters()
     utils.insert_iclamp()
-    utils.set_iclamp_params(stim_params["amplitude"], stim_params["delay"],
-        stim_params["duration"])
+    utils.set_iclamp_params(stim_params["amplitude"], stim_params["delay"], stim_params["duration"])
 
     h.tstop = stim_params["delay"] * 2.0 + stim_params["duration"]
     h.cvode_active(1)
@@ -154,7 +153,7 @@ def main():
 
     v_vec, i_vec, t_vec = utils.record_values()
 
-    try: # Wrapping this all to catch exceptions during NEURON parallel execution
+    try:  # Wrapping this all to catch exceptions during NEURON parallel execution
         neuron_parallel.runworker()
 
         # Set up genetic algorithm
@@ -170,7 +169,7 @@ def main():
 
         ndim = len(config.data["channels"]) + len(config.data["addl_params"])
 
-        creator.create("FitnessMin", base.Fitness, weights=(-1.0, ))
+        creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
         creator.create("Individual", list, fitness=creator.FitnessMin)
 
         toolbox = base.Toolbox()
@@ -180,10 +179,8 @@ def main():
         toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
         toolbox.register("evaluate", eval_param_set)
-        toolbox.register("mate", tools.cxSimulatedBinaryBounded, low=BOUND_LOWER, up=BOUND_UPPER,
-            eta=eta)
-        toolbox.register("mutate", tools.mutPolynomialBounded, low=BOUND_LOWER, up=BOUND_UPPER,
-            eta=eta, indpb=mtpb)
+        toolbox.register("mate", tools.cxSimulatedBinaryBounded, low=BOUND_LOWER, up=BOUND_UPPER, eta=eta)
+        toolbox.register("mutate", tools.mutPolynomialBounded, low=BOUND_LOWER, up=BOUND_UPPER, eta=eta, indpb=mtpb)
         toolbox.register("variate", algorithms.varAnd)
         toolbox.register("select", tools.selBest)
         toolbox.register("map", neuron_parallel.map)
@@ -243,7 +240,7 @@ def main():
         h.quit()
     except RuntimeError:
         _optimize_log.critical("Exception encountered during parallel NEURON execution")
-        MPI.COMM_WORLD.Abort() # Shut down all the processes
+        MPI.COMM_WORLD.Abort()  # Shut down all the processes
 
 
 if __name__ == "__main__":

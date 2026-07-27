@@ -6,15 +6,13 @@ from pynwb import NWBFile, ProcessingModule
 from pynwb.ophys import OpticalChannel, ImageSegmentation
 
 import allensdk.brain_observatory.roi_masks as roi
-from allensdk.brain_observatory.behavior.data_files.neuropil_corrected_file \
-    import NeuropilCorrectedFile
+from allensdk.brain_observatory.behavior.data_files.neuropil_corrected_file import NeuropilCorrectedFile
 from allensdk.brain_observatory.behavior.data_files.demix_file import DemixFile
 from allensdk.brain_observatory.behavior.data_files.neuropil_file import (
     NeuropilFile,
 )
 from allensdk.brain_observatory.behavior.data_files.dff_file import DFFFile
-from allensdk.brain_observatory.behavior.data_files.event_detection_file \
-    import EventDetectionFile
+from allensdk.brain_observatory.behavior.data_files.event_detection_file import EventDetectionFile
 from allensdk.core import DataObject
 from allensdk.core import (
     JsonReadableInterface,
@@ -22,22 +20,20 @@ from allensdk.core import (
     NwbReadableInterface,
 )
 from allensdk.core import NwbWritableInterface
-from allensdk.brain_observatory.behavior.data_objects.cell_specimens.events \
-    import Events
-from allensdk.brain_observatory.behavior.data_objects.cell_specimens.traces\
-    .corrected_fluorescence_traces import CorrectedFluorescenceTraces
-from allensdk.brain_observatory.behavior.data_objects.cell_specimens.traces\
-    .demixed_traces import DemixedTraces
-from allensdk.brain_observatory.behavior.data_objects.cell_specimens.traces\
-    .neuropil_traces import NeuropilTraces
-from allensdk.brain_observatory.behavior.data_objects.cell_specimens.traces\
-    .dff_traces import DFFTraces
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.field_of_view_shape import FieldOfViewShape
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.imaging_plane import ImagingPlane
-from allensdk.brain_observatory.behavior.data_objects.timestamps\
-    .ophys_timestamps import OphysTimestamps
+from allensdk.brain_observatory.behavior.data_objects.cell_specimens.events import Events
+from allensdk.brain_observatory.behavior.data_objects.cell_specimens.traces.corrected_fluorescence_traces import (
+    CorrectedFluorescenceTraces,
+)
+from allensdk.brain_observatory.behavior.data_objects.cell_specimens.traces.demixed_traces import DemixedTraces
+from allensdk.brain_observatory.behavior.data_objects.cell_specimens.traces.neuropil_traces import NeuropilTraces
+from allensdk.brain_observatory.behavior.data_objects.cell_specimens.traces.dff_traces import DFFTraces
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.field_of_view_shape import (
+    FieldOfViewShape,
+)
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.imaging_plane import (
+    ImagingPlane,
+)
+from allensdk.brain_observatory.behavior.data_objects.timestamps.ophys_timestamps import OphysTimestamps
 from allensdk.brain_observatory.behavior.image_api import Image
 from allensdk.brain_observatory.nwb import CELL_SPECIMEN_COL_DESCRIPTIONS
 from allensdk.brain_observatory.nwb.nwb_utils import add_image_to_nwb
@@ -79,9 +75,7 @@ class CellSpecimenMeta(
     """Cell specimen metadata"""
 
     def __init__(self, imaging_plane: ImagingPlane, emission_lambda=520.0):
-        super().__init__(
-            name="cell_specimen_meta", value=None, is_value_self=True
-        )
+        super().__init__(name="cell_specimen_meta", value=None, is_value_self=True)
         self._emission_lambda = emission_lambda
         self._imaging_plane = imaging_plane
 
@@ -108,12 +102,8 @@ class CellSpecimenMeta(
         return cls(imaging_plane=imaging_plane_meta)
 
     @classmethod
-    def from_json(
-        cls, dict_repr: dict, ophys_timestamps: OphysTimestamps
-    ) -> "CellSpecimenMeta":
-        imaging_plane_meta = ImagingPlane.from_json(
-            dict_repr=dict_repr, ophys_timestamps=ophys_timestamps
-        )
+    def from_json(cls, dict_repr: dict, ophys_timestamps: OphysTimestamps) -> "CellSpecimenMeta":
+        imaging_plane_meta = ImagingPlane.from_json(dict_repr=dict_repr, ophys_timestamps=ophys_timestamps)
         return cls(imaging_plane=imaging_plane_meta)
 
     @classmethod
@@ -128,9 +118,7 @@ class CellSpecimenMeta(
         emission_lambda = optical_channel.emission_lambda
 
         imaging_plane = ImagingPlane.from_nwb(nwbfile=nwbfile)
-        return CellSpecimenMeta(
-            emission_lambda=emission_lambda, imaging_plane=imaging_plane
-        )
+        return CellSpecimenMeta(emission_lambda=emission_lambda, imaging_plane=imaging_plane)
 
 
 class CellSpecimens(
@@ -185,14 +173,10 @@ class CellSpecimens(
         exclude_invalid_rois
             Whether to exclude invalid rois
         """
-        super().__init__(
-            name="cell_specimen_table", value=None, is_value_self=True
-        )
+        super().__init__(name="cell_specimen_table", value=None, is_value_self=True)
 
         # Validate ophys timestamps, traces
-        ophys_timestamps = ophys_timestamps.validate(
-            number_of_frames=dff_traces.get_number_of_frames()
-        )
+        ophys_timestamps = ophys_timestamps.validate(number_of_frames=dff_traces.get_number_of_frames())
         self._validate_traces(
             ophys_timestamps=ophys_timestamps,
             dff_traces=dff_traces,
@@ -203,26 +187,16 @@ class CellSpecimens(
         )
 
         if exclude_invalid_rois:
-            cell_specimen_table = cell_specimen_table[
-                cell_specimen_table["valid_roi"]
-            ]
+            cell_specimen_table = cell_specimen_table[cell_specimen_table["valid_roi"]]
 
         # Filter/reorder rois according to cell_specimen_table
         if dff_traces is not None:
-            dff_traces.filter_and_reorder(
-                roi_ids=cell_specimen_table["cell_roi_id"].values
-            )
+            dff_traces.filter_and_reorder(roi_ids=cell_specimen_table["cell_roi_id"].values)
         if demixed_traces is not None:
-            demixed_traces.filter_and_reorder(
-                roi_ids=cell_specimen_table["cell_roi_id"].values
-            )
+            demixed_traces.filter_and_reorder(roi_ids=cell_specimen_table["cell_roi_id"].values)
         if neuropil_traces is not None:
-            neuropil_traces.filter_and_reorder(
-                roi_ids=cell_specimen_table["cell_roi_id"].values
-            )
-        corrected_fluorescence_traces.filter_and_reorder(
-            roi_ids=cell_specimen_table["cell_roi_id"].values
-        )
+            neuropil_traces.filter_and_reorder(roi_ids=cell_specimen_table["cell_roi_id"].values)
+        corrected_fluorescence_traces.filter_and_reorder(roi_ids=cell_specimen_table["cell_roi_id"].values)
 
         # Note: setting raise_if_rois_missing to False for events, since
         # there seem to be cases where cell_specimen_table contains rois not in
@@ -240,9 +214,7 @@ class CellSpecimens(
         self._neuropil_traces = neuropil_traces
         self._corrected_fluorescence_traces = corrected_fluorescence_traces
         self._events = events
-        self._segmentation_mask_image = self._get_segmentation_mask_image(
-            spacing=segmentation_mask_image_spacing
-        )
+        self._segmentation_mask_image = self._get_segmentation_mask_image(spacing=segmentation_mask_image_spacing)
 
     @property
     def table(self) -> pd.DataFrame:
@@ -280,9 +252,7 @@ class CellSpecimens(
         """
         if self._dff_traces is None:
             return None
-        df = self.table[["cell_roi_id"]].join(
-            self._dff_traces.value, on="cell_roi_id"
-        )
+        df = self.table[["cell_roi_id"]].join(self._dff_traces.value, on="cell_roi_id")
         return df
 
     @property
@@ -308,9 +278,7 @@ class CellSpecimens(
         """
         if self._demixed_traces is None:
             return None
-        df = self.table[["cell_roi_id"]].join(
-            self._demixed_traces.value, on="cell_roi_id"
-        )
+        df = self.table[["cell_roi_id"]].join(self._demixed_traces.value, on="cell_roi_id")
         return df
 
     @property
@@ -337,9 +305,7 @@ class CellSpecimens(
         """
         if self._neuropil_traces is None:
             return None
-        df = self.table[["cell_roi_id"]].join(
-            self._neuropil_traces.value, on="cell_roi_id"
-        )
+        df = self.table[["cell_roi_id"]].join(self._neuropil_traces.value, on="cell_roi_id")
         return df
 
     @property
@@ -368,17 +334,13 @@ class CellSpecimens(
                 r:
                     r values (arbitrary units)
         """
-        df = self.table[["cell_roi_id"]].join(
-            self._corrected_fluorescence_traces.value, on="cell_roi_id"
-        )
+        df = self.table[["cell_roi_id"]].join(self._corrected_fluorescence_traces.value, on="cell_roi_id")
         return df
 
     @property
     def events(self) -> pd.DataFrame:
         df = self.table.reset_index()
-        df = df[["cell_roi_id", "cell_specimen_id"]].merge(
-            self._events.value, on="cell_roi_id"
-        )
+        df = df[["cell_roi_id", "cell_specimen_id"]].merge(self._events.value, on="cell_roi_id")
         df = df.set_index("cell_specimen_id")
         return df
 
@@ -406,9 +368,7 @@ class CellSpecimens(
                     ON oe.id = oseg.ophys_experiment_id
                     WHERE oseg.current = 't'
                     AND oe.id = {};
-                    """.format(
-                ophys_experiment_id
-            )
+                    """.format(ophys_experiment_id)
             return lims_db.fetchone(query, strict=True)
 
         def _get_cell_specimen_table():
@@ -417,61 +377,39 @@ class CellSpecimens(
                     SELECT *
                     FROM cell_rois cr
                     WHERE cr.ophys_cell_segmentation_run_id = {};
-                    """.format(
-                ophys_cell_seg_run_id
-            )
+                    """.format(ophys_cell_seg_run_id)
             initial_cs_table = pd.read_sql(query, lims_db.get_connection())
-            cst = initial_cs_table.rename(
-                columns={"id": "cell_roi_id", "mask_matrix": "roi_mask"}
-            )
+            cst = initial_cs_table.rename(columns={"id": "cell_roi_id", "mask_matrix": "roi_mask"})
             cst.drop(
                 ["ophys_experiment_id", "ophys_cell_segmentation_run_id"],
                 inplace=True,
                 axis=1,
             )
             cst = cst.to_dict()
-            fov_shape = FieldOfViewShape.from_lims(
-                ophys_experiment_id=ophys_experiment_id, lims_db=lims_db
-            )
-            cst = cls._postprocess(
-                cell_specimen_table=cst, fov_shape=fov_shape
-            )
+            fov_shape = FieldOfViewShape.from_lims(ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
+            cst = cls._postprocess(cell_specimen_table=cst, fov_shape=fov_shape)
             return cst
 
         def _get_dff_traces():
-            dff_file = DFFFile.from_lims(
-                ophys_experiment_id=ophys_experiment_id, db=lims_db
-            )
+            dff_file = DFFFile.from_lims(ophys_experiment_id=ophys_experiment_id, db=lims_db)
             return DFFTraces.from_data_file(dff_file=dff_file)
 
         def _get_demixed_traces():
-            demix_file = DemixFile.from_lims(
-                ophys_experiment_id=ophys_experiment_id, db=lims_db
-            )
-            return DemixedTraces.from_data_file(
-                demix_file=demix_file
-            )
+            demix_file = DemixFile.from_lims(ophys_experiment_id=ophys_experiment_id, db=lims_db)
+            return DemixedTraces.from_data_file(demix_file=demix_file)
 
         def _get_neuropil_traces():
-            neuropil_file = NeuropilFile.from_lims(
-                ophys_experiment_id=ophys_experiment_id, db=lims_db
-            )
-            return NeuropilTraces.from_data_file(
-                neuropil_file=neuropil_file
-            )
+            neuropil_file = NeuropilFile.from_lims(ophys_experiment_id=ophys_experiment_id, db=lims_db)
+            return NeuropilTraces.from_data_file(neuropil_file=neuropil_file)
 
         def _get_corrected_fluorescence_traces():
             neuropil_corrected_file = NeuropilCorrectedFile.from_lims(
                 ophys_experiment_id=ophys_experiment_id, db=lims_db
             )
-            return CorrectedFluorescenceTraces.from_data_file(
-                neuropil_corrected_file=neuropil_corrected_file
-            )
+            return CorrectedFluorescenceTraces.from_data_file(neuropil_corrected_file=neuropil_corrected_file)
 
         def _get_events():
-            events_file = EventDetectionFile.from_lims(
-                ophys_experiment_id=ophys_experiment_id, db=lims_db
-            )
+            events_file = EventDetectionFile.from_lims(ophys_experiment_id=ophys_experiment_id, db=lims_db)
             return cls._get_events(
                 events_file=events_file,
                 events_params=events_params,
@@ -516,41 +454,25 @@ class CellSpecimens(
     ) -> "CellSpecimens":
         cell_specimen_table = dict_repr["cell_specimen_table_dict"]
         fov_shape = FieldOfViewShape.from_json(dict_repr=dict_repr)
-        cell_specimen_table = cls._postprocess(
-            cell_specimen_table=cell_specimen_table, fov_shape=fov_shape
-        )
+        cell_specimen_table = cls._postprocess(cell_specimen_table=cell_specimen_table, fov_shape=fov_shape)
 
         def _get_dff_traces():
             dff_file = DFFFile.from_json(dict_repr=dict_repr)
             return DFFTraces.from_data_file(dff_file=dff_file)
 
         def _get_demixed_traces():
-            demix_file = DemixFile.from_json(
-                dict_repr=dict_repr
-            )
-            return DemixedTraces.from_data_file(
-                demix_file=demix_file
-            )
+            demix_file = DemixFile.from_json(dict_repr=dict_repr)
+            return DemixedTraces.from_data_file(demix_file=demix_file)
 
         def _get_neuropil_traces():
-            neuropil_file = NeuropilFile.from_json(
-                dict_repr=dict_repr
-            )
-            return NeuropilTraces.from_data_file(
-                neuropil_file=neuropil_file
-            )
+            neuropil_file = NeuropilFile.from_json(dict_repr=dict_repr)
+            return NeuropilTraces.from_data_file(neuropil_file=neuropil_file)
 
         def _get_corrected_fluorescence_traces():
-            neuropil_corrected_file = NeuropilCorrectedFile.from_json(
-                dict_repr=dict_repr
-            )
-            return CorrectedFluorescenceTraces.from_data_file(
-                neuropil_corrected_file=neuropil_corrected_file
-            )
+            neuropil_corrected_file = NeuropilCorrectedFile.from_json(dict_repr=dict_repr)
+            return CorrectedFluorescenceTraces.from_data_file(neuropil_corrected_file=neuropil_corrected_file)
 
-        meta = CellSpecimenMeta.from_json(
-            dict_repr=dict_repr, ophys_timestamps=ophys_timestamps
-        )
+        meta = CellSpecimenMeta.from_json(dict_repr=dict_repr, ophys_timestamps=ophys_timestamps)
 
         def _get_events():
             events_file = EventDetectionFile.from_json(dict_repr=dict_repr)
@@ -596,19 +518,14 @@ class CellSpecimens(
             df = cell_specimen_table.to_dataframe()
 
             # Ensure int64 used instead of int32
-            df = df.astype(
-                {col: "int64" for col in df.select_dtypes("int32").columns}
-            )
+            df = df.astype({col: "int64" for col in df.select_dtypes("int32").columns})
 
             # Because pynwb stores this field as "image_mask", it is renamed
             # here
             df = df.rename(columns={"image_mask": "roi_mask"})
 
             df.index.rename("cell_roi_id", inplace=True)
-            df["cell_specimen_id"] = [
-                None if id_ == -1 else id_
-                for id_ in df["cell_specimen_id"].values
-            ]
+            df["cell_specimen_id"] = [None if id_ == -1 else id_ for id_ in df["cell_specimen_id"].values]
 
             df.reset_index(inplace=True)
             df.set_index("cell_specimen_id", inplace=True)
@@ -619,9 +536,7 @@ class CellSpecimens(
         dff_traces = DFFTraces.from_nwb(nwbfile=nwbfile)
         demixed_traces = DemixedTraces.from_nwb(nwbfile=nwbfile)
         neuropil_traces = NeuropilTraces.from_nwb(nwbfile=nwbfile)
-        corrected_fluorescence_traces = CorrectedFluorescenceTraces.from_nwb(
-            nwbfile=nwbfile
-        )
+        corrected_fluorescence_traces = CorrectedFluorescenceTraces.from_nwb(nwbfile=nwbfile)
 
         def _get_events():
             return Events.from_nwb(
@@ -647,9 +562,7 @@ class CellSpecimens(
             exclude_invalid_rois=exclude_invalid_rois,
         )
 
-    def to_nwb(
-        self, nwbfile: NWBFile, ophys_timestamps: OphysTimestamps
-    ) -> NWBFile:
+    def to_nwb(self, nwbfile: NWBFile, ophys_timestamps: OphysTimestamps) -> NWBFile:
         """
         :param nwbfile
             In-memory nwb file object
@@ -665,13 +578,10 @@ class CellSpecimens(
         # FOV:
         fov_width = metadata.field_of_view_width
         fov_height = metadata.field_of_view_height
-        imaging_plane_description = (
-            "{} field of view in {} at depth {} "
-            "um".format(
-                (fov_width, fov_height),
-                self._meta.imaging_plane.targeted_structure,
-                metadata.imaging_depth,
-            )
+        imaging_plane_description = "{} field of view in {} at depth {} um".format(
+            (fov_width, fov_height),
+            self._meta.imaging_plane.targeted_structure,
+            metadata.imaging_depth,
         )
 
         # Optical Channel:
@@ -725,9 +635,7 @@ class CellSpecimens(
                 # of column both equal to the column name in the cell_roi_table
                 plane_segmentation.add_column(
                     col_name,
-                    CELL_SPECIMEN_COL_DESCRIPTIONS.get(
-                        col_name, "No Description Available"
-                    ),
+                    CELL_SPECIMEN_COL_DESCRIPTIONS.get(col_name, "No Description Available"),
                 )
 
         # go through each roi and add it to the plan segmentation object
@@ -748,9 +656,7 @@ class CellSpecimens(
             plane_segmentation.add_roi(image_mask=mask, **table_row.to_dict())
 
         # 2. Add DFF traces
-        self._dff_traces.to_nwb(
-            nwbfile=nwbfile, ophys_timestamps=ophys_timestamps
-        )
+        self._dff_traces.to_nwb(nwbfile=nwbfile, ophys_timestamps=ophys_timestamps)
 
         # 3. Add demixed traces
         self._demixed_traces.to_nwb(nwbfile=nwbfile)
@@ -793,15 +699,9 @@ class CellSpecimens(
         return mask_image
 
     @staticmethod
-    def _postprocess(
-        cell_specimen_table: dict, fov_shape: FieldOfViewShape
-    ) -> pd.DataFrame:
+    def _postprocess(cell_specimen_table: dict, fov_shape: FieldOfViewShape) -> pd.DataFrame:
         """Converts raw cell_specimen_table dict to dataframe"""
-        cell_specimen_table = (
-            pd.DataFrame.from_dict(cell_specimen_table)
-            .set_index("cell_roi_id")
-            .sort_index()
-        )
+        cell_specimen_table = pd.DataFrame.from_dict(cell_specimen_table).set_index("cell_roi_id").sort_index()
         fov_width = fov_shape.width
         fov_height = fov_shape.height
 
@@ -823,9 +723,7 @@ class CellSpecimens(
             roi_mask_list.append(curr_roi.get_mask_plane().astype(bool))
 
         cell_specimen_table["roi_mask"] = roi_mask_list
-        cell_specimen_table = cell_specimen_table[
-            sorted(cell_specimen_table.columns)
-        ]
+        cell_specimen_table = cell_specimen_table[sorted(cell_specimen_table.columns)]
 
         cell_specimen_table.index.rename("cell_roi_id", inplace=True)
         cell_specimen_table.reset_index(inplace=True)
@@ -858,21 +756,12 @@ class CellSpecimens(
                 continue
             # validate traces contain expected roi ids
             if not np.isin(traces.value.index, cell_roi_ids).all():
-                raise RuntimeError(
-                    f"{traces.name} contains ROI IDs that "
-                    f"are not in "
-                    f"cell_specimen_table.cell_roi_id"
-                )
+                raise RuntimeError(f"{traces.name} contains ROI IDs that are not in cell_specimen_table.cell_roi_id")
             if not np.isin(cell_roi_ids, traces.value.index).all():
-                raise RuntimeError(
-                    f"cell_specimen_table contains ROI IDs "
-                    f"that are not in {traces.name}"
-                )
+                raise RuntimeError(f"cell_specimen_table contains ROI IDs that are not in {traces.name}")
 
             # validate traces contain expected timepoints
-            num_trace_timepoints = len(
-                traces.value.iloc[0][trace_col_map[traces.name]]
-            )
+            num_trace_timepoints = len(traces.value.iloc[0][trace_col_map[traces.name]])
             num_ophys_timestamps = ophys_timestamps.value.shape[0]
             if num_trace_timepoints != num_ophys_timestamps:
                 raise RuntimeError(

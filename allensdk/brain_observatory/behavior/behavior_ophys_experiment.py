@@ -75,9 +75,7 @@ class BehaviorOphysExperiment(BehaviorSession):
             task_parameters=behavior_session._task_parameters,
             trials=behavior_session._trials,
             date_of_acquisition=date_of_acquisition,
-            eye_tracking_rig_geometry=(
-                behavior_session._eye_tracking_rig_geometry
-            ),
+            eye_tracking_rig_geometry=(behavior_session._eye_tracking_rig_geometry),
             eye_tracking_table=behavior_session._eye_tracking,
         )
 
@@ -92,9 +90,7 @@ class BehaviorOphysExperiment(BehaviorSession):
 
         self._metadata.to_nwb(nwbfile=nwbfile)
         self._projections.to_nwb(nwbfile=nwbfile)
-        self._cell_specimens.to_nwb(
-            nwbfile=nwbfile, ophys_timestamps=self._ophys_timestamps
-        )
+        self._cell_specimens.to_nwb(nwbfile=nwbfile, ophys_timestamps=self._ophys_timestamps)
         self._motion_correction.to_nwb(nwbfile=nwbfile)
 
         return nwbfile
@@ -136,21 +132,15 @@ class BehaviorOphysExperiment(BehaviorSession):
             imaging_plane_group_meta = ImagingPlaneGroup.from_lims(
                 ophys_experiment_id=ophys_experiment_id, lims_db=lims_db
             )
-            return cls._is_multi_plane_session(
-                imaging_plane_group_meta=imaging_plane_group_meta
-            )
+            return cls._is_multi_plane_session(imaging_plane_group_meta=imaging_plane_group_meta)
 
         def _get_motion_correction():
             rigid_motion_transform_file = RigidMotionTransformFile.from_lims(
                 ophys_experiment_id=ophys_experiment_id, db=lims_db
             )
-            return MotionCorrection.from_data_file(
-                rigid_motion_transform_file=rigid_motion_transform_file
-            )
+            return MotionCorrection.from_data_file(rigid_motion_transform_file=rigid_motion_transform_file)
 
-        lims_db = db_connection_creator(
-            fallback_credentials=LIMS_DB_CREDENTIAL_MAP
-        )
+        lims_db = db_connection_creator(fallback_credentials=LIMS_DB_CREDENTIAL_MAP)
 
         behavior_session_id = BehaviorSessionId.from_lims(
             db=lims_db,
@@ -165,17 +155,11 @@ class BehaviorOphysExperiment(BehaviorSession):
             is_multiplane=is_multiplane_session,
         )
 
-        sync_file = SyncFile.from_lims(
-            db=lims_db, behavior_session_id=behavior_session_id.value
-        )
+        sync_file = SyncFile.from_lims(db=lims_db, behavior_session_id=behavior_session_id.value)
 
-        monitor_delay = calculate_monitor_delay(
-            sync_file=sync_file, equipment=meta.behavior_metadata.equipment
-        )
+        monitor_delay = calculate_monitor_delay(sync_file=sync_file, equipment=meta.behavior_metadata.equipment)
 
-        date_of_acquisition = DateOfAcquisitionOphys.from_lims(
-            ophys_experiment_id=ophys_experiment_id, lims_db=lims_db
-        )
+        date_of_acquisition = DateOfAcquisitionOphys.from_lims(ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
         behavior_session = BehaviorSession.from_lims(
             lims_db=lims_db,
             behavior_session_id=behavior_session_id.value,
@@ -192,13 +176,9 @@ class BehaviorOphysExperiment(BehaviorSession):
                 plane_group=meta.ophys_metadata.imaging_plane_group,
             )
         else:
-            ophys_timestamps = OphysTimestamps.from_sync_file(
-                sync_file=sync_file
-            )
+            ophys_timestamps = OphysTimestamps.from_sync_file(sync_file=sync_file)
 
-        projections = Projections.from_lims(
-            ophys_experiment_id=ophys_experiment_id, lims_db=lims_db
-        )
+        projections = Projections.from_lims(ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
         cell_specimens = CellSpecimens.from_lims(
             ophys_experiment_id=ophys_experiment_id,
             lims_db=lims_db,
@@ -257,12 +237,8 @@ class BehaviorOphysExperiment(BehaviorSession):
         """
 
         def _is_multi_plane_session():
-            imaging_plane_group_meta = ImagingPlaneGroup.from_nwb(
-                nwbfile=nwbfile
-            )
-            return cls._is_multi_plane_session(
-                imaging_plane_group_meta=imaging_plane_group_meta
-            )
+            imaging_plane_group_meta = ImagingPlaneGroup.from_nwb(nwbfile=nwbfile)
+            return cls._is_multi_plane_session(imaging_plane_group_meta=imaging_plane_group_meta)
 
         behavior_session = BehaviorSession.from_nwb(nwbfile=nwbfile)
         projections = Projections.from_nwb(nwbfile=nwbfile)
@@ -277,13 +253,9 @@ class BehaviorOphysExperiment(BehaviorSession):
         )
         motion_correction = MotionCorrection.from_nwb(nwbfile=nwbfile)
         is_multiplane_session = _is_multi_plane_session()
-        metadata = BehaviorOphysMetadata.from_nwb(
-            nwbfile=nwbfile, is_multiplane=is_multiplane_session
-        )
+        metadata = BehaviorOphysMetadata.from_nwb(nwbfile=nwbfile, is_multiplane=is_multiplane_session)
         if is_multiplane_session:
-            ophys_timestamps = OphysTimestampsMultiplane.from_nwb(
-                nwbfile=nwbfile
-            )
+            ophys_timestamps = OphysTimestampsMultiplane.from_nwb(nwbfile=nwbfile)
         else:
             ophys_timestamps = OphysTimestamps.from_nwb(nwbfile=nwbfile)
         date_of_acquisition = DateOfAcquisitionOphys.from_nwb(nwbfile=nwbfile)
@@ -327,30 +299,18 @@ class BehaviorOphysExperiment(BehaviorSession):
         """
 
         def _is_multi_plane_session():
-            imaging_plane_group_meta = ImagingPlaneGroup.from_json(
-                dict_repr=session_data
-            )
-            return cls._is_multi_plane_session(
-                imaging_plane_group_meta=imaging_plane_group_meta
-            )
+            imaging_plane_group_meta = ImagingPlaneGroup.from_json(dict_repr=session_data)
+            return cls._is_multi_plane_session(imaging_plane_group_meta=imaging_plane_group_meta)
 
         def _get_motion_correction():
-            rigid_motion_transform_file = RigidMotionTransformFile.from_json(
-                dict_repr=session_data
-            )
-            return MotionCorrection.from_data_file(
-                rigid_motion_transform_file=rigid_motion_transform_file
-            )
+            rigid_motion_transform_file = RigidMotionTransformFile.from_json(dict_repr=session_data)
+            return MotionCorrection.from_data_file(rigid_motion_transform_file=rigid_motion_transform_file)
 
         sync_file = SyncFile.from_json(dict_repr=session_data)
         is_multiplane_session = _is_multi_plane_session()
-        meta = BehaviorOphysMetadata.from_json(
-            dict_repr=session_data, is_multiplane=is_multiplane_session
-        )
+        meta = BehaviorOphysMetadata.from_json(dict_repr=session_data, is_multiplane=is_multiplane_session)
         if "monitor_delay" not in session_data:
-            monitor_delay = calculate_monitor_delay(
-                sync_file=sync_file, equipment=meta.behavior_metadata.equipment
-            )
+            monitor_delay = calculate_monitor_delay(sync_file=sync_file, equipment=meta.behavior_metadata.equipment)
             session_data["monitor_delay"] = monitor_delay
 
         behavior_session = BehaviorSession.from_json(session_data=session_data)
@@ -362,9 +322,7 @@ class BehaviorOphysExperiment(BehaviorSession):
                 plane_group=meta.ophys_metadata.imaging_plane_group,
             )
         else:
-            ophys_timestamps = OphysTimestamps.from_sync_file(
-                sync_file=sync_file
-            )
+            ophys_timestamps = OphysTimestamps.from_sync_file(sync_file=sync_file)
 
         projections = Projections.from_json(dict_repr=session_data)
         cell_specimens = CellSpecimens.from_json(
@@ -402,12 +360,8 @@ class BehaviorOphysExperiment(BehaviorSession):
             Subset of experiments sharing the same container as the experiment
             being loaded in this object.
         """
-        lims_db = db_connection_creator(
-            fallback_credentials=LIMS_DB_CREDENTIAL_MAP
-        )
-        self._metadata.update_targeted_imaging_depth(
-            ophys_experiment_ids, lims_db=lims_db
-        )
+        lims_db = db_connection_creator(fallback_credentials=LIMS_DB_CREDENTIAL_MAP)
+        self._metadata.update_targeted_imaging_depth(ophys_experiment_ids, lims_db=lims_db)
 
     # ========================= 'get' methods ==========================
 
@@ -427,12 +381,8 @@ class BehaviorOphysExperiment(BehaviorSession):
         if cell_specimen_ids is None:
             cell_specimen_ids = self.get_cell_specimen_ids()
 
-        csid_table = self.cell_specimen_table.reset_index()[
-            ["cell_specimen_id"]
-        ]
-        csid_subtable = csid_table[
-            csid_table["cell_specimen_id"].isin(cell_specimen_ids)
-        ].set_index("cell_specimen_id")
+        csid_table = self.cell_specimen_table.reset_index()[["cell_specimen_id"]]
+        csid_subtable = csid_table[csid_table["cell_specimen_id"].isin(cell_specimen_ids)].set_index("cell_specimen_id")
         dff_table = csid_subtable.join(self.dff_traces, how="left")
         dff_traces = np.vstack(dff_table["dff"].values)
         timestamps = self.ophys_timestamps
@@ -442,22 +392,14 @@ class BehaviorOphysExperiment(BehaviorSession):
 
     @legacy()
     def get_cell_specimen_indices(self, cell_specimen_ids):
-        return [
-            self.cell_specimen_table.index.get_loc(csid)
-            for csid in cell_specimen_ids
-        ]
+        return [self.cell_specimen_table.index.get_loc(csid) for csid in cell_specimen_ids]
 
     @legacy("Consider using cell_specimen_table['cell_specimen_id'] instead.")
     def get_cell_specimen_ids(self):
         cell_specimen_ids = self.cell_specimen_table.index.values
 
-        if np.isnan(cell_specimen_ids.astype(float)).sum() == len(
-            self.cell_specimen_table
-        ):
-            raise ValueError(
-                "cell_specimen_id values not assigned "
-                f"for {self.ophys_experiment_id}"
-            )
+        if np.isnan(cell_specimen_ids.astype(float)).sum() == len(self.cell_specimen_table):
+            raise ValueError(f"cell_specimen_id values not assigned for {self.ophys_experiment_id}")
         return cell_specimen_ids
 
     # ====================== properties ========================
@@ -478,9 +420,7 @@ class BehaviorOphysExperiment(BehaviorSession):
 
     @property
     def metadata(self):
-        behavior_meta = super()._get_metadata(
-            behavior_metadata=self._metadata.behavior_metadata
-        )
+        behavior_meta = super()._get_metadata(behavior_metadata=self._metadata.behavior_metadata)
         ophys_meta = {
             "indicator": self._cell_specimens.meta.imaging_plane.indicator,
             "emission_lambda": self._cell_specimens.meta.emission_lambda,
@@ -744,10 +684,7 @@ class BehaviorOphysExperiment(BehaviorSession):
         imaging_plane_group_meta: ImagingPlaneGroup,
     ) -> bool:
         """Returns whether this experiment is part of a multiplane session"""
-        return (
-            imaging_plane_group_meta is not None
-            and imaging_plane_group_meta.plane_group_count > 1
-        )
+        return imaging_plane_group_meta is not None and imaging_plane_group_meta.plane_group_count > 1
 
     def _get_session_type(self) -> str:
         return self._metadata.behavior_metadata.session_type

@@ -38,38 +38,37 @@ import warnings
 
 
 class RmaApi(Api):
-    '''
+    """
     See: `RESTful Model Access (RMA) <http://help.brain-map.org/display/api/RESTful+Model+Access+%28RMA%29>`_
-    '''
-    MODEL = 'model::'
-    PIPE = 'pipe::'
-    SERVICE = 'service::'
-    CRITERIA = 'rma::criteria'
-    INCLUDE = 'rma::include'
-    OPTIONS = 'rma::options'
-    ORDER = 'order'
-    NUM_ROWS = 'num_rows'
-    ALL = 'all'
-    START_ROW = 'start_row'
-    COUNT = 'count'
-    ONLY = 'only'
-    EXCEPT = 'except'
-    EXCPT = 'excpt'
-    TABULAR = 'tabular'
-    DEBUG = 'debug'
-    PREVIEW = 'preview'
-    TRUE = 'true'
-    FALSE = 'false'
-    IS = '$is'
-    EQ = '$eq'
+    """
+
+    MODEL = "model::"
+    PIPE = "pipe::"
+    SERVICE = "service::"
+    CRITERIA = "rma::criteria"
+    INCLUDE = "rma::include"
+    OPTIONS = "rma::options"
+    ORDER = "order"
+    NUM_ROWS = "num_rows"
+    ALL = "all"
+    START_ROW = "start_row"
+    COUNT = "count"
+    ONLY = "only"
+    EXCEPT = "except"
+    EXCPT = "excpt"
+    TABULAR = "tabular"
+    DEBUG = "debug"
+    PREVIEW = "preview"
+    TRUE = "true"
+    FALSE = "false"
+    IS = "$is"
+    EQ = "$eq"
 
     def __init__(self, base_uri=None):
         super(RmaApi, self).__init__(base_uri)
 
-    def build_query_url(self,
-                        stage_clauses,
-                        fmt='json'):
-        '''Combine one or more RMA query stages into a single RMA query.
+    def build_query_url(self, stage_clauses, fmt="json"):
+        """Combine one or more RMA query stages into a single RMA query.
 
         Parameters
         ----------
@@ -82,23 +81,16 @@ class RmaApi(Api):
         -------
         string
             complete RMA url
-        '''
+        """
         if type(stage_clauses) is not list:
             stage_clauses = [stage_clauses]
 
-        url = ''.join([
-            self.rma_endpoint,
-            '/query.',
-            fmt,
-            '?q=',
-            ','.join(stage_clauses)])
+        url = "".join([self.rma_endpoint, "/query.", fmt, "?q=", ",".join(stage_clauses)])
 
         return url
 
-    def model_stage(self,
-                    model,
-                    **kwargs):
-        '''Construct a model stage of an RMA query string.
+    def model_stage(self, model, **kwargs):
+        """Construct a model stage of an RMA query string.
 
         Parameters
         ----------
@@ -134,63 +126,59 @@ class RmaApi(Api):
         used in much of the RMA documentation.
         Using the &debug=true option with an RMA URL will include debugging information in the
         response, including the normalized query.
-        '''
+        """
         clauses = [RmaApi.MODEL + model]
 
-        filters = kwargs.get('filters', None)
+        filters = kwargs.get("filters", None)
 
         if filters is not None:
             clauses.append(self.filters(filters))
 
-        criteria = kwargs.get('criteria', None)
+        criteria = kwargs.get("criteria", None)
 
         if criteria is not None:
-            clauses.append(',')
+            clauses.append(",")
             clauses.append(RmaApi.CRITERIA)
-            clauses.append(',')
+            clauses.append(",")
             clauses.extend(criteria)
 
-        include = kwargs.get('include', None)
+        include = kwargs.get("include", None)
 
         if include is not None:
-            clauses.append(',')
+            clauses.append(",")
             clauses.append(RmaApi.INCLUDE)
-            clauses.append(',')
+            clauses.append(",")
             clauses.extend(include)
 
         options_clause = self.options_clause(**kwargs)
 
-        if options_clause != '':
-            clauses.append(',')
+        if options_clause != "":
+            clauses.append(",")
             clauses.append(options_clause)
 
-        stage = ''.join(clauses)
+        stage = "".join(clauses)
 
         return stage
 
-    def pipe_stage(self,
-                   pipe_name,
-                   parameters):
-        '''Connect model and service stages via their JSON responses.
+    def pipe_stage(self, pipe_name, parameters):
+        """Connect model and service stages via their JSON responses.
 
         Notes
         -----
         See: `Service Pipelines <http://help.brain-map.org/display/api/Service+Pipelines>`_
         and
         `Connected Services and Pipes <http://help.brain-map.org/display/api/Connected+Services+and+Pipes>`_
-        '''
+        """
         clauses = [RmaApi.PIPE + pipe_name]
 
         clauses.append(self.tuple_filters(parameters))
 
-        stage = ''.join(clauses)
+        stage = "".join(clauses)
 
         return stage
 
-    def service_stage(self,
-                      service_name,
-                      parameters=None):
-        '''Construct an RMA query fragment to send a request to a connected service.
+    def service_stage(self, service_name, parameters=None):
+        """Construct an RMA query fragment to send a request to a connected service.
 
         Parameters
         ----------
@@ -204,18 +192,18 @@ class RmaApi(Api):
         See: `Service Pipelines <http://help.brain-map.org/display/api/Service+Pipelines>`_
         and
         `Connected Services and Pipes <http://help.brain-map.org/display/api/Connected+Services+and+Pipes>`_
-        '''
+        """
         clauses = [RmaApi.SERVICE + service_name]
 
         if parameters is not None:
             clauses.append(self.tuple_filters(parameters))
 
-        stage = ''.join(clauses)
+        stage = "".join(clauses)
 
         return stage
 
     def model_query(self, *args, **kwargs):
-        '''Construct and execute a model stage of an RMA query string.
+        """Construct and execute a model stage of an RMA query string.
 
         Parameters
         ----------
@@ -253,13 +241,11 @@ class RmaApi(Api):
         used in much of the RMA documentation.
         Using the &debug=true option with an RMA URL will include debugging information in the
         response, including the normalized query.
-        '''
-        return self.json_msg_query(
-            self.build_query_url(
-                self.model_stage(*args, **kwargs)))
+        """
+        return self.json_msg_query(self.build_query_url(self.model_stage(*args, **kwargs)))
 
     def service_query(self, *args, **kwargs):
-        '''Construct and Execute a single-stage RMA query
+        """Construct and Execute a single-stage RMA query
         to send a request to a connected service.
 
         Parameters
@@ -274,13 +260,11 @@ class RmaApi(Api):
         See: `Service Pipelines <http://help.brain-map.org/display/api/Service+Pipelines>`_
         and
         `Connected Services and Pipes <http://help.brain-map.org/display/api/Connected+Services+and+Pipes>`_
-        '''
-        return self.json_msg_query(
-            self.build_query_url(
-                self.service_stage(*args, **kwargs)))
+        """
+        return self.json_msg_query(self.build_query_url(self.service_stage(*args, **kwargs)))
 
     def options_clause(self, **kwargs):
-        '''build rma:: options clause.
+        """build rma:: options clause.
 
         Parameters
         ----------
@@ -292,38 +276,31 @@ class RmaApi(Api):
             'true', 'false' or 'preview'
         num_rows : int or string, optional
         start_row : int or string, optional
-        '''
-        clause = ''
+        """
+        clause = ""
         options_params = []
 
         only = kwargs.get(RmaApi.ONLY, None)
 
         if only is not None:
-            options_params.append(
-                self.only_except_tabular_clause(RmaApi.ONLY,
-                                                only))
+            options_params.append(self.only_except_tabular_clause(RmaApi.ONLY, only))
 
         # handle alternate 'except' spelling to avoid reserved word conflict
         excpt = kwargs.get(RmaApi.EXCEPT, None)
         excpt2 = kwargs.get(RmaApi.EXCPT, None)
-        
+
         if excpt is not None and excpt2 is not None:
-            warnings.warn('excpt and except options should not be used together',
-                          Warning)
+            warnings.warn("excpt and except options should not be used together", Warning)
         elif excpt2 is not None:
-            excpt = excpt2 
+            excpt = excpt2
 
         if excpt is not None:
-            options_params.append(
-                self.only_except_tabular_clause(RmaApi.EXCEPT,
-                                                excpt))
+            options_params.append(self.only_except_tabular_clause(RmaApi.EXCEPT, excpt))
 
         tabular = kwargs.get(RmaApi.TABULAR, None)
 
         if tabular is not None:
-            options_params.append(
-                self.only_except_tabular_clause(RmaApi.TABULAR,
-                                                tabular))
+            options_params.append(self.only_except_tabular_clause(RmaApi.TABULAR, tabular))
 
         num_rows = kwargs.get(RmaApi.NUM_ROWS, None)
 
@@ -331,14 +308,12 @@ class RmaApi(Api):
             if num_rows == RmaApi.ALL:
                 options_params.append("[%s$eq'all']" % (RmaApi.NUM_ROWS))
             else:
-                options_params.append('[%s$eq%d]' % (RmaApi.NUM_ROWS,
-                                                     num_rows))
+                options_params.append("[%s$eq%d]" % (RmaApi.NUM_ROWS, num_rows))
 
         start_row = kwargs.get(RmaApi.START_ROW, None)
 
         if start_row is not None:
-            options_params.append('[%s$eq%d]' % (RmaApi.START_ROW,
-                                                 start_row))
+            options_params.append("[%s$eq%d]" % (RmaApi.START_ROW, start_row))
 
         order = kwargs.get(RmaApi.ORDER, None)
 
@@ -353,22 +328,20 @@ class RmaApi(Api):
         cnt = kwargs.get(RmaApi.COUNT, None)
 
         if cnt is not None:
-            if cnt is True or cnt == 'true':
-                options_params.append('[%s$eq%s]' % (RmaApi.COUNT,
-                                                     RmaApi.TRUE))
-            elif cnt is False or cnt == 'false':
-                options_params.append('[%s$eq%s]' % (RmaApi.COUNT,
-                                                     RmaApi.FALSE))
+            if cnt is True or cnt == "true":
+                options_params.append("[%s$eq%s]" % (RmaApi.COUNT, RmaApi.TRUE))
+            elif cnt is False or cnt == "false":
+                options_params.append("[%s$eq%s]" % (RmaApi.COUNT, RmaApi.FALSE))
             else:
                 pass
 
         if len(options_params) > 0:
-            clause = RmaApi.OPTIONS + ''.join(options_params)
+            clause = RmaApi.OPTIONS + "".join(options_params)
 
         return clause
 
     def only_except_tabular_clause(self, filter_type, attribute_list):
-        '''Construct a clause to filter which attributes are returned
+        """Construct a clause to filter which attributes are returned
         for use in an rma::options clause.
 
         Parameters
@@ -394,17 +367,16 @@ class RmaApi(Api):
         The tabular option does not mask the inner-join behavior of an rma::include
         clause.
         The tabular filter is required for .csv format RMA requests.
-        '''
-        clause = ''
+        """
+        clause = ""
 
         if attribute_list is not None:
-            clause = '[%s$eq%s]' % (filter_type,
-                                    ','.join(attribute_list))
+            clause = "[%s$eq%s]" % (filter_type, ",".join(attribute_list))
 
         return clause
 
     def order_clause(self, order_list=None):
-        '''Construct a debug clause for use in an rma::options clause.
+        """Construct a debug clause for use in an rma::options clause.
 
         Parameters
         ----------
@@ -420,16 +392,16 @@ class RmaApi(Api):
         -----
         Optionally adding '+asc' (default) or '+desc' after an attribute
         will change the sort order.
-        '''
-        clause = ''
+        """
+        clause = ""
 
         if order_list is not None:
-            clause = '[order$eq%s]' % (','.join(order_list))
+            clause = "[order$eq%s]" % (",".join(order_list))
 
         return clause
 
     def debug_clause(self, debug_value=None):
-        '''Construct a debug clause for use in an rma::options clause.
+        """Construct a debug clause for use in an rma::options clause.
         Parameters
         ----------
         debug_value : string or boolean
@@ -447,23 +419,23 @@ class RmaApi(Api):
         None will return an empty clause.
         'preview' will request debugging information without the query being run.
 
-        '''
-        clause = ''
+        """
+        clause = ""
 
         if debug_value is None:
-            clause = ''
-        if debug_value is True or debug_value == 'true':
-            clause = '[debug$eqtrue]'
-        elif debug_value is False or debug_value == 'false':
-            clause = '[debug$eqfalse]'
-        elif debug_value == 'preview':
+            clause = ""
+        if debug_value is True or debug_value == "true":
+            clause = "[debug$eqtrue]"
+        elif debug_value is False or debug_value == "false":
+            clause = "[debug$eqfalse]"
+        elif debug_value == "preview":
             clause = "[debug$eq'preview']"
 
         return clause
 
     # TODO: deprecate for something that can preserve order
     def filters(self, filters):
-        '''serialize RMA query filter clauses.
+        """serialize RMA query filter clauses.
 
         Parameters
         ----------
@@ -474,23 +446,23 @@ class RmaApi(Api):
         -------
         string
             filter clause for an RMA query string.
-        '''
+        """
         filters_builder = []
 
-        for (key, value) in filters.items():
+        for key, value in filters.items():
             filters_builder.append(self.filter(key, value))
 
-        return ''.join(filters_builder)
+        return "".join(filters_builder)
 
     # TODO: this needs to be more rigorous.
     def tuple_filters(self, filters):
-        '''Construct an RMA filter clause.
+        """Construct an RMA filter clause.
 
         Notes
         -----
 
         See `RMA Path Syntax - Square Brackets for Filters <http://help.brain-map.org/display/api/RMA+Path+Syntax#RMAPathSyntax-SquareBracketsforFilters>`_ for additional documentation.
-        '''
+        """
         filters_builder = []
 
         for filt in sorted(filters):
@@ -505,7 +477,7 @@ class RmaApi(Api):
                             val_array.append(v)
                         else:
                             val_array.append(str(v))
-                    val = ','.join(val_array)
+                    val = ",".join(val_array)
                     filters_builder.append("[%s$eq%s]" % (filt[0], val))
                 elif type(val) is int:
                     filters_builder.append("[%s$eq%d]" % (filt[0], val))
@@ -517,14 +489,12 @@ class RmaApi(Api):
                 elif type(val) is str:
                     filters_builder.append("[%s$eq%s]" % (filt[0], filt[1]))
             elif len(filt) == 3:
-                filters_builder.append("[%s%s%s]" % (filt[0],
-                                                     filt[1],
-                                                     str(filt[2])))
+                filters_builder.append("[%s%s%s]" % (filt[0], filt[1], str(filt[2])))
 
-        return ''.join(filters_builder)
+        return "".join(filters_builder)
 
     def quote_string(self, the_string):
-        '''Wrap a clause in single quotes.
+        """Wrap a clause in single quotes.
 
         Parameters
         ----------
@@ -535,11 +505,11 @@ class RmaApi(Api):
         -------
         string
             input wrapped in single quotes
-        '''
-        return ''.join(["'", the_string, "'"])
+        """
+        return "".join(["'", the_string, "'"])
 
     def filter(self, key, value):
-        '''serialize a single RMA query filter clause.
+        """serialize a single RMA query filter clause.
 
         Parameters
         ----------
@@ -552,15 +522,11 @@ class RmaApi(Api):
         -------
         string
             a single filter clause for an RMA query string.
-        '''
-        return "".join(['[',
-                        key,
-                        RmaApi.EQ,
-                        str(value),
-                        ']'])
+        """
+        return "".join(["[", key, RmaApi.EQ, str(value), "]"])
 
-    def build_schema_query(self, clazz=None, fmt='json'):
-        '''Build the URL that will fetch the data schema.
+    def build_schema_query(self, clazz=None, fmt="json"):
+        """Build the URL that will fetch the data schema.
 
         Parameters
         ----------
@@ -578,23 +544,18 @@ class RmaApi(Api):
         -----
         If a class is specified, only the schema information for that class
         will be requested, otherwise the url requests the entire schema.
-        '''
+        """
         if clazz is not None:
-            class_clause = '/' + clazz
+            class_clause = "/" + clazz
         else:
-            class_clause = ''
+            class_clause = ""
 
-        url = ''.join([self.rma_endpoint,
-                       class_clause,
-                       '.',
-                       fmt])
+        url = "".join([self.rma_endpoint, class_clause, ".", fmt])
 
         return url
 
     def get_schema(self, clazz=None):
-        '''Retrieve schema information.'''
-        schema_data = self.do_query(self.build_schema_query,
-                                    self.read_data,
-                                    clazz)
+        """Retrieve schema information."""
+        schema_data = self.do_query(self.build_schema_query, self.read_data, clazz)
 
         return schema_data

@@ -5,25 +5,19 @@ import pandas as pd
 import pynwb
 
 from allensdk.brain_observatory import dict_to_indexed_array
-from allensdk.brain_observatory.ecephys.nwb import EcephysProbe, \
-    EcephysElectrodeGroup
+from allensdk.brain_observatory.ecephys.nwb import EcephysProbe, EcephysElectrodeGroup
 
 ELECTRODE_TABLE_DEFAULT_COLUMNS = [
-    ("probe_vertical_position",
-     "Length-wise position of electrode/channel on device (microns)"),
-    ("probe_horizontal_position",
-     "Width-wise position of electrode/channel on device (microns)"),
+    ("probe_vertical_position", "Length-wise position of electrode/channel on device (microns)"),
+    ("probe_horizontal_position", "Width-wise position of electrode/channel on device (microns)"),
     ("probe_id", "The unique id of this electrode's/channel's device"),
-    ("probe_channel_number",
-     "The local index of electrode/channel on device"),
-    ("valid_data", "Whether data from this electrode/channel is usable")
+    ("probe_channel_number", "The local index of electrode/channel on device"),
+    ("valid_data", "Whether data from this electrode/channel is usable"),
 ]
 
 
-def add_ragged_data_to_dynamic_table(
-        table, data, column_name, column_description=""
-):
-    """ Builds the index and data vectors required for writing ragged array
+def add_ragged_data_to_dynamic_table(table, data, column_name, column_description=""):
+    """Builds the index and data vectors required for writing ragged array
     data to a pynwb dynamic table
 
     Parameters
@@ -46,18 +40,13 @@ def add_ragged_data_to_dynamic_table(
     idx, values = dict_to_indexed_array(data, table.id.data)
     del data
 
-    table.add_column(
-        name=column_name,
-        description=column_description,
-        data=values,
-        index=idx
-    )
+    table.add_column(name=column_name, description=column_description, data=values, index=idx)
 
 
-def add_probe_to_nwbfile(nwbfile, probe_id, sampling_rate, lfp_sampling_rate,
-                         has_lfp_data, name,
-                         location="See electrode locations"):
-    """ Creates objects required for representation of a single
+def add_probe_to_nwbfile(
+    nwbfile, probe_id, sampling_rate, lfp_sampling_rate, has_lfp_data, name, location="See electrode locations"
+):
+    """Creates objects required for representation of a single
     extracellular ephys probe within an NWB file.
 
     Parameters
@@ -92,11 +81,13 @@ def add_probe_to_nwbfile(nwbfile, probe_id, sampling_rate, lfp_sampling_rate,
             electrode group object corresponding to this probe
 
     """
-    probe_nwb_device = EcephysProbe(name=name,
-                                    description="Neuropixels 1.0 Probe",
-                                    manufacturer="imec",
-                                    probe_id=probe_id,
-                                    sampling_rate=sampling_rate)
+    probe_nwb_device = EcephysProbe(
+        name=name,
+        description="Neuropixels 1.0 Probe",
+        manufacturer="imec",
+        probe_id=probe_id,
+        sampling_rate=sampling_rate,
+    )
 
     probe_nwb_electrode_group = EcephysElectrodeGroup(
         name=name,
@@ -105,7 +96,7 @@ def add_probe_to_nwbfile(nwbfile, probe_id, sampling_rate, lfp_sampling_rate,
         location=location,
         device=probe_nwb_device,
         lfp_sampling_rate=lfp_sampling_rate,
-        has_lfp_data=has_lfp_data
+        has_lfp_data=has_lfp_data,
     )
 
     nwbfile.add_device(probe_nwb_device)
@@ -115,10 +106,11 @@ def add_probe_to_nwbfile(nwbfile, probe_id, sampling_rate, lfp_sampling_rate,
 
 
 def add_ecephys_electrodes(
-       nwbfile: pynwb.NWBFile,
-       channels: List[dict],
-       electrode_group: EcephysElectrodeGroup,
-       channel_number_whitelist: Optional[np.ndarray] = None):
+    nwbfile: pynwb.NWBFile,
+    channels: List[dict],
+    electrode_group: EcephysElectrodeGroup,
+    channel_number_whitelist: Optional[np.ndarray] = None,
+):
     """Add electrode information to an ecephys nwbfile electrode table.
 
     Parameters
@@ -182,13 +174,11 @@ def add_ecephys_electrodes(
             group=electrode_group,
             location=row["structure_acronym"],
             imp=row.get("impedence", row.get("impedance")),
-            filtering=row["filtering"]
+            filtering=row["filtering"],
         )
 
 
-def _add_ecephys_electrode_columns(nwbfile: pynwb.NWBFile,
-                                   columns_to_add:
-                                   Optional[List[Tuple[str, str]]] = None):
+def _add_ecephys_electrode_columns(nwbfile: pynwb.NWBFile, columns_to_add: Optional[List[Tuple[str, str]]] = None):
     """Add additional columns to ecephys nwbfile electrode table.
 
     Parameters
@@ -204,7 +194,5 @@ def _add_ecephys_electrode_columns(nwbfile: pynwb.NWBFile,
         columns_to_add = ELECTRODE_TABLE_DEFAULT_COLUMNS
 
     for col_name, col_description in columns_to_add:
-        if (not nwbfile.electrodes) or \
-                (col_name not in nwbfile.electrodes.colnames):
-            nwbfile.add_electrode_column(name=col_name,
-                                         description=col_description)
+        if (not nwbfile.electrodes) or (col_name not in nwbfile.electrodes.colnames):
+            nwbfile.add_electrode_column(name=col_name, description=col_description)

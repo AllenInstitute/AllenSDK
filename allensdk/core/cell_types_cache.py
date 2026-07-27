@@ -39,9 +39,9 @@ from allensdk.config.manifest_builder import ManifestBuilder
 from allensdk.api.warehouse_cache.cache import Cache, get_default_manifest_file
 from allensdk.api.queries.cell_types_api import CellTypesApi
 
-from . import json_utilities as json_utilities
+from . import json_utilities as json_utilities  # noqa: F401
 from .nwb_data_set import NwbDataSet
-from . import  swc
+from . import swc
 
 import logging
 import warnings
@@ -75,30 +75,31 @@ class CellTypesCache(Cache):
     """
 
     # manifest keys
-    CELLS_KEY = 'CELLS'
-    EPHYS_FEATURES_KEY = 'EPHYS_FEATURES'
-    MORPHOLOGY_FEATURES_KEY = 'MORPHOLOGY_FEATURES'
-    EPHYS_DATA_KEY = 'EPHYS_DATA'
-    EPHYS_SWEEPS_KEY = 'EPHYS_SWEEPS'
-    RECONSTRUCTION_KEY = 'RECONSTRUCTION'
-    MARKER_KEY = 'MARKER'
+    CELLS_KEY = "CELLS"
+    EPHYS_FEATURES_KEY = "EPHYS_FEATURES"
+    MORPHOLOGY_FEATURES_KEY = "MORPHOLOGY_FEATURES"
+    EPHYS_DATA_KEY = "EPHYS_DATA"
+    EPHYS_SWEEPS_KEY = "EPHYS_SWEEPS"
+    RECONSTRUCTION_KEY = "RECONSTRUCTION"
+    MARKER_KEY = "MARKER"
     MANIFEST_VERSION = "1.1"
 
     def __init__(self, cache=True, manifest_file=None, base_uri=None):
-
         if manifest_file is None:
-            manifest_file = get_default_manifest_file('cell_types')
+            manifest_file = get_default_manifest_file("cell_types")
 
-        super(CellTypesCache, self).__init__(
-            manifest=manifest_file, cache=cache, version=self.MANIFEST_VERSION)
+        super(CellTypesCache, self).__init__(manifest=manifest_file, cache=cache, version=self.MANIFEST_VERSION)
         self.api = CellTypesApi(base_uri=base_uri)
 
-    def get_cells(self, file_name=None,
-                  require_morphology=False,
-                  require_reconstruction=False,
-                  reporter_status=None,
-                  species=None,
-                  simple=True):
+    def get_cells(
+        self,
+        file_name=None,
+        require_morphology=False,
+        require_reconstruction=False,
+        reporter_status=None,
+        species=None,
+        simple=True,
+    ):
         """
         Download metadata for all cells in the database and optionally return a
         subset filtered by whether or not they have a morphology or reconstruction.
@@ -127,26 +128,17 @@ class CellTypesCache(Cache):
 
         file_name = self.get_cache_path(file_name, self.CELLS_KEY)
 
-        cells = self.api.list_cells_api(path=file_name,
-                                        strategy='lazy',
-                                        **Cache.cache_json())
+        cells = self.api.list_cells_api(path=file_name, strategy="lazy", **Cache.cache_json())
 
         if isinstance(reporter_status, str):
             reporter_status = [reporter_status]
 
         # filter the cells on the way out
-        cells = self.api.filter_cells_api(cells,
-                                          require_morphology,
-                                          require_reconstruction,
-                                          reporter_status,
-                                          species,
-                                          simple)
-
+        cells = self.api.filter_cells_api(
+            cells, require_morphology, require_reconstruction, reporter_status, species, simple
+        )
 
         return cells
-
-
-
 
     def get_ephys_sweeps(self, specimen_id, file_name=None):
         """
@@ -159,13 +151,9 @@ class CellTypesCache(Cache):
              ID of a cell.
         """
 
-        file_name = self.get_cache_path(
-            file_name, self.EPHYS_SWEEPS_KEY, specimen_id)
+        file_name = self.get_cache_path(file_name, self.EPHYS_SWEEPS_KEY, specimen_id)
 
-        sweeps = self.api.get_ephys_sweeps(specimen_id,
-                                           strategy='lazy',
-                                           path=file_name,
-                                           **Cache.cache_json())
+        sweeps = self.api.get_ephys_sweeps(specimen_id, strategy="lazy", path=file_name, **Cache.cache_json())
 
         return sweeps
 
@@ -194,15 +182,13 @@ class CellTypesCache(Cache):
                 args = Cache.cache_csv_dataframe()
             else:
                 args = Cache.cache_csv_json()
-            args['strategy'] = 'lazy'
+            args["strategy"] = "lazy"
         else:
             args = Cache.nocache_json()
 
-        features_df = self.api.get_ephys_features(path=file_name,
-                                                  **args)
+        features_df = self.api.get_ephys_features(path=file_name, **args)
 
         return features_df
-
 
     def get_morphology_features(self, dataframe=False, file_name=None):
         """
@@ -222,8 +208,7 @@ class CellTypesCache(Cache):
             a list of dictionaries.
         """
 
-        file_name = self.get_cache_path(
-            file_name, self.MORPHOLOGY_FEATURES_KEY)
+        file_name = self.get_cache_path(file_name, self.MORPHOLOGY_FEATURES_KEY)
 
         if self.cache:
             if dataframe:
@@ -234,11 +219,10 @@ class CellTypesCache(Cache):
         else:
             args = Cache.nocache_json()
 
-        args['strategy'] = 'lazy'
-        args['path'] = file_name
+        args["strategy"] = "lazy"
+        args["path"] = file_name
 
         return self.api.get_morphology_features(**args)
-
 
     def get_all_features(self, dataframe=False, require_reconstruction=True):
         """
@@ -260,17 +244,15 @@ class CellTypesCache(Cache):
         ephys_features = pd.DataFrame(self.get_ephys_features())
         morphology_features = pd.DataFrame(self.get_morphology_features())
 
-        how = 'inner' if require_reconstruction else 'outer'
+        how = "inner" if require_reconstruction else "outer"
 
-        all_features = ephys_features.merge(morphology_features,
-                                            how=how,
-                                            on='specimen_id')
+        all_features = ephys_features.merge(morphology_features, how=how, on="specimen_id")
 
         if dataframe:
             warnings.warn("dataframe argument is deprecated.")
             return all_features
         else:
-            return all_features.to_dict('records')
+            return all_features.to_dict("records")
 
     def get_ephys_data(self, specimen_id, file_name=None):
         """
@@ -295,10 +277,9 @@ class CellTypesCache(Cache):
             and response traces out of an NWB file.
         """
 
-        file_name = self.get_cache_path(
-            file_name, self.EPHYS_DATA_KEY, specimen_id)
+        file_name = self.get_cache_path(file_name, self.EPHYS_DATA_KEY, specimen_id)
 
-        self.api.save_ephys_data(specimen_id, file_name, strategy='lazy')
+        self.api.save_ephys_data(specimen_id, file_name, strategy="lazy")
 
         return NwbDataSet(file_name)
 
@@ -324,12 +305,10 @@ class CellTypesCache(Cache):
              A class instance with methods for accessing morphology compartments.
         """
 
-        file_name = self.get_cache_path(
-            file_name, self.RECONSTRUCTION_KEY, specimen_id)
+        file_name = self.get_cache_path(file_name, self.RECONSTRUCTION_KEY, specimen_id)
 
         if file_name is None:
-            raise Exception(
-                "Please enable caching (CellTypes.cache = True) or specify a save_file_name.")
+            raise Exception("Please enable caching (CellTypes.cache = True) or specify a save_file_name.")
 
         if not os.path.exists(file_name):
             self.api.save_reconstruction(specimen_id, file_name)
@@ -358,12 +337,10 @@ class CellTypesCache(Cache):
              A class instance with methods for accessing morphology compartments.
         """
 
-        file_name = self.get_cache_path(
-            file_name, self.MARKER_KEY, specimen_id)
+        file_name = self.get_cache_path(file_name, self.MARKER_KEY, specimen_id)
 
         if file_name is None:
-            raise Exception(
-                "Please enable caching (CellTypes.cache = True) or specify a save_file_name.")
+            raise Exception("Please enable caching (CellTypes.cache = True) or specify a save_file_name.")
 
         if not os.path.exists(file_name):
             try:
@@ -388,21 +365,14 @@ class CellTypesCache(Cache):
 
         mb = ManifestBuilder()
         mb.set_version(self.MANIFEST_VERSION)
-        mb.add_path('BASEDIR', '.')
-        mb.add_path(self.CELLS_KEY, 'cells.json',
-                    typename='file', parent_key='BASEDIR')
-        mb.add_path(self.EPHYS_DATA_KEY, 'specimen_%d/ephys.nwb',
-                    typename='file', parent_key='BASEDIR')
-        mb.add_path(self.EPHYS_FEATURES_KEY, 'ephys_features.csv',
-                    typename='file', parent_key='BASEDIR')
-        mb.add_path(self.MORPHOLOGY_FEATURES_KEY, 'morphology_features.csv',
-                    typename='file', parent_key='BASEDIR')
-        mb.add_path(self.RECONSTRUCTION_KEY, 'specimen_%d/reconstruction.swc',
-                    typename='file', parent_key='BASEDIR')
-        mb.add_path(self.MARKER_KEY, 'specimen_%d/reconstruction.marker',
-                    typename='file', parent_key='BASEDIR')
-        mb.add_path(self.EPHYS_SWEEPS_KEY, 'specimen_%d/ephys_sweeps.json',
-                    typename='file', parent_key='BASEDIR')
+        mb.add_path("BASEDIR", ".")
+        mb.add_path(self.CELLS_KEY, "cells.json", typename="file", parent_key="BASEDIR")
+        mb.add_path(self.EPHYS_DATA_KEY, "specimen_%d/ephys.nwb", typename="file", parent_key="BASEDIR")
+        mb.add_path(self.EPHYS_FEATURES_KEY, "ephys_features.csv", typename="file", parent_key="BASEDIR")
+        mb.add_path(self.MORPHOLOGY_FEATURES_KEY, "morphology_features.csv", typename="file", parent_key="BASEDIR")
+        mb.add_path(self.RECONSTRUCTION_KEY, "specimen_%d/reconstruction.swc", typename="file", parent_key="BASEDIR")
+        mb.add_path(self.MARKER_KEY, "specimen_%d/reconstruction.marker", typename="file", parent_key="BASEDIR")
+        mb.add_path(self.EPHYS_SWEEPS_KEY, "specimen_%d/ephys_sweeps.json", typename="file", parent_key="BASEDIR")
 
         mb.write_json_file(file_name)
 
@@ -412,7 +382,7 @@ class ReporterStatus:
     Valid strings for filtering by cell reporter status.
     """
 
-    POSITIVE = 'positive'
-    NEGATIVE = 'negative'
+    POSITIVE = "positive"
+    NEGATIVE = "negative"
     NA = None
     INDETERMINATE = None

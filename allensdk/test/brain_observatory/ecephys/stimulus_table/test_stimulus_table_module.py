@@ -53,9 +53,7 @@ def stim_file(*a, **k):
                 },
                 {
                     "stim_path": "C:\\ecephys_stimulus_scripts\\static_gratings.stim",
-                    "display_sequence": np.array(
-                        [[45, 46], [100, 110]], dtype=np.int32
-                    ),
+                    "display_sequence": np.array([[45, 46], [100, 110]], dtype=np.int32),
                     "dimnames": ["Ori", "Phase"],
                     "sweep_frames": [(0, 8), (9, 17), (18, 26), (27, 35)],
                     "sweep_order": [0, 2, 3, 1],
@@ -283,7 +281,6 @@ def expected_table():
     new=sync_file(),
 )
 def test_build_stimulus_table(tmpdir_factory, expected_table):
-
     tmpdir = str(tmpdir_factory.mktemp("ecephys_stimulus_table_integration"))
     table_path = os.path.join(tmpdir, "stimulus_table.csv")
     frame_times_path = os.path.join(tmpdir, "frame_times.npy")
@@ -306,7 +303,7 @@ def test_build_stimulus_table(tmpdir_factory, expected_table):
         column_name_map={},
         output_stimulus_table_path=table_path,
         output_frame_times_path=frame_times_path,
-        fail_on_negative_duration=True
+        fail_on_negative_duration=True,
     )
 
     obtained_table = pd.read_csv(table_path)

@@ -7,13 +7,9 @@ from allensdk.brain_observatory.behavior.data_files.neuropil_file import (
     NeuropilFile,
 )
 from allensdk.core import DataObject
-from allensdk.core import \
-    DataFileReadableInterface, NwbReadableInterface
-from allensdk.core import \
-    NwbWritableInterface
-from allensdk.brain_observatory.behavior.data_objects.cell_specimens\
-    .rois_mixin import \
-    RoisMixin
+from allensdk.core import DataFileReadableInterface, NwbReadableInterface
+from allensdk.core import NwbWritableInterface
+from allensdk.brain_observatory.behavior.data_objects.cell_specimens.rois_mixin import RoisMixin
 
 
 class NeuropilTraces(
@@ -45,9 +41,7 @@ class NeuropilTraces(
         # TODO Remove try/except once VBO released.
         try:
             neuropil_traces_nwb = (
-                nwbfile.processing["ophys"]
-                .data_interfaces["neuropil_trace"]
-                .roi_response_series["traces"]
+                nwbfile.processing["ophys"].data_interfaces["neuropil_trace"].roi_response_series["traces"]
             )
             # f traces stored as timepoints x rois in NWB
             # We want rois x timepoints, hence the transpose
@@ -76,17 +70,8 @@ class NeuropilTraces(
         # Create/Add neuropil_traces modules and interfaces:
         ophys_module = nwbfile.processing["ophys"]
 
-        roi_table_region = (
-            nwbfile.processing["ophys"]
-            .data_interfaces["dff"]
-            .roi_response_series["traces"]
-            .rois
-        )  # noqa: E501
-        ophys_timestamps = (
-            ophys_module.get_data_interface("dff")
-            .roi_response_series["traces"]
-            .timestamps
-        )
+        roi_table_region = nwbfile.processing["ophys"].data_interfaces["dff"].roi_response_series["traces"].rois  # noqa: E501
+        ophys_timestamps = ophys_module.get_data_interface("dff").roi_response_series["traces"].timestamps
         f_interface = Fluorescence(name="neuropil_trace")
         ophys_module.add_data_interface(f_interface)
 

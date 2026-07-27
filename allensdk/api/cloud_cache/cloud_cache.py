@@ -54,12 +54,7 @@ class BasicLocalCache(ABC):
         functionality (used to populate helpful error messages)
     """
 
-    def __init__(
-        self,
-        cache_dir: Union[str, Path],
-        project_name: str,
-        ui_class_name: Optional[str] = None
-    ):
+    def __init__(self, cache_dir: Union[str, Path], project_name: str, ui_class_name: Optional[str] = None):
         os.makedirs(cache_dir, exist_ok=True)
 
         # the class users are actually interacting with
@@ -96,12 +91,11 @@ class BasicLocalCache(ABC):
     @property
     def manifest_prefix(self) -> str:
         """On-line prefix for manifest files"""
-        return f'{self.project_name}/manifests/'
+        return f"{self.project_name}/manifests/"
 
     @property
     def file_id_column(self) -> str:
-        """The col name in metadata files used to uniquely identify data files
-        """
+        """The col name in metadata files used to uniquely identify data files"""
         return self._manifest.file_id_column
 
     @property
@@ -116,8 +110,7 @@ class BasicLocalCache(ABC):
 
     @property
     def manifest_file_names(self) -> list:
-        """Sorted list of manifest file names associated with this dataset
-        """
+        """Sorted list of manifest file names associated with this dataset"""
         return self._manifest_file_names
 
     @property
@@ -160,8 +153,7 @@ class BasicLocalCache(ABC):
         Return a list of all of the manifest files that have been
         downloaded for this dataset
         """
-        output = [x for x in os.listdir(self._cache_dir)
-                  if re.fullmatch(".*_manifest_v.*.json", x)]
+        output = [x for x in os.listdir(self._cache_dir) if re.fullmatch(".*_manifest_v.*.json", x)]
         output.sort()
         return output
 
@@ -173,17 +165,12 @@ class BasicLocalCache(ABC):
 
         and return the one with the latest version
         """
-        vstrs = [s.split(".json")[0].split("_v")[-1]
-                 for s in file_name_list]
+        vstrs = [s.split(".json")[0].split("_v")[-1] for s in file_name_list]
         versions = [semver.VersionInfo.parse(v) for v in vstrs]
         imax = versions.index(max(versions))
         return file_name_list[imax]
 
-    def _load_manifest(
-        self,
-        manifest_name: str,
-        use_static_project_dir: bool = False
-    ) -> Manifest:
+    def _load_manifest(self, manifest_name: str, use_static_project_dir: bool = False) -> Manifest:
         """
         Load and return a manifest from this dataset.
 
@@ -217,17 +204,13 @@ class BasicLocalCache(ABC):
             )
 
         if use_static_project_dir:
-            manifest_path = os.path.join(
-                self._cache_dir, self.project_name, "manifests", manifest_name
-            )
+            manifest_path = os.path.join(self._cache_dir, self.project_name, "manifests", manifest_name)
         else:
             manifest_path = os.path.join(self._cache_dir, manifest_name)
 
         with open(manifest_path, "r") as f:
             local_manifest = Manifest(
-                cache_dir=self._cache_dir,
-                json_input=f,
-                use_static_project_dir=use_static_project_dir
+                cache_dir=self._cache_dir, json_input=f, use_static_project_dir=use_static_project_dir
             )
 
         return local_manifest
@@ -270,9 +253,7 @@ class BasicLocalCache(ABC):
 
         if file_attributes.local_path.exists():
             if not file_attributes.local_path.is_file():
-                raise RuntimeError(f"{file_attributes.local_path}\n"
-                                   "exists, but is not a file;\n"
-                                   "unsure how to proceed")
+                raise RuntimeError(f"{file_attributes.local_path}\nexists, but is not a file;\nunsure how to proceed")
 
             file_exists = True
 
@@ -308,9 +289,7 @@ class BasicLocalCache(ABC):
         file_attributes = self._manifest.metadata_file_attributes(fname)
         exists = self._file_exists(file_attributes)
         local_path = file_attributes.local_path
-        output = {'local_path': local_path,
-                  'exists': exists,
-                  'file_attributes': file_attributes}
+        output = {"local_path": local_path, "exists": exists, "file_attributes": file_attributes}
 
         return output
 
@@ -344,9 +323,7 @@ class BasicLocalCache(ABC):
         file_attributes = self.get_file_attributes(file_id)
         exists = self._file_exists(file_attributes)
         local_path = file_attributes.local_path
-        output = {'local_path': local_path,
-                  'exists': exists,
-                  'file_attributes': file_attributes}
+        output = {"local_path": local_path, "exists": exists, "file_attributes": file_attributes}
 
         return output
 
@@ -388,8 +365,7 @@ class CloudCacheBase(BasicLocalCache):
     _bucket_name = None
 
     def __init__(self, cache_dir, project_name, ui_class_name=None):
-        super().__init__(cache_dir=cache_dir, project_name=project_name,
-                         ui_class_name=ui_class_name)
+        super().__init__(cache_dir=cache_dir, project_name=project_name, ui_class_name=ui_class_name)
 
         # what latest_manifest was the last time an OutdatedManifestWarning
         # was emitted
@@ -399,43 +375,43 @@ class CloudCacheBase(BasicLocalCache):
 
         # self._manifest_last_used contains the name of the manifest
         # last loaded from this cache dir (if applicable)
-        self._manifest_last_used = c_path / '_manifest_last_used.txt'
+        self._manifest_last_used = c_path / "_manifest_last_used.txt"
 
         # self._downloaded_data_path is where we will keep a JSONized
         # dict mapping paths to downloaded files to their file_hashes;
         # this will be used when determining if a downloaded file
         # can instead be a symlink
-        self._downloaded_data_path = c_path / '_downloaded_data.json'
+        self._downloaded_data_path = c_path / "_downloaded_data.json"
 
         # if the local manifest is missing but there are
         # data files in cache_dir, emit a warning
         # suggesting that the user run
         # self.construct_local_manifest
         if not self._downloaded_data_path.exists():
-            file_list = c_path.glob('**/*')
+            file_list = c_path.glob("**/*")
             has_files = False
             for fname in file_list:
                 if fname.is_file():
-                    if 'json' not in fname.name:
+                    if "json" not in fname.name:
                         has_files = True
                         break
             if has_files:
-                msg = 'This cache directory appears to '
-                msg += 'contain data files, but it has no '
-                msg += 'record of what those files are. '
-                msg += 'You might want to consider running\n\n'
-                msg += f'{self.ui}.construct_local_manifest()\n\n'
-                msg += 'to avoid needlessly downloading duplicates '
-                msg += 'of data files that did not change between '
-                msg += 'data releases. NOTE: running this method '
-                msg += 'will require hashing every data file you '
-                msg += 'have currently downloaded and could be '
-                msg += 'very time consuming.\n\n'
-                msg += 'To avoid this warning in the future, make '
-                msg += 'sure that\n\n'
-                msg += f'{str(self._downloaded_data_path.resolve())}\n\n'
-                msg += 'is not deleted between instantiations of this '
-                msg += 'cache'
+                msg = "This cache directory appears to "
+                msg += "contain data files, but it has no "
+                msg += "record of what those files are. "
+                msg += "You might want to consider running\n\n"
+                msg += f"{self.ui}.construct_local_manifest()\n\n"
+                msg += "to avoid needlessly downloading duplicates "
+                msg += "of data files that did not change between "
+                msg += "data releases. NOTE: running this method "
+                msg += "will require hashing every data file you "
+                msg += "have currently downloaded and could be "
+                msg += "very time consuming.\n\n"
+                msg += "To avoid this warning in the future, make "
+                msg += "sure that\n\n"
+                msg += f"{str(self._downloaded_data_path.resolve())}\n\n"
+                msg += "is not deleted between instantiations of this "
+                msg += "cache"
                 warnings.warn(msg, MissingLocalManifestWarning)
 
     def construct_local_manifest(self) -> None:
@@ -446,22 +422,19 @@ class CloudCacheBase(BasicLocalCache):
         lookup = {}
         files_to_hash = set()
         c_dir = pathlib.Path(self._cache_dir)
-        file_iterator = c_dir.glob('**/*')
+        file_iterator = c_dir.glob("**/*")
         for file_name in file_iterator:
             if file_name.is_file():
-                if 'json' not in file_name.name:
+                if "json" not in file_name.name:
                     if file_name != self._manifest_last_used:
                         files_to_hash.add(file_name.resolve())
 
-        with tqdm.tqdm(files_to_hash,
-                       total=len(files_to_hash),
-                       unit='(files hashed)') as pbar:
-
+        with tqdm.tqdm(files_to_hash, total=len(files_to_hash), unit="(files hashed)") as pbar:
             for local_path in pbar:
                 hsh = file_hash_from_path(local_path)
                 lookup[str(local_path.absolute())] = hsh
 
-        with open(self._downloaded_data_path, 'w') as out_file:
+        with open(self._downloaded_data_path, "w") as out_file:
             out_file.write(json.dumps(lookup, indent=2, sort_keys=True))
 
     def _warn_of_outdated_manifest(self, manifest_name: str) -> None:
@@ -474,14 +447,14 @@ class CloudCacheBase(BasicLocalCache):
 
         self._manifest_last_warned_on = self.latest_manifest_file
 
-        msg = '\n\n'
-        msg += 'The manifest file you are loading is not the '
-        msg += 'most up to date manifest file available for '
-        msg += 'this dataset. The most up to data manifest file '
-        msg += 'available for this dataset is \n\n'
-        msg += f'{self.latest_manifest_file}\n\n'
-        msg += 'To see the differences between these manifests,'
-        msg += 'run\n\n'
+        msg = "\n\n"
+        msg += "The manifest file you are loading is not the "
+        msg += "most up to date manifest file available for "
+        msg += "this dataset. The most up to data manifest file "
+        msg += "available for this dataset is \n\n"
+        msg += f"{self.latest_manifest_file}\n\n"
+        msg += "To see the differences between these manifests,"
+        msg += "run\n\n"
         msg += f"{self.ui}.compare_manifests('{manifest_name}', "
         msg += f"'{self.latest_manifest_file}')\n\n"
         msg += "To see all of the manifest files currently downloaded "
@@ -506,7 +479,7 @@ class CloudCacheBase(BasicLocalCache):
         """
         file_list = self.list_all_downloaded_manifests()
         if len(file_list) == 0:
-            return ''
+            return ""
         return self._find_latest_file(self.list_all_downloaded_manifests())
 
     def load_last_manifest(self):
@@ -519,17 +492,17 @@ class CloudCacheBase(BasicLocalCache):
             self.load_latest_manifest()
             return None
 
-        with open(self._manifest_last_used, 'r') as in_file:
+        with open(self._manifest_last_used, "r") as in_file:
             to_load = in_file.read()
 
         latest = self.latest_manifest_file
 
         if to_load not in self.manifest_file_names:
-            msg = 'The manifest version recorded as last used '
-            msg += f'for this cache -- {to_load}-- '
-            msg += 'is not a valid manifest for this dataset. '
-            msg += f'Loading latest version -- {latest} -- '
-            msg += 'instead.'
+            msg = "The manifest version recorded as last used "
+            msg += f"for this cache -- {to_load}-- "
+            msg += "is not a valid manifest for this dataset. "
+            msg += f"Loading latest version -- {latest} -- "
+            msg += "instead."
             warnings.warn(msg, UserWarning)
             self.load_latest_manifest()
             return None
@@ -552,23 +525,22 @@ class CloudCacheBase(BasicLocalCache):
         latest_downloaded = self.latest_downloaded_manifest_file
         latest = self.latest_manifest_file
         if latest != latest_downloaded:
-            if latest_downloaded != '':
-                msg = f'You are loading\n{self.latest_manifest_file}\n'
-                msg += 'which is newer than the most recent manifest '
-                msg += 'file you have previously been working with\n'
-                msg += f'{latest_downloaded}\n'
-                msg += 'It is possible that some data files have changed '
-                msg += 'between these two data releases, which will '
-                msg += 'force you to re-download those data files '
-                msg += '(currently downloaded files will not be overwritten).'
-                msg += f' To continue using {latest_downloaded}, run\n'
+            if latest_downloaded != "":
+                msg = f"You are loading\n{self.latest_manifest_file}\n"
+                msg += "which is newer than the most recent manifest "
+                msg += "file you have previously been working with\n"
+                msg += f"{latest_downloaded}\n"
+                msg += "It is possible that some data files have changed "
+                msg += "between these two data releases, which will "
+                msg += "force you to re-download those data files "
+                msg += "(currently downloaded files will not be overwritten)."
+                msg += f" To continue using {latest_downloaded}, run\n"
                 msg += f"{self.ui}.load_manifest('{latest_downloaded}')"
                 warnings.warn(msg, OutdatedManifestWarning)
         self.load_manifest(self.latest_manifest_file)
 
     @abstractmethod
-    def _download_manifest(self,
-                           manifest_name: str):
+    def _download_manifest(self, manifest_name: str):
         """
         Download a manifest from the dataset
 
@@ -636,14 +608,12 @@ class CloudCacheBase(BasicLocalCache):
         self._manifest = self._load_manifest(manifest_name)
 
         # Keep track of the newly loaded manifest
-        with open(self._manifest_last_used, 'w') as out_file:
+        with open(self._manifest_last_used, "w") as out_file:
             out_file.write(manifest_name)
 
         self._manifest_name = manifest_name
 
-    def _update_list_of_downloads(self,
-                                  file_attributes: CacheFileAttributes
-                                  ) -> None:
+    def _update_list_of_downloads(self, file_attributes: CacheFileAttributes) -> None:
         """
         Update the local file that keeps track of files that have actually
         been downloaded to reflect a newly downloaded file.
@@ -661,7 +631,7 @@ class CloudCacheBase(BasicLocalCache):
             return None
 
         if self._downloaded_data_path.exists():
-            with open(self._downloaded_data_path, 'rb') as in_file:
+            with open(self._downloaded_data_path, "rb") as in_file:
                 downloaded_data = json.load(in_file)
         else:
             downloaded_data = {}
@@ -674,15 +644,11 @@ class CloudCacheBase(BasicLocalCache):
                 return None
 
         downloaded_data[abs_path] = file_attributes.file_hash
-        with open(self._downloaded_data_path, 'w') as out_file:
-            out_file.write(json.dumps(downloaded_data,
-                                      indent=2,
-                                      sort_keys=True))
+        with open(self._downloaded_data_path, "w") as out_file:
+            out_file.write(json.dumps(downloaded_data, indent=2, sort_keys=True))
         return None
 
-    def _check_for_identical_copy(self,
-                                  file_attributes: CacheFileAttributes
-                                  ) -> bool:
+    def _check_for_identical_copy(self, file_attributes: CacheFileAttributes) -> bool:
         """
         Check the manifest of files that have been locally downloaded to
         see if a file with an identical hash to the requested file has already
@@ -704,7 +670,7 @@ class CloudCacheBase(BasicLocalCache):
         if not self._downloaded_data_path.exists():
             return False
 
-        with open(self._downloaded_data_path, 'rb') as in_file:
+        with open(self._downloaded_data_path, "rb") as in_file:
             available_files = json.load(in_file)
 
         matched_path = None
@@ -756,9 +722,7 @@ class CloudCacheBase(BasicLocalCache):
 
         if file_attributes.local_path.exists():
             if not file_attributes.local_path.is_file():
-                raise RuntimeError(f"{file_attributes.local_path}\n"
-                                   "exists, but is not a file;\n"
-                                   "unsure how to proceed")
+                raise RuntimeError(f"{file_attributes.local_path}\nexists, but is not a file;\nunsure how to proceed")
 
             file_exists = True
 
@@ -789,7 +753,7 @@ class CloudCacheBase(BasicLocalCache):
             If the file cannot be downloaded
         """
         super_attributes = self.data_path(file_id)
-        file_attributes = super_attributes['file_attributes']
+        file_attributes = super_attributes["file_attributes"]
         was_downloaded = self._download_file(file_attributes)
         if was_downloaded:
             self._update_list_of_downloads(file_attributes)
@@ -817,7 +781,7 @@ class CloudCacheBase(BasicLocalCache):
             If the file cannot be downloaded
         """
         super_attributes = self.metadata_path(fname)
-        file_attributes = super_attributes['file_attributes']
+        file_attributes = super_attributes["file_attributes"]
         was_downloaded = self._download_file(file_attributes)
         if was_downloaded:
             self._update_list_of_downloads(file_attributes)
@@ -845,8 +809,7 @@ class CloudCacheBase(BasicLocalCache):
         local_path = self.download_metadata(fname)
         return pd.read_csv(local_path)
 
-    def _detect_changes(self,
-                        filename_to_hash: dict) -> List[Tuple[str, str]]:
+    def _detect_changes(self, filename_to_hash: dict) -> List[Tuple[str, str]]:
         """
         Assemble list of changes between two manifests
 
@@ -893,18 +856,18 @@ class CloudCacheBase(BasicLocalCache):
                 h0 = filename_to_hash[0][fname]
                 h1 = filename_to_hash[1][fname]
                 if h0 != h1:
-                    delta = f'{fname} changed'
+                    delta = f"{fname} changed"
             elif fname in filename_to_hash[0]:
                 h0 = filename_to_hash[0][fname]
                 if h0 in hash_to_filename[1]:
                     f1 = hash_to_filename[1][h0]
-                    delta = f'{fname} renamed {f1}'
+                    delta = f"{fname} renamed {f1}"
                 else:
-                    delta = f'{fname} deleted'
+                    delta = f"{fname} deleted"
             elif fname in filename_to_hash[1]:
                 h1 = filename_to_hash[1][fname]
                 if h1 not in hash_to_filename[0]:
-                    delta = f'{fname} created'
+                    delta = f"{fname} created"
             else:
                 raise RuntimeError("should never reach this line")
 
@@ -913,10 +876,7 @@ class CloudCacheBase(BasicLocalCache):
 
         return output
 
-    def summarize_comparison(self,
-                             manifest_0_name: str,
-                             manifest_1_name: str
-                             ) -> Dict[str, List[Tuple[str, str]]]:
+    def summarize_comparison(self, manifest_0_name: str, manifest_1_name: str) -> Dict[str, List[Tuple[str, str]]]:
         """
         Compare two manifests from this dataset. Return a dict
         containing the list of metadata and data files that changed
@@ -958,34 +918,27 @@ class CloudCacheBase(BasicLocalCache):
         man1 = self._load_manifest(manifest_1_name)
 
         result: dict = dict()
-        for (result_key,
-             file_id_list,
-             attr_lookup) in zip(('metadata_changes', 'data_changes'),
-                                 ((man0.metadata_file_names,
-                                   man1.metadata_file_names),
-                                  (man0.file_id_values,
-                                   man1.file_id_values)),
-                                 ((man0.metadata_file_attributes,
-                                   man1.metadata_file_attributes),
-                                  (man0.data_file_attributes,
-                                   man1.data_file_attributes))):
-
+        for result_key, file_id_list, attr_lookup in zip(
+            ("metadata_changes", "data_changes"),
+            ((man0.metadata_file_names, man1.metadata_file_names), (man0.file_id_values, man1.file_id_values)),
+            (
+                (man0.metadata_file_attributes, man1.metadata_file_attributes),
+                (man0.data_file_attributes, man1.data_file_attributes),
+            ),
+        ):
             filename_to_hash: dict = dict()
             for version in (0, 1):
                 filename_to_hash[version] = {}
                 for file_id in file_id_list[version]:
                     obj = attr_lookup[version](file_id)
                     file_name = relative_path_from_url(obj.url)
-                    file_name = '/'.join(file_name.split('/')[1:])
+                    file_name = "/".join(file_name.split("/")[1:])
                     filename_to_hash[version][file_name] = obj.file_hash
             changes = self._detect_changes(filename_to_hash)
             result[result_key] = changes
         return result
 
-    def compare_manifests(self,
-                          manifest_0_name: str,
-                          manifest_1_name: str
-                          ) -> str:
+    def compare_manifests(self, manifest_0_name: str, manifest_1_name: str) -> str:
         """
         Compare two manifests from this dataset. Return a dict
         containing the list of metadata and data files that changed
@@ -1006,32 +959,31 @@ class CloudCacheBase(BasicLocalCache):
             manifest_0 to manifest_1
         """
 
-        changes = self.summarize_comparison(manifest_0_name,
-                                            manifest_1_name)
-        if len(changes['data_changes']) == 0:
-            if len(changes['metadata_changes']) == 0:
+        changes = self.summarize_comparison(manifest_0_name, manifest_1_name)
+        if len(changes["data_changes"]) == 0:
+            if len(changes["metadata_changes"]) == 0:
                 return "The two manifests are equivalent"
 
         data_change_dict = {}
-        for delta in changes['data_changes']:
+        for delta in changes["data_changes"]:
             data_change_dict[delta[0]] = delta[1]
         metadata_change_dict = {}
-        for delta in changes['metadata_changes']:
+        for delta in changes["metadata_changes"]:
             metadata_change_dict[delta[0]] = delta[1]
 
-        msg = 'Changes going from\n'
-        msg += f'{manifest_0_name}\n'
-        msg += 'to\n'
-        msg += f'{manifest_1_name}\n\n'
+        msg = "Changes going from\n"
+        msg += f"{manifest_0_name}\n"
+        msg += "to\n"
+        msg += f"{manifest_1_name}\n\n"
 
         m_keys = list(metadata_change_dict.keys())
         m_keys.sort()
         for m in m_keys:
-            msg += f'{metadata_change_dict[m]}\n'
+            msg += f"{metadata_change_dict[m]}\n"
         d_keys = list(data_change_dict.keys())
         d_keys.sort()
         for d in d_keys:
-            msg += f'{data_change_dict[d]}\n'
+            msg += f"{data_change_dict[d]}\n"
         return msg
 
 
@@ -1058,13 +1010,11 @@ class S3CloudCache(CloudCacheBase):
         functionality (used to populate helpful error messages)
     """
 
-    def __init__(self, cache_dir, bucket_name, project_name,
-                 ui_class_name=None):
+    def __init__(self, cache_dir, bucket_name, project_name, ui_class_name=None):
         self._manifest = None
         self._bucket_name = bucket_name
 
-        super().__init__(cache_dir=cache_dir, project_name=project_name,
-                         ui_class_name=ui_class_name)
+        super().__init__(cache_dir=cache_dir, project_name=project_name, ui_class_name=ui_class_name)
 
     _s3_client = None
 
@@ -1076,8 +1026,7 @@ class S3CloudCache(CloudCacheBase):
     def s3_client(self):
         if self._s3_client is None:
             s3_config = Config(signature_version=UNSIGNED)
-            self._s3_client = boto3.client('s3',
-                                           config=s3_config)
+            self._s3_client = boto3.client("s3", config=s3_config)
         return self._s3_client
 
     def _list_all_manifests(self) -> list:
@@ -1085,23 +1034,19 @@ class S3CloudCache(CloudCacheBase):
         Return a list of all of the file names of the manifests associated
         with this dataset
         """
-        paginator = self.s3_client.get_paginator('list_objects_v2')
-        subset_iterator = paginator.paginate(
-            Bucket=self._bucket_name,
-            Prefix=self.manifest_prefix
-        )
+        paginator = self.s3_client.get_paginator("list_objects_v2")
+        subset_iterator = paginator.paginate(Bucket=self._bucket_name, Prefix=self.manifest_prefix)
 
         output = []
         for subset in subset_iterator:
-            if 'Contents' in subset:
-                for obj in subset['Contents']:
-                    output.append(pathlib.Path(obj['Key']).name)
+            if "Contents" in subset:
+                for obj in subset["Contents"]:
+                    output.append(pathlib.Path(obj["Key"]).name)
 
         output.sort()
         return output
 
-    def _download_manifest(self,
-                           manifest_name: str):
+    def _download_manifest(self, manifest_name: str):
         """
         Download a manifest from the dataset
 
@@ -1113,13 +1058,12 @@ class S3CloudCache(CloudCacheBase):
         """
 
         manifest_key = self.manifest_prefix + manifest_name
-        response = self.s3_client.get_object(Bucket=self._bucket_name,
-                                             Key=manifest_key)
+        response = self.s3_client.get_object(Bucket=self._bucket_name, Key=manifest_key)
 
         filepath = os.path.join(self._cache_dir, manifest_name)
 
-        with open(filepath, 'wb') as f:
-            for chunk in response['Body'].iter_chunks():
+        with open(filepath, "wb") as f:
+            for chunk in response["Body"].iter_chunks():
                 f.write(chunk)
 
     def _download_file(self, file_attributes: CacheFileAttributes) -> bool:
@@ -1161,8 +1105,7 @@ class S3CloudCache(CloudCacheBase):
         # returns a str
         os.makedirs(local_dir, exist_ok=True)
         if not os.path.isdir(local_dir):
-            raise RuntimeError(f"{local_dir}\n"
-                               "is not a directory")
+            raise RuntimeError(f"{local_dir}\nis not a directory")
 
         bucket_name = bucket_name_from_url(file_attributes.url)
         obj_key = relative_path_from_url(file_attributes.url)
@@ -1174,25 +1117,23 @@ class S3CloudCache(CloudCacheBase):
 
         pbar = None
         if not self._file_exists(file_attributes):
-            response = self.s3_client.list_object_versions(Bucket=bucket_name,
-                                                           Prefix=str(obj_key))
-            object_info = [i for i in response["Versions"]
-                           if i["VersionId"] == version_id][0]
-            pbar = tqdm.tqdm(desc=object_info["Key"].split("/")[-1],
-                             total=object_info["Size"],
-                             unit_scale=True,
-                             unit_divisor=1000.,
-                             unit="MB")
+            response = self.s3_client.list_object_versions(Bucket=bucket_name, Prefix=str(obj_key))
+            object_info = [i for i in response["Versions"] if i["VersionId"] == version_id][0]
+            pbar = tqdm.tqdm(
+                desc=object_info["Key"].split("/")[-1],
+                total=object_info["Size"],
+                unit_scale=True,
+                unit_divisor=1000.0,
+                unit="MB",
+            )
 
         while not self._file_exists(file_attributes):
             was_downloaded = True
-            response = self.s3_client.get_object(Bucket=bucket_name,
-                                                 Key=str(obj_key),
-                                                 VersionId=version_id)
+            response = self.s3_client.get_object(Bucket=bucket_name, Key=str(obj_key), VersionId=version_id)
 
-            if 'Body' in response:
-                with open(local_path, 'wb') as out_file:
-                    for chunk in response['Body'].iter_chunks():
+            if "Body" in response:
+                with open(local_path, "wb") as out_file:
+                    for chunk in response["Body"].iter_chunks():
                         out_file.write(chunk)
                         pbar.update(len(chunk))
 
@@ -1206,9 +1147,7 @@ class S3CloudCache(CloudCacheBase):
             n_iter += 1
             if n_iter > max_iter:
                 pbar.close()
-                raise RuntimeError("Could not download\n"
-                                   f"{file_attributes}\n"
-                                   "In {max_iter} iterations")
+                raise RuntimeError(f"Could not download\n{file_attributes}\nIn {{max_iter}} iterations")
         if pbar is not None:
             pbar.close()
 
@@ -1232,9 +1171,9 @@ class LocalCache(CloudCacheBase):
         Name of the class users are actually using to maniuplate this
         functionality (used to populate helpful error messages)
     """
+
     def __init__(self, cache_dir, project_name, ui_class_name=None):
-        super().__init__(cache_dir=cache_dir, project_name=project_name,
-                         ui_class_name=ui_class_name)
+        super().__init__(cache_dir=cache_dir, project_name=project_name, ui_class_name=ui_class_name)
 
     def _list_all_manifests(self) -> list:
         return self.list_all_downloaded_manifests()
@@ -1272,8 +1211,7 @@ class StaticLocalCache(BasicLocalCache):
     """
 
     def __init__(self, cache_dir, project_name, ui_class_name=None):
-        super().__init__(cache_dir=cache_dir, project_name=project_name,
-                         ui_class_name=ui_class_name)
+        super().__init__(cache_dir=cache_dir, project_name=project_name, ui_class_name=ui_class_name)
 
     def _list_all_manifests(self) -> list:
         """
@@ -1281,9 +1219,7 @@ class StaticLocalCache(BasicLocalCache):
         with this dataset. For the StaticLocalCache only return only the
         latest manifest.
         """
-        manifest_dir = os.path.join(
-            self._cache_dir, self.project_name, "manifests"
-        )
+        manifest_dir = os.path.join(self._cache_dir, self.project_name, "manifests")
         if not os.path.exists(manifest_dir):
             raise RuntimeError(
                 f"Expected the provided cache_dir ({self._cache_dir})"
@@ -1291,8 +1227,7 @@ class StaticLocalCache(BasicLocalCache):
                 f"{self.project_name}/manifests"
             )
 
-        output = [x for x in os.listdir(manifest_dir)
-                  if re.fullmatch(".*_manifest_v.*.json", x)]
+        output = [x for x in os.listdir(manifest_dir) if re.fullmatch(".*_manifest_v.*.json", x)]
 
         return [self._find_latest_file(output)]
 
@@ -1317,10 +1252,7 @@ class StaticLocalCache(BasicLocalCache):
             The name of the manifest to load. Must be an element in
             self.manifest_file_names
         """
-        self._manifest = self._load_manifest(
-            manifest_name,
-            use_static_project_dir=True
-        )
+        self._manifest = self._load_manifest(manifest_name, use_static_project_dir=True)
         self._manifest_name = manifest_name
 
     def compare_manifests(self, manifest_0_name: str, manifest_1_name: str):

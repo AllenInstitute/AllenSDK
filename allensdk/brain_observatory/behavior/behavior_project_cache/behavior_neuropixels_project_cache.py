@@ -1,18 +1,16 @@
 import numpy as np
 import pandas as pd
 
-from allensdk.brain_observatory.behavior.behavior_project_cache.\
-    project_apis.data_io import VisualBehaviorNeuropixelsProjectCloudApi
-from allensdk.brain_observatory.behavior.behavior_project_cache.\
-    project_cache_base import ProjectCacheBase
-from allensdk.brain_observatory.behavior.behavior_session import \
-    BehaviorSession
-from allensdk.brain_observatory.ecephys.behavior_ecephys_session import \
-    BehaviorEcephysSession
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io import (
+    VisualBehaviorNeuropixelsProjectCloudApi,
+)
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_cache_base import ProjectCacheBase
+from allensdk.brain_observatory.behavior.behavior_session import BehaviorSession
+from allensdk.brain_observatory.ecephys.behavior_ecephys_session import BehaviorEcephysSession
 
 
 class VisualBehaviorNeuropixelsProjectCache(ProjectCacheBase):
-    """ Entrypoint for accessing Visual Behavior Neuropixels data.
+    """Entrypoint for accessing Visual Behavior Neuropixels data.
 
     Supports access to metadata tables:
     get_ecephys_session_table()
@@ -35,21 +33,14 @@ class VisualBehaviorNeuropixelsProjectCache(ProjectCacheBase):
     PROJECT_NAME = "visual-behavior-neuropixels"
     BUCKET_NAME = "visual-behavior-neuropixels-data"
 
-    def __init__(
-            self,
-            fetch_api: VisualBehaviorNeuropixelsProjectCloudApi,
-            fetch_tries: int = 2
-    ):
+    def __init__(self, fetch_api: VisualBehaviorNeuropixelsProjectCloudApi, fetch_tries: int = 2):
         super().__init__(fetch_api=fetch_api, fetch_tries=fetch_tries)
 
     @classmethod
     def cloud_api_class(cls):
         return VisualBehaviorNeuropixelsProjectCloudApi
 
-    def get_ecephys_session_table(
-            self,
-            filter_abnormalities: bool = True
-    ) -> pd.DataFrame:
+    def get_ecephys_session_table(self, filter_abnormalities: bool = True) -> pd.DataFrame:
         """
         Parameters
         ----------
@@ -69,9 +60,8 @@ class VisualBehaviorNeuropixelsProjectCache(ProjectCacheBase):
 
         if filter_abnormalities:
             sessions_table = sessions_table.loc[
-                    np.logical_and(
-                        sessions_table.abnormal_histology.isna(),
-                        sessions_table.abnormal_activity.isna())]
+                np.logical_and(sessions_table.abnormal_histology.isna(), sessions_table.abnormal_activity.isna())
+            ]
 
         return sessions_table
 
@@ -126,10 +116,7 @@ class VisualBehaviorNeuropixelsProjectCache(ProjectCacheBase):
         """
         return self.fetch_api.get_unit_table()
 
-    def get_ecephys_session(
-            self,
-            ecephys_session_id: int
-    ) -> BehaviorEcephysSession:
+    def get_ecephys_session(self, ecephys_session_id: int) -> BehaviorEcephysSession:
         """
         Loads all data for `ecephys_session_id` into an
         `allensdk.ecephys.behavior_ecephys_session.BehaviorEcephysSession`
@@ -148,10 +135,7 @@ class VisualBehaviorNeuropixelsProjectCache(ProjectCacheBase):
         """
         return self.fetch_api.get_ecephys_session(ecephys_session_id)
 
-    def get_behavior_session(
-            self,
-            behavior_session_id: int
-    ) -> BehaviorSession:
+    def get_behavior_session(self, behavior_session_id: int) -> BehaviorSession:
         """
         Loads all data for `behavior_session_id` into an
         `allensdk.brain_observatory.behavior.behavior_session.BehaviorSession`

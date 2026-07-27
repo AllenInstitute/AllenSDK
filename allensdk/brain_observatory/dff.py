@@ -41,8 +41,7 @@ import h5py
 import numpy as np
 from scipy.ndimage.filters import median_filter
 
-from allensdk.core.brain_observatory_nwb_data_set import \
-    BrainObservatoryNwbDataSet
+from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet
 
 GAUSSIAN_MAD_STD_SCALE = 1.4826
 
@@ -72,8 +71,7 @@ def movingmode_fast(x, kernelsize, y):
 
     # compute a histogram of a half kernel
     halfsize = int(kernelsize / 2)
-    histo = np.bincount(np.rint(x[:halfsize]).astype(
-        np.uint32), minlength=int(maxval + 2))
+    histo = np.bincount(np.rint(x[:halfsize]).astype(np.uint32), minlength=int(maxval + 2))
 
     # find the mode of the first half kernel
     mode = np.argmax(histo)
@@ -168,24 +166,22 @@ def plot_onetrace(dff, fc):
 
         frames = np.arange(r[0], r[1])
         ax = plt.subplot(len(qs), 1, qi + 1)
-        ax.plot(frames, dff[r[0]:r[1]], 'g')
+        ax.plot(frames, dff[r[0] : r[1]], "g")
         ax.set_ylim(dff_min, dff_max)
         ax.set_xlim(r[0], r[1])
-        ax.set_xlabel('frames', fontsize=18)
-        ax.set_ylabel('DF/F', fontsize=18, color='g')
+        ax.set_xlabel("frames", fontsize=18)
+        ax.set_ylabel("DF/F", fontsize=18, color="g")
 
         ax = ax.twinx()
-        ax.plot(frames, fc[r[0]:r[1]], 'b')
+        ax.plot(frames, fc[r[0] : r[1]], "b")
         ax.set_ylim(fc_min, fc_max)
         ax.set_xlim(r[0], r[1])
-        ax.set_ylabel('FC', fontsize=18, color='b')
+        ax.set_ylabel("FC", fontsize=18, color="b")
 
     return 0
 
 
-def compute_dff_windowed_mode(traces,
-                              mode_kernelsize=5400,
-                              mean_kernelsize=3000):
+def compute_dff_windowed_mode(traces, mode_kernelsize=5400, mean_kernelsize=3000):
     """Compute dF/F of a set of traces using a low-pass windowed-mode operator.
 
     The operation is basically:
@@ -219,8 +215,7 @@ def compute_dff_windowed_mode(traces,
     if mode_kernelsize == 0 or mean_kernelsize == 0:
         raise ValueError("Kernel length is 0!")
 
-    logging.debug("trace matrix shape: %d %d" %
-                  (traces.shape[0], traces.shape[1]))
+    logging.debug("trace matrix shape: %d %d" % (traces.shape[0], traces.shape[1]))
 
     modeline = np.zeros(traces.shape[1])
     modelineLP = np.zeros(traces.shape[1])
@@ -230,8 +225,7 @@ def compute_dff_windowed_mode(traces,
 
     for n in range(0, traces.shape[0]):
         if np.any(np.isnan(traces[n])):
-            logging.warning(
-                "trace for roi %d contains NaNs, setting to NaN", n)
+            logging.warning("trace for roi %d contains NaNs, setting to NaN", n)
             dff[n, :] = np.nan
             continue
 
@@ -244,12 +238,9 @@ def compute_dff_windowed_mode(traces,
     return dff
 
 
-def compute_dff_windowed_median(traces,
-                                median_kernel_long=5401,
-                                median_kernel_short=101,
-                                noise_stds=None,
-                                n_small_baseline_frames=None,
-                                **kwargs):
+def compute_dff_windowed_median(
+    traces, median_kernel_long=5401, median_kernel_short=101, noise_stds=None, n_small_baseline_frames=None, **kwargs
+):
     """Compute dF/F of a set of traces with median filter detrending.
 
     The operation is basically:
@@ -294,7 +285,7 @@ def compute_dff_windowed_median(traces,
         sigma_f = noise_std(dff, **kwargs)
 
         # long timescale median filter for baseline subtraction
-        tf = median_filter(dff, median_kernel_long, mode='constant')
+        tf = median_filter(dff, median_kernel_long, mode="constant")
         dff -= tf
         dff /= np.maximum(tf, sigma_f)
 
@@ -306,8 +297,8 @@ def compute_dff_windowed_median(traces,
             noise_stds.append(sigma_dff)
 
         # short timescale detrending
-        tf = median_filter(dff, median_kernel_short, mode='constant')
-        tf = np.minimum(tf, 2.5*sigma_dff)
+        tf = median_filter(dff, median_kernel_short, mode="constant")
+        tf = np.minimum(tf, 2.5 * sigma_dff)
         dff -= tf
 
     return dff_traces
@@ -315,23 +306,24 @@ def compute_dff_windowed_median(traces,
 
 def _check_kernel(kernel_size, data_size):
     if kernel_size % 2 == 0 or kernel_size <= 0 or kernel_size >= data_size:
-        raise ValueError("Invalid kernel length {} for data length {}. Kernel "
-                         "length must be positive and odd, and less than data "
-                         "length.".format(kernel_size, data_size))
+        raise ValueError(
+            "Invalid kernel length {} for data length {}. Kernel "
+            "length must be positive and odd, and less than data "
+            "length.".format(kernel_size, data_size)
+        )
 
 
-def noise_std(x, noise_kernel_length=31, positive_peak_scale=1.5,
-              outlier_std_scale=2.5):
+def noise_std(x, noise_kernel_length=31, positive_peak_scale=1.5, outlier_std_scale=2.5):
     """Robust estimate of the standard deviation of the trace noise."""
     _check_kernel(noise_kernel_length, len(x))
     if any(np.isnan(x)):
         return np.nan
-    x = x - median_filter(x, noise_kernel_length, mode='constant')
+    x = x - median_filter(x, noise_kernel_length, mode="constant")
     # first pass removing big pos peak outliers
-    x = x[x < positive_peak_scale*np.abs(x.min())]
+    x = x[x < positive_peak_scale * np.abs(x.min())]
     rstd = robust_std(x)
     # second pass removing remaining pos and neg peak outliers
-    x = x[abs(x) < outlier_std_scale*rstd]
+    x = x[abs(x) < outlier_std_scale * rstd]
     return robust_std(x)
 
 
@@ -342,7 +334,7 @@ def robust_std(x):
     deviation of x.
     """
     median_absolute_deviation = np.median(np.abs(x - np.median(x)))
-    return GAUSSIAN_MAD_STD_SCALE*median_absolute_deviation
+    return GAUSSIAN_MAD_STD_SCALE * median_absolute_deviation
 
 
 def calculate_dff(traces, dff_computation_cb=None, save_plot_dir=None):
@@ -382,9 +374,8 @@ def calculate_dff(traces, dff_computation_cb=None, save_plot_dir=None):
             fig = plt.figure(figsize=(150, 40))
             plot_onetrace(dff[n, :], traces[n, :])
 
-            plt.title('ROI ' + str(n) + ' ', fontsize=18)
-            fig.savefig(os.path.join(save_plot_dir, 'dff_%d.png' %
-                                     n), orientation='landscape')
+            plt.title("ROI " + str(n) + " ", fontsize=18)
+            fig.savefig(os.path.join(save_plot_dir, "dff_%d.png" % n), orientation="landscape")
             plt.close(fig)
 
     return dff
@@ -403,8 +394,7 @@ def main():
 
     # read from "data"
     if args.input_h5.endswith("nwb"):
-        timestamps, traces = BrainObservatoryNwbDataSet(
-            args.input_h5).get_corrected_fluorescence_traces()
+        timestamps, traces = BrainObservatoryNwbDataSet(args.input_h5).get_corrected_fluorescence_traces()
     else:
         input_h5 = h5py.File(args.input_h5, "r")
         traces = input_h5["data"][()]

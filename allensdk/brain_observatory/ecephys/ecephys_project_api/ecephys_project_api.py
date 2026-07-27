@@ -4,20 +4,16 @@ import numpy as np
 import pandas as pd
 
 
-# TODO: This should be a generic over the type of the values, but there is not 
-# good support currently for numpy and pandas type annotations 
+# TODO: This should be a generic over the type of the values, but there is not
+# good support currently for numpy and pandas type annotations
 # we should investigate numpy and pandas typing support and migrate
 # https://github.com/numpy/numpy-stubs
-# https://github.com/pandas-dev/pandas/blob/master/pandas/_typing.py 
+# https://github.com/pandas-dev/pandas/blob/master/pandas/_typing.py
 ArrayLike = TypeVar("ArrayLike", list, np.ndarray, pd.Series, tuple)
 
 
 class EcephysProjectApi:
-    def get_sessions(
-        self,
-        session_ids: Optional[ArrayLike] = None,
-        published_at: Optional[str] = None
-    ):
+    def get_sessions(self, session_ids: Optional[ArrayLike] = None, published_at: Optional[str] = None):
         raise NotImplementedError()
 
     def get_session_data(self, session_id: int) -> Iterable:
@@ -27,29 +23,29 @@ class EcephysProjectApi:
         raise NotImplementedError()
 
     def get_units(
-        self, 
-        unit_ids: Optional[ArrayLike] = None, 
-        channel_ids: Optional[ArrayLike] = None, 
-        probe_ids: Optional[ArrayLike] = None, 
-        session_ids: Optional[ArrayLike] = None, 
-        published_at: Optional[str] = None
+        self,
+        unit_ids: Optional[ArrayLike] = None,
+        channel_ids: Optional[ArrayLike] = None,
+        probe_ids: Optional[ArrayLike] = None,
+        session_ids: Optional[ArrayLike] = None,
+        published_at: Optional[str] = None,
     ):
         raise NotImplementedError()
 
     def get_channels(
-        self, 
-        channel_ids: Optional[ArrayLike] = None, 
-        probe_ids: Optional[ArrayLike] = None, 
-        session_ids: Optional[ArrayLike] = None, 
-        published_at: Optional[str] = None
+        self,
+        channel_ids: Optional[ArrayLike] = None,
+        probe_ids: Optional[ArrayLike] = None,
+        session_ids: Optional[ArrayLike] = None,
+        published_at: Optional[str] = None,
     ):
         raise NotImplementedError()
 
     def get_probes(
-        self, 
-        probe_ids: Optional[ArrayLike] = None, 
-        session_ids: Optional[ArrayLike] = None, 
-        published_at: Optional[str] = None
+        self,
+        probe_ids: Optional[ArrayLike] = None,
+        session_ids: Optional[ArrayLike] = None,
+        published_at: Optional[str] = None,
     ):
         raise NotImplementedError()
 
@@ -63,9 +59,9 @@ class EcephysProjectApi:
         raise NotImplementedError()
 
     def get_unit_analysis_metrics(
-        self, 
-        unit_ids: Optional[ArrayLike] = None, 
-        ecephys_session_ids: Optional[ArrayLike] = None, 
-        session_types: Optional[ArrayLike] = None
+        self,
+        unit_ids: Optional[ArrayLike] = None,
+        ecephys_session_ids: Optional[ArrayLike] = None,
+        session_types: Optional[ArrayLike] = None,
     ) -> pd.DataFrame:
         raise NotImplementedError()

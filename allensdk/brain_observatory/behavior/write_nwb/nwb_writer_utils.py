@@ -10,10 +10,7 @@ class OphysNwbWriter(NWBWriter):
     """NWBWriter with additional options to modify targeted_imaging_depth."""
 
     def _update_session(
-        self,
-        lims_session: BehaviorSession,
-        ophys_experiment_ids: Optional[List[int]] = None,
-        **kwargs
+        self, lims_session: BehaviorSession, ophys_experiment_ids: Optional[List[int]] = None, **kwargs
     ) -> BehaviorSession:
         """Call session methods to update certain values within the session.
 

@@ -18,33 +18,21 @@ def mounted_s3_dataset_fixture(tmp_path, request) -> Tuple[Path, str, dict]:
     # Get fixture parameters
     project_name = request.param.get("project_name", "test_project_name_1")
     dataset_version = request.param.get("dataset_version", "0.3.0")
-    metadata_file_id_column_name = request.param.get(
-        "metadata_file_id_column_name", "file_id"
-    )
+    metadata_file_id_column_name = request.param.get("metadata_file_id_column_name", "file_id")
     metadata_files_contents = request.param.get(
         "metadata_files_contents",
         # Each item in list is a tuple of:
         # (metadata_filename, metadata_contents)
         [
             ("metadata_1.csv", {"mouse": [1, 2, 3], "sex": ["F", "F", "M"]}),
-            (
-                "metadata_2.csv",
-                {
-                    "experiment": [4, 5, 6],
-                    metadata_file_id_column_name: ["data1", "data2", "data3"]
-                }
-            )
-        ]
+            ("metadata_2.csv", {"experiment": [4, 5, 6], metadata_file_id_column_name: ["data1", "data2", "data3"]}),
+        ],
     )
     data_files_contents = request.param.get(
         "data_files_contents",
         # Each item in list is a tuple of:
         # (data_filename, data_contents)
-        [
-            ("data_1.nwb", "123456"),
-            ("data_2.nwb", "abcdef"),
-            ("data_3.nwb", "ghijkl")
-        ]
+        [("data_1.nwb", "123456"), ("data_2.nwb", "abcdef"), ("data_3.nwb", "ghijkl")],
     )
 
     # Create mock mounted s3 directory structure
@@ -64,12 +52,9 @@ def mounted_s3_dataset_fixture(tmp_path, request) -> Tuple[Path, str, dict]:
         df_to_save.to_csv(str(meta_save_path), index=False)
 
         manifest_meta_entries[meta_fname.rstrip(".csv")] = {
-            "url": (
-                f"http://{project_name}.s3.amazonaws.com/{project_name}"
-                f"/project_metadata/{meta_fname}"
-            ),
+            "url": (f"http://{project_name}.s3.amazonaws.com/{project_name}/project_metadata/{meta_fname}"),
             "version_id": "test_placeholder",
-            "file_hash": file_hash_from_path(meta_save_path)
+            "file_hash": file_hash_from_path(meta_save_path),
         }
 
     # Create data files and manifest entries
@@ -79,16 +64,13 @@ def mounted_s3_dataset_fixture(tmp_path, request) -> Tuple[Path, str, dict]:
     manifest_data_entries = dict()
     for file_fname, file_contents in data_files_contents:
         file_save_path = mock_data_dir / file_fname
-        with file_save_path.open('w') as f:
+        with file_save_path.open("w") as f:
             f.write(file_contents)
 
         manifest_data_entries[file_fname.rstrip(".nwb")] = {
-            "url": (
-                f"http://{project_name}.s3.amazonaws.com/{project_name}"
-                f"/project_data/{file_fname}"
-            ),
+            "url": (f"http://{project_name}.s3.amazonaws.com/{project_name}/project_data/{file_fname}"),
             "version_id": "test_placeholder",
-            "file_hash": file_hash_from_path(file_save_path)
+            "file_hash": file_hash_from_path(file_save_path),
         }
 
     # Create manifest dir and manifest
@@ -100,35 +82,22 @@ def mounted_s3_dataset_fixture(tmp_path, request) -> Tuple[Path, str, dict]:
     manifest_contents = {
         "project_name": project_name,
         "manifest_version": dataset_version,
-        "data_pipeline": [
-            {
-                "name": "AllenSDK",
-                "version": "2.11.0",
-                "comment": "This is a test entry. NOT REAL."
-            }
-        ],
+        "data_pipeline": [{"name": "AllenSDK", "version": "2.11.0", "comment": "This is a test entry. NOT REAL."}],
         "metadata_file_id_column_name": metadata_file_id_column_name,
         "metadata_files": manifest_meta_entries,
-        "data_files": manifest_data_entries
+        "data_files": manifest_data_entries,
     }
 
-    with manifest_path.open('w') as f:
+    with manifest_path.open("w") as f:
         json.dump(manifest_contents, f, indent=4)
 
-    expected = {
-        "expected_metadata": metadata_files_contents,
-        "expected_data": data_files_contents
-    }
+    expected = {"expected_metadata": metadata_files_contents, "expected_data": data_files_contents}
 
     return mock_mounted_base_dir, project_name, expected
 
 
 @pytest.mark.parametrize(
-    "mounted_s3_dataset_fixture",
-    [
-        {"project_name": "visual-behavior-ophys"}
-    ],
-    indirect=["mounted_s3_dataset_fixture"]
+    "mounted_s3_dataset_fixture", [{"project_name": "visual-behavior-ophys"}], indirect=["mounted_s3_dataset_fixture"]
 )
 def test_static_local_cache_access(mounted_s3_dataset_fixture):
     local_static_cache_dir, proj_name, expected = mounted_s3_dataset_fixture
@@ -152,30 +121,18 @@ def test_static_local_cache_access(mounted_s3_dataset_fixture):
 @pytest.mark.parametrize(
     "num_manifests, project_name, create_project_folders, expected",
     [
-        (
-            2,
-            "test_project",
-            True,
-            ['test_project_manifest_v0.1.0.json']
-        ),
-        (
-            4,
-            "test_project_2",
-            True,
-            ['test_project_2_manifest_v0.3.0.json']
-        ),
+        (2, "test_project", True, ["test_project_manifest_v0.1.0.json"]),
+        (4, "test_project_2", True, ["test_project_2_manifest_v0.3.0.json"]),
         # This test case is expected to raise a RuntimeError
         (
             None,  # Not applicable
             "test_project_2",
             False,
-            None  # Not applicable
-        )
-    ]
+            None,  # Not applicable
+        ),
+    ],
 )
-def test_static_local_cache_list_all_manifests(
-    tmp_path, num_manifests, project_name, create_project_folders, expected
-):
+def test_static_local_cache_list_all_manifests(tmp_path, num_manifests, project_name, create_project_folders, expected):
     cache_dir = tmp_path / "cache_dir"
     cache_dir.mkdir()
 
@@ -187,9 +144,7 @@ def test_static_local_cache_list_all_manifests(
         manifests_dir.mkdir()
 
         for n in range(num_manifests):
-            manifest_path = (
-                manifests_dir / f"{project_name}_manifest_v0.{n}.0.json"
-            )
+            manifest_path = manifests_dir / f"{project_name}_manifest_v0.{n}.0.json"
             manifest_path.touch()
 
         cache = StaticLocalCache(cache_dir, project_name)
@@ -197,7 +152,5 @@ def test_static_local_cache_list_all_manifests(
         assert cache._manifest_file_names == expected
 
     else:
-        with pytest.raises(
-            RuntimeError, match="Expected the provided cache_dir"
-        ):
+        with pytest.raises(RuntimeError, match="Expected the provided cache_dir"):
             _ = StaticLocalCache(cache_dir, project_name)

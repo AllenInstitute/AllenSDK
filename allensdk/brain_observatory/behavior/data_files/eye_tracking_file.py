@@ -3,8 +3,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from allensdk.brain_observatory.behavior.eye_tracking_processing import \
-    load_eye_tracking_hdf
+from allensdk.brain_observatory.behavior.eye_tracking_processing import load_eye_tracking_hdf
 from allensdk.internal.api import PostgresQueryMixin, OneResultExpectedError
 from allensdk.internal.core.lims_utilities import safe_system_path
 from allensdk.internal.core import DataFile
@@ -24,10 +23,7 @@ class EyeTrackingFile(DataFile):
         return cls(filepath=filepath)
 
     @classmethod
-    def from_lims(
-        cls, db: PostgresQueryMixin,
-        behavior_session_id: Union[int, str]
-    ) -> "EyeTrackingFile":
+    def from_lims(cls, db: PostgresQueryMixin, behavior_session_id: Union[int, str]) -> "EyeTrackingFile":
         query = f"""
                 SELECT wkf.storage_directory || wkf.filename AS eye_tracking_file
                 FROM behavior_sessions bs

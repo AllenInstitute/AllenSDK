@@ -51,10 +51,10 @@ import allensdk.core.json_utilities as json_utilities
 
 
 class Api(object):
-    _log = logging.getLogger('allensdk.api.api')
-    _file_download_log = logging.getLogger('allensdk.api.api.retrieve_file_over_http')
-    default_api_url = 'http://api.brain-map.org'
-    download_url = 'http://download.alleninstitute.org'
+    _log = logging.getLogger("allensdk.api.api")
+    _file_download_log = logging.getLogger("allensdk.api.api.retrieve_file_over_http")
+    default_api_url = "http://api.brain-map.org"
+    download_url = "http://download.alleninstitute.org"
 
     def __init__(self, api_base_url_string=None):
         if api_base_url_string is None:
@@ -64,73 +64,67 @@ class Api(object):
         self.default_working_directory = os.getcwd()
 
     def set_api_urls(self, api_base_url_string):
-        '''Set the internal RMA and well known file download endpoint urls
+        """Set the internal RMA and well known file download endpoint urls
         based on a api server endpoint.
 
         Parameters
         ----------
         api_base_url_string : string
             url of the api to point to
-        '''
+        """
         self.api_url = api_base_url_string
 
         # http://help.brain-map.org/display/api/Downloading+a+WellKnownFile
-        self.well_known_file_endpoint = api_base_url_string + \
-            '/api/v2/well_known_file_download'
+        self.well_known_file_endpoint = api_base_url_string + "/api/v2/well_known_file_download"
 
         # http://help.brain-map.org/display/api/Downloading+3-D+Expression+Grid+Data
-        self.grid_data_endpoint = api_base_url_string + '/grid_data'
+        self.grid_data_endpoint = api_base_url_string + "/grid_data"
 
         # http://help.brain-map.org/display/api/Downloading+and+Displaying+SVG
-        self.svg_endpoint = api_base_url_string + '/api/v2/svg'
-        self.svg_download_endpoint = api_base_url_string + '/api/v2/svg_download'
+        self.svg_endpoint = api_base_url_string + "/api/v2/svg"
+        self.svg_download_endpoint = api_base_url_string + "/api/v2/svg_download"
 
         # http://help.brain-map.org/display/api/Downloading+an+Ontology%27s+Structure+Graph
-        self.structure_graph_endpoint = api_base_url_string + \
-            '/api/v2/structure_graph_download'
+        self.structure_graph_endpoint = api_base_url_string + "/api/v2/structure_graph_download"
 
         # http://help.brain-map.org/display/api/Searching+a+Specimen+or+Structure+Tree
-        self.tree_search_endpoint = api_base_url_string + '/api/v2/tree_search'
+        self.tree_search_endpoint = api_base_url_string + "/api/v2/tree_search"
 
         # http://help.brain-map.org/display/api/Searching+Annotated+SectionDataSets
-        self.annotated_section_data_sets_endpoint = api_base_url_string + \
-            '/api/v2/annotated_section_data_sets'
-        self.compound_annotated_section_data_sets_endpoint = api_base_url_string + \
-            '/api/v2/compound_annotated_section_data_sets'
+        self.annotated_section_data_sets_endpoint = api_base_url_string + "/api/v2/annotated_section_data_sets"
+        self.compound_annotated_section_data_sets_endpoint = (
+            api_base_url_string + "/api/v2/compound_annotated_section_data_sets"
+        )
 
         # http://help.brain-map.org/display/api/Image-to-Image+Synchronization#Image-to-ImageSynchronization-ImagetoImage
-        self.image_to_atlas_endpoint = api_base_url_string + '/api/v2/image_to_atlas'
-        self.image_to_image_endpoint = api_base_url_string + '/api/v2/image_to_image'
-        self.image_to_image_2d_endpoint = api_base_url_string + '/api/v2/image_to_image_2d'
-        self.reference_to_image_endpoint = api_base_url_string + '/api/v2/reference_to_image'
-        self.image_to_reference_endpoint = api_base_url_string + '/api/v2/image_to_reference'
-        self.structure_to_image_endpoint = api_base_url_string + '/api/v2/structure_to_image'
+        self.image_to_atlas_endpoint = api_base_url_string + "/api/v2/image_to_atlas"
+        self.image_to_image_endpoint = api_base_url_string + "/api/v2/image_to_image"
+        self.image_to_image_2d_endpoint = api_base_url_string + "/api/v2/image_to_image_2d"
+        self.reference_to_image_endpoint = api_base_url_string + "/api/v2/reference_to_image"
+        self.image_to_reference_endpoint = api_base_url_string + "/api/v2/image_to_reference"
+        self.structure_to_image_endpoint = api_base_url_string + "/api/v2/structure_to_image"
 
         # http://help.brain-map.org/display/mouseconnectivity/API
-        self.section_image_download_endpoint = api_base_url_string + \
-            '/api/v2/section_image_download'
-        self.atlas_image_download_endpoint = api_base_url_string + \
-            '/api/v2/atlas_image_download'
-        self.projection_image_download_endpoint = api_base_url_string + \
-            '/api/v2/projection_image_download'
-        self.image_download_endpoint = api_base_url_string + \
-            '/api/v2/image_download'
-        self.informatics_archive_endpoint = Api.download_url + '/informatics-archive'
+        self.section_image_download_endpoint = api_base_url_string + "/api/v2/section_image_download"
+        self.atlas_image_download_endpoint = api_base_url_string + "/api/v2/atlas_image_download"
+        self.projection_image_download_endpoint = api_base_url_string + "/api/v2/projection_image_download"
+        self.image_download_endpoint = api_base_url_string + "/api/v2/image_download"
+        self.informatics_archive_endpoint = Api.download_url + "/informatics-archive"
 
-        self.rma_endpoint = api_base_url_string + '/api/v2/data'
+        self.rma_endpoint = api_base_url_string + "/api/v2/data"
 
     def set_default_working_directory(self, working_directory):
-        '''Set the working directory where files will be saved.
+        """Set the working directory where files will be saved.
 
         Parameters
         ----------
         working_directory : string
              the absolute path string of the working directory.
-        '''
+        """
         self.default_working_directory = working_directory
 
     def read_data(self, parsed_json):
-        '''Return the message data from the parsed query.
+        """Return the message data from the parsed query.
 
         Parameters
         ----------
@@ -141,11 +135,11 @@ class Api(object):
         -----
         See `API Response Formats - Response Envelope <http://help.brain-map.org/display/api/API+Response+Formats#APIResponseFormats-ResponseEnvelope>`_
         for additional documentation.
-        '''
-        return parsed_json['msg']
+        """
+        return parsed_json["msg"]
 
     def json_msg_query(self, url, dataframe=False):
-        ''' Common case where the url is fully constructed
+        """Common case where the url is fully constructed
             and the response data is stored in the 'msg' field.
 
         Parameters
@@ -159,10 +153,9 @@ class Api(object):
         -------
         dict or DataFrame
             returned data; type depends on dataframe option
-        '''
+        """
 
-        data = self.do_query(lambda *a, **k: url,
-                             self.read_data)
+        data = self.do_query(lambda *a, **k: url, self.read_data)
 
         if dataframe is True:
             warnings.warn("dataframe argument is deprecated", DeprecationWarning)
@@ -171,7 +164,7 @@ class Api(object):
         return data
 
     def do_query(self, url_builder_fn, json_traversal_fn, *args, **kwargs):
-        '''Bundle an query url construction function
+        """Bundle an query url construction function
         with a corresponding response json traversal function.
 
         Parameters
@@ -196,17 +189,17 @@ class Api(object):
         --------
         `A simple Api subclass example
         <data_api_client.html#creating-new-api-query-classes>`_.
-        '''
+        """
         api_url = url_builder_fn(*args, **kwargs)
 
-        post = kwargs.get('post', False)
+        post = kwargs.get("post", False)
 
         json_parsed_data = self.retrieve_parsed_json_over_http(api_url, post)
 
         return json_traversal_fn(json_parsed_data)
 
     def do_rma_query(self, rma_builder_fn, json_traversal_fn, *args, **kwargs):
-        '''Bundle an RMA query url construction function
+        """Bundle an RMA query url construction function
         with a corresponding response json traversal function.
 
         ..note:: Deprecated in AllenSDK 0.9.2
@@ -233,11 +226,11 @@ class Api(object):
         --------
         `A simple Api subclass example
         <data_api_client.html#creating-new-api-query-classes>`_.
-        '''
+        """
         return self.do_query(rma_builder_fn, json_traversal_fn, *args, **kwargs)
 
     def load_api_schema(self):
-        '''Download the RMA schema from the current RMA endpoint
+        """Download the RMA schema from the current RMA endpoint
 
         Returns
         -------
@@ -252,15 +245,14 @@ class Api(object):
         `Class Hierarchy <http://api.brain-map.org/class_hierarchy>`_
         and `Class List <http://api.brain-map.org/class_hierarchy>`_.
 
-        '''
-        schema_url = self.rma_endpoint + '/enumerate.json'
-        json_parsed_schema_data = self.retrieve_parsed_json_over_http(
-            schema_url)
+        """
+        schema_url = self.rma_endpoint + "/enumerate.json"
+        json_parsed_schema_data = self.retrieve_parsed_json_over_http(schema_url)
 
         return json_parsed_schema_data
 
     def construct_well_known_file_download_url(self, well_known_file_id):
-        '''Join data api endpoint and id.
+        """Join data api endpoint and id.
 
         Parameters
         ----------
@@ -275,16 +267,16 @@ class Api(object):
         See Also
         --------
         retrieve_file_over_http: Can be used to retrieve the file from the url.
-        '''
-        return self.well_known_file_endpoint + '/' + str(well_known_file_id)
+        """
+        return self.well_known_file_endpoint + "/" + str(well_known_file_id)
 
     def cleanup_truncated_file(self, file_path):
-        '''Helper for removing files.
+        """Helper for removing files.
 
         Parameters
         ----------
         file_path : string
-            Absolute path including the file name to remove.'''
+            Absolute path including the file name to remove."""
         try:
             os.remove(file_path)
         except OSError as e:
@@ -292,7 +284,7 @@ class Api(object):
                 raise
 
     def retrieve_file_over_http(self, url, file_path, zipped=False):
-        '''Get a file from the data api and save it.
+        """Get a file from the data api and save it.
 
         Parameters
         ----------
@@ -301,8 +293,8 @@ class Api(object):
         file_path : string
             Absolute path including the file name to save.
         zipped : bool, optional
-            If true, assume that the response is a zipped directory and attempt 
-            to extract contained files into the directory containing file_path. 
+            If true, assume that the response is a zipped directory and attempt
+            to extract contained files into the directory containing file_path.
             Default is False.
 
         See Also
@@ -312,7 +304,7 @@ class Api(object):
         References
         ----------
         .. [1] Allen Brain Atlas Data Portal: `Downloading a WellKnownFile <http://help.brain-map.org/display/api/Downloading+a+WellKnownFile>`_.
-        '''
+        """
 
         self._file_download_log.info("Downloading URL: %s", url)
 
@@ -323,22 +315,22 @@ class Api(object):
                 stream_file_over_http(url, file_path)
 
         except exceptions.StreamingError:
-            self._file_download_log.error("Couldn't retrieve file %s from %s (streaming)." % (file_path,url))
+            self._file_download_log.error("Couldn't retrieve file %s from %s (streaming)." % (file_path, url))
             self.cleanup_truncated_file(file_path)
             raise
 
         except requests.exceptions.ConnectionError:
-            self._file_download_log.error("Couldn't retrieve file %s from %s (connection)." % (file_path,url))
+            self._file_download_log.error("Couldn't retrieve file %s from %s (connection)." % (file_path, url))
             self.cleanup_truncated_file(file_path)
             raise
 
         except requests.exceptions.ReadTimeout:
-            self._file_download_log.error("Couldn't retrieve file %s from %s (timeout)." % (file_path,url))
+            self._file_download_log.error("Couldn't retrieve file %s from %s (timeout)." % (file_path, url))
             self.cleanup_truncated_file(file_path)
             raise
 
         except requests.exceptions.RequestException:
-            self._file_download_log.error("Couldn't retrieve file %s from %s (request)." % (file_path,url))
+            self._file_download_log.error("Couldn't retrieve file %s from %s (request)." % (file_path, url))
             self.cleanup_truncated_file(file_path)
             raise
 
@@ -347,9 +339,8 @@ class Api(object):
             self.cleanup_truncated_file(file_path)
             raise
 
-
     def retrieve_parsed_json_over_http(self, url, post=False):
-        '''Get the document and put it in a Python data structure
+        """Get the document and put it in a Python data structure
 
         Parameters
         ----------
@@ -362,20 +353,18 @@ class Api(object):
         -------
         dict
             Result document as parsed by the JSON library.
-        '''
+        """
         self._log.info("Downloading URL: %s", url)
-        
+
         if post is False:
-            data = json_utilities.read_url_get(
-                requests.utils.quote(url,
-                                     ';/?:@&=+$,'))
+            data = json_utilities.read_url_get(requests.utils.quote(url, ";/?:@&=+$,"))
         else:
             data = json_utilities.read_url_post(url)
 
         return data
 
     def retrieve_xml_over_http(self, url):
-        '''Get the document and put it in a Python data structure
+        """Get the document and put it in a Python data structure
 
         Parameters
         ----------
@@ -386,16 +375,16 @@ class Api(object):
         -------
         string
             Unparsed xml string.
-        '''
+        """
         self._log.info("Downloading URL: %s", url)
-                
+
         response = requests.get(url)
 
         return response.content
 
 
 def stream_zip_directory_over_http(url, directory, members=None, timeout=(9.05, 31.1)):
-    ''' Supply an http get request and stream the response to a file.
+    """Supply an http get request and stream the response to a file.
 
     Parameters
     ----------
@@ -406,15 +395,15 @@ def stream_zip_directory_over_http(url, directory, members=None, timeout=(9.05, 
     members : list of str, optional
         Extract only these files
     timeout : float or tuple of float, optional
-        Specify a timeout for the request. If a tuple, specify seperate connect 
+        Specify a timeout for the request. If a tuple, specify seperate connect
         and read timeouts.
 
-    '''
+    """
 
     buf = io.BytesIO()
 
-    with closing( requests.get(url, stream=True, timeout=timeout) ) as request:
-        stream.stream_response_to_file( request, buf )
+    with closing(requests.get(url, stream=True, timeout=timeout)) as request:
+        stream.stream_response_to_file(request, buf)
 
     zipper = zipfile.ZipFile(buf)
     zipper.extractall(path=directory, members=members)
@@ -422,7 +411,7 @@ def stream_zip_directory_over_http(url, directory, members=None, timeout=(9.05, 
 
 
 def stream_file_over_http(url, file_path, timeout=(9.05, 31.1)):
-    ''' Supply an http get request and stream the response to a file.
+    """Supply an http get request and stream the response to a file.
 
     Parameters
     ----------
@@ -431,13 +420,12 @@ def stream_file_over_http(url, file_path, timeout=(9.05, 31.1)):
     file_path : str
         Stream the response to this path
     timeout : float or tuple of float, optional
-        Specify a timeout for the request. If a tuple, specify seperate connect 
+        Specify a timeout for the request. If a tuple, specify seperate connect
         and read timeouts.
 
-    '''
+    """
 
     with closing(requests.get(url, stream=True, timeout=timeout)) as response:
-
         response.raise_for_status()
-        with open(file_path, 'wb') as fil:
+        with open(file_path, "wb") as fil:
             stream.stream_response_to_file(response, path=fil)

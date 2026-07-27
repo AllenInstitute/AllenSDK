@@ -9,8 +9,7 @@ import pytest
 from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
 from allensdk.brain_observatory.behavior.data_objects.rewards import Rewards
-from allensdk.test.brain_observatory.behavior.data_objects.lims_util import \
-    LimsTest
+from allensdk.test.brain_observatory.behavior.data_objects.lims_util import LimsTest
 
 
 class TestFromBehaviorStimulusFile(LimsTest):
@@ -19,20 +18,16 @@ class TestFromBehaviorStimulusFile(LimsTest):
         cls.behavior_session_id = 994174745
 
         dir = Path(__file__).parent.resolve()
-        test_data_dir = dir / 'test_data'
+        test_data_dir = dir / "test_data"
 
-        expected = pd.read_pickle(str(test_data_dir / 'rewards.pkl'))
+        expected = pd.read_pickle(str(test_data_dir / "rewards.pkl"))
         cls.expected = Rewards(rewards=expected)
 
     @pytest.mark.requires_bamboo
     def test_from_stimulus_file(self):
-        stimulus_file = BehaviorStimulusFile.from_lims(
-            behavior_session_id=self.behavior_session_id, db=self.dbconn)
-        timestamps = StimulusTimestamps.from_stimulus_file(
-            stimulus_file=stimulus_file,
-            monitor_delay=0.0)
-        rewards = Rewards.from_stimulus_file(stimulus_file=stimulus_file,
-                                             stimulus_timestamps=timestamps)
+        stimulus_file = BehaviorStimulusFile.from_lims(behavior_session_id=self.behavior_session_id, db=self.dbconn)
+        timestamps = StimulusTimestamps.from_stimulus_file(stimulus_file=stimulus_file, monitor_delay=0.0)
+        rewards = Rewards.from_stimulus_file(stimulus_file=stimulus_file, stimulus_timestamps=timestamps)
         assert rewards == self.expected
 
     def test_monitor_delay_error(self):
@@ -40,14 +35,9 @@ class TestFromBehaviorStimulusFile(LimsTest):
         Test that an error is raised if Rewards are instantiated with
         non-zero monitor delay
         """
-        timestamps = StimulusTimestamps(
-                        np.arange(10),
-                        0.1)
-        with pytest.raises(RuntimeError,
-                           match="monitor_delay should be zero"):
-            Rewards.from_stimulus_file(
-                     stimulus_file=None,
-                     stimulus_timestamps=timestamps)
+        timestamps = StimulusTimestamps(np.arange(10), 0.1)
+        with pytest.raises(RuntimeError, match="monitor_delay should be zero"):
+            Rewards.from_stimulus_file(stimulus_file=None, stimulus_timestamps=timestamps)
 
     def test_from_stimulus_file2(self, tmpdir):
         """
@@ -59,37 +49,26 @@ class TestFromBehaviorStimulusFile(LimsTest):
 
         def _create_dummy_stimulus_file():
             trial_log = [
-                {'rewards': [(0.001, -1.0, 4)],
-                 'trial_params': {'auto_reward': True}},
-                {'rewards': []},
-                {'rewards': [(0.002, -1.0, 10)],
-                 'trial_params': {'auto_reward': False}}
+                {"rewards": [(0.001, -1.0, 4)], "trial_params": {"auto_reward": True}},
+                {"rewards": []},
+                {"rewards": [(0.002, -1.0, 10)], "trial_params": {"auto_reward": False}},
             ]
             data = {
-                'items': {
-                    'behavior': {
-                        'trial_log': trial_log
-                    }
-                },
+                "items": {"behavior": {"trial_log": trial_log}},
             }
-            tmp_path = tmpdir / 'stimulus_file.pkl'
-            with open(tmp_path, 'wb') as f:
+            tmp_path = tmpdir / "stimulus_file.pkl"
+            with open(tmp_path, "wb") as f:
                 pickle.dump(data, f)
                 f.seek(0)
 
             return tmp_path
 
         stimulus_filepath = _create_dummy_stimulus_file()
-        stimulus_file = BehaviorStimulusFile.from_json(
-            dict_repr={'behavior_stimulus_file': str(stimulus_filepath)})
-        timestamps = StimulusTimestamps(timestamps=np.arange(0, 2.0, 0.01),
-                                        monitor_delay=0.0)
-        rewards = Rewards.from_stimulus_file(stimulus_file=stimulus_file,
-                                             stimulus_timestamps=timestamps)
+        stimulus_file = BehaviorStimulusFile.from_json(dict_repr={"behavior_stimulus_file": str(stimulus_filepath)})
+        timestamps = StimulusTimestamps(timestamps=np.arange(0, 2.0, 0.01), monitor_delay=0.0)
+        rewards = Rewards.from_stimulus_file(stimulus_file=stimulus_file, stimulus_timestamps=timestamps)
 
-        expected_dict = {'volume': [0.001, 0.002],
-                         'timestamps': [0.04, 0.1],
-                         'auto_rewarded': [True, False]}
+        expected_dict = {"volume": [0.001, 0.002], "timestamps": [0.04, 0.1], "auto_rewarded": [True, False]}
         expected_df = pd.DataFrame(expected_dict)
         expected_df = expected_df
         assert expected_df.equals(rewards.value)
@@ -99,27 +78,22 @@ class TestNWB:
     @classmethod
     def setup_class(cls):
         dir = Path(__file__).parent.resolve()
-        test_data_dir = dir / 'test_data'
+        test_data_dir = dir / "test_data"
 
-        rewards = pd.read_pickle(str(test_data_dir / 'rewards.pkl'))
+        rewards = pd.read_pickle(str(test_data_dir / "rewards.pkl"))
         cls.rewards = Rewards(rewards=rewards)
 
     def setup_method(self, method):
         self.nwbfile = pynwb.NWBFile(
-            session_description='asession',
-            identifier='1234',
-            session_start_time=datetime.now()
+            session_description="asession", identifier="1234", session_start_time=datetime.now()
         )
 
-    @pytest.mark.parametrize('roundtrip', [True, False])
-    def test_read_write_nwb(self, roundtrip,
-                            data_object_roundtrip_fixture):
+    @pytest.mark.parametrize("roundtrip", [True, False])
+    def test_read_write_nwb(self, roundtrip, data_object_roundtrip_fixture):
         self.rewards.to_nwb(nwbfile=self.nwbfile)
 
         if roundtrip:
-            obt = data_object_roundtrip_fixture(
-                nwbfile=self.nwbfile,
-                data_object_cls=Rewards)
+            obt = data_object_roundtrip_fixture(nwbfile=self.nwbfile, data_object_cls=Rewards)
         else:
             obt = self.rewards.from_nwb(nwbfile=self.nwbfile)
 

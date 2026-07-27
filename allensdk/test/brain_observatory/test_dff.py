@@ -89,7 +89,7 @@ def test_compute_dff_windowed_mode():
 
     y = dff.compute_dff_windowed_mode(x)
 
-    assert(y.shape == x.shape)
+    assert y.shape == x.shape
 
 
 def test_compute_dff_windowed_median():
@@ -104,21 +104,22 @@ def test_compute_dff_windowed_median():
     with pytest.raises(ValueError):
         dff.compute_dff_windowed_median(x)
 
-    x = np.sin(np.arange(0, 200)).reshape(1,200)
+    x = np.sin(np.arange(0, 200)).reshape(1, 200)
 
-    y = dff.compute_dff_windowed_median(x, median_kernel_long=101,
-                                        median_kernel_short=11,
-                                        noise_kernel_length=5)
+    y = dff.compute_dff_windowed_median(x, median_kernel_long=101, median_kernel_short=11, noise_kernel_length=5)
 
-    assert(y.shape == x.shape)
+    assert y.shape == x.shape
 
     noise_stds = []
     small_frames = []
-    y = dff.compute_dff_windowed_median(x, median_kernel_long=101,
-                                        median_kernel_short=11,
-                                        noise_stds=noise_stds,
-                                        n_small_baseline_frames=small_frames,
-                                        noise_kernel_length=5)
+    y = dff.compute_dff_windowed_median(
+        x,
+        median_kernel_long=101,
+        median_kernel_short=11,
+        noise_stds=noise_stds,
+        n_small_baseline_frames=small_frames,
+        noise_kernel_length=5,
+    )
 
     assert len(noise_stds) == 1
     assert len(small_frames) == 1
@@ -129,8 +130,7 @@ def test_calculate_dff():
 
     with patch("os.makedirs") as mock_makedirs:
         with patch.object(Figure, "savefig") as mock_save:
-            with patch.object(dff, "compute_dff_windowed_median",
-                       return_value=x) as mock_computation:
+            with patch.object(dff, "compute_dff_windowed_median", return_value=x) as mock_computation:
                 dff.calculate_dff(x)
     assert mock_makedirs.call_count == 0
     assert mock_save.call_count == 0
@@ -139,22 +139,23 @@ def test_calculate_dff():
     with patch("os.makedirs") as mock_makedirs:
         with patch.object(Figure, "savefig") as mock_save:
             mock_computation = MagicMock(return_value=x)
-            dff.calculate_dff(x, dff_computation_cb=mock_computation,
-                              save_plot_dir="./test")
+            dff.calculate_dff(x, dff_computation_cb=mock_computation, save_plot_dir="./test")
     mock_makedirs.assert_called_once_with("./test")
     mock_save.assert_called_once()
     mock_computation.assert_called_once_with(x)
 
-    x = np.sin(np.arange(0, 200)).reshape(1,200)
+    x = np.sin(np.arange(0, 200)).reshape(1, 200)
 
     noise_stds = []
     small_frames = []
-    computation_cb = partial(dff.compute_dff_windowed_median,
-                             median_kernel_long=101,
-                             median_kernel_short=11,
-                             noise_stds=noise_stds,
-                             n_small_baseline_frames=small_frames,
-                             noise_kernel_length=5)
+    computation_cb = partial(
+        dff.compute_dff_windowed_median,
+        median_kernel_long=101,
+        median_kernel_short=11,
+        noise_stds=noise_stds,
+        n_small_baseline_frames=small_frames,
+        noise_kernel_length=5,
+    )
     dff.calculate_dff(x, dff_computation_cb=computation_cb)
     assert len(noise_stds) == 1
     assert len(small_frames) == 1

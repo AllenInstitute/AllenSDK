@@ -40,14 +40,14 @@ import pandas as pd
 from allensdk.deprecated import class_deprecated
 
 
-@class_deprecated('Use StructureTree instead.')
+@class_deprecated("Use StructureTree instead.")
 class Ontology(object):
-    '''
+    """
 
     .. note:: Deprecated from 0.12.5
         `Ontology` has been replaced by `StructureTree`.
 
-    '''
+    """
 
     def __init__(self, df):
         self.df = df
@@ -57,12 +57,12 @@ class Ontology(object):
 
         for _, s in df.iterrows():
             sid = s.name
-            parent_id = s['parent_structure_id']
+            parent_id = s["parent_structure_id"]
             if np.isfinite(parent_id):
                 parent_id = int(parent_id)
                 child_ids[parent_id].add(sid)
 
-            parent_id_list = map(int, s['structure_id_path'].split('/')[1:-1])
+            parent_id_list = map(int, s["structure_id_path"].split("/")[1:-1])
 
             for parent_id in parent_id_list:
                 descendant_ids[parent_id].add(sid)
@@ -94,7 +94,7 @@ class Ontology(object):
         # multiple arguments (e.g. ontology[315,997]), that gets passed through as a
         # tuple.  This normalizes the arguments so that everything is iterable.
         if not isinstance(structures, tuple) and not isinstance(structures, list) and not isinstance(structures, set):
-            structures = structures,
+            structures = (structures,)
 
         # this is the final set of structure ids used to filter
         structure_ids = set()
@@ -115,9 +115,8 @@ class Ontology(object):
 
         # convert the string arguments to rows
         if len(string_strs):
-
             # pull out the rows that match these acronyms
-            string_strs = self.df[self.df['acronym'].isin(string_strs)]
+            string_strs = self.df[self.df["acronym"].isin(string_strs)]
 
             # if there are no other structure ids, just return this dataframe
             if len(structure_ids) == 0:
@@ -126,7 +125,7 @@ class Ontology(object):
             # otherwise pull out the ids and add them to the set
             structure_ids.update(string_strs.id.tolist())
 
-        return self.df.loc[structure_ids].dropna(axis=0, how='all')
+        return self.df.loc[structure_ids].dropna(axis=0, how="all")
 
     def get_descendant_ids(self, structure_ids):
         """
@@ -149,8 +148,7 @@ class Ontology(object):
         else:
             descendants = set()
             for structure_id in structure_ids:
-                descendants.update(self.descendant_ids.get(
-                    int(structure_id), set()))
+                descendants.update(self.descendant_ids.get(int(structure_id), set()))
             return descendants
 
     def get_child_ids(self, structure_ids):
@@ -220,7 +218,7 @@ class Ontology(object):
         child = self[child_id]
 
         if child is not None:
-            parent_str = '/%d/' % parent_id
-            return child['structure_id_path'].values[0].find(parent_str) >= 0
+            parent_str = "/%d/" % parent_id
+            return child["structure_id_path"].values[0].find(parent_str) >= 0
 
         return False

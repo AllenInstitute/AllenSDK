@@ -73,15 +73,13 @@ def test_init_by_pixels_large():
     a = np.random.random((512, 512))
     a[a > 0.5] = 1
 
-    m = roi_masks.create_roi_mask(
-        512, 512, [0, 0, 0, 0], pix_list=np.argwhere(a))
+    m = roi_masks.create_roi_mask(512, 512, [0, 0, 0, 0], pix_list=np.argwhere(a))
 
     npx = len(np.where(a)[0])
     assert npx == len(np.where(m.get_mask_plane())[0])
 
 
 def test_create_neuropil_mask():
-
     image_width = 100
     image_height = 80
 
@@ -97,7 +95,7 @@ def test_create_neuropil_mask():
     roi = roi_masks.create_roi_mask(image_w=image_width, image_h=image_height, border=border, roi_mask=roi_mask)
     obtained = roi_masks.create_neuropil_mask(roi, border, combined_binary_mask)
 
-    expected_mask = np.zeros((58-27, 45-17), dtype=np.uint8)
+    expected_mask = np.zeros((58 - 27, 45 - 17), dtype=np.uint8)
     expected_mask[:, :] = 1
 
     assert np.allclose(expected_mask, obtained.mask)
@@ -124,39 +122,34 @@ def test_create_empty_neuropil_mask():
     obtained = roi_masks.create_neuropil_mask(roi, border, combined_binary_mask)
 
     assert obtained.mask is None
-    assert 'zero_pixels' in obtained.flags
+    assert "zero_pixels" in obtained.flags
 
 
 @pytest.fixture
 def image_dims():
-    return {
-        'width': 100,
-        'height': 100
-    }
+    return {"width": 100, "height": 100}
 
 
 @pytest.fixture
 def motion_border():
     return [5.0, 5.0, 5.0, 5.0]
 
+
 @pytest.fixture
 def roi_mask_list(image_dims, motion_border):
-
     base_pixels = np.argwhere(np.ones((10, 10)))
 
     masks = []
     for ii in range(10):
         pixels = base_pixels + ii * 10
-        masks.append(roi_masks.create_roi_mask(
-            image_dims['width'], 
-            image_dims['height'],
-            motion_border,
-            pix_list=pixels,
-            label=str(ii),
-            mask_group=-1
-        ))
+        masks.append(
+            roi_masks.create_roi_mask(
+                image_dims["width"], image_dims["height"], motion_border, pix_list=pixels, label=str(ii), mask_group=-1
+            )
+        )
 
     return masks
+
 
 @pytest.fixture
 def neuropil_masks(roi_mask_list, motion_border):
@@ -166,18 +159,14 @@ def neuropil_masks(roi_mask_list, motion_border):
     combined_mask = mask_array.max(axis=0)
 
     for roi_mask in roi_mask_list:
-        neuropil_masks.append(roi_masks.create_neuropil_mask(
-            roi_mask, 
-            motion_border, 
-            combined_mask, 
-            roi_mask.label
-        ))
+        neuropil_masks.append(roi_masks.create_neuropil_mask(roi_mask, motion_border, combined_mask, roi_mask.label))
     return neuropil_masks
+
 
 @pytest.fixture
 def video(image_dims):
     num_frames = 20
-    data = np.ones((num_frames, image_dims['height'], image_dims['width']))
+    data = np.ones((num_frames, image_dims["height"], image_dims["width"]))
     data[:, 50:, 50:] = 2
     return data
 
@@ -185,16 +174,15 @@ def video(image_dims):
 def test_calculate_traces(video, roi_mask_list):
     roi_traces, exclusions = roi_masks.calculate_traces(video, roi_mask_list)
 
-    expected_exclusions = pd.DataFrame({
-        'roi_id': ['0', '9'],
-        'exclusion_label_name': ['motion_border', 'motion_border']
-    })
+    expected_exclusions = pd.DataFrame(
+        {"roi_id": ["0", "9"], "exclusion_label_name": ["motion_border", "motion_border"]}
+    )
 
     assert np.all(np.isnan(roi_traces[0, :]))
     assert np.all(roi_traces[4, :] == 1)
     assert np.all(roi_traces[6, :] == 2)
     assert np.all(np.isnan(roi_traces[9, :]))
-    
+
     pd.testing.assert_frame_equal(expected_exclusions, pd.DataFrame(exclusions), check_like=True)
 
 
@@ -207,9 +195,10 @@ def test_validate_masks(roi_mask_list, neuropil_masks):
     for mask in roi_mask_list:
         obtained.extend(roi_masks.validate_mask(mask))
 
-    expected_exclusions = pd.DataFrame({
-        'roi_id': ['0', '3', '9', '7'],
-        'exclusion_label_name': ['motion_border', 'empty_roi_mask', 'motion_border', 'empty_neuropil_mask']
-    })
+    expected_exclusions = pd.DataFrame(
+        {
+            "roi_id": ["0", "3", "9", "7"],
+            "exclusion_label_name": ["motion_border", "empty_roi_mask", "motion_border", "empty_neuropil_mask"],
+        }
+    )
     pd.testing.assert_frame_equal(expected_exclusions, pd.DataFrame(obtained), check_like=True)
-

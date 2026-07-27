@@ -2,10 +2,8 @@ import sys
 import os
 import numpy as np
 
-from allensdk.brain_observatory.behavior.behavior_ophys_experiment import (
-    BehaviorOphysExperiment)
-from allensdk.brain_observatory.behavior.session_apis.data_io import (
-    BehaviorOphysNwbApi)
+from allensdk.brain_observatory.behavior.behavior_ophys_experiment import BehaviorOphysExperiment
+from allensdk.brain_observatory.behavior.session_apis.data_io import BehaviorOphysNwbApi
 
 import behavior_project_cache as bpc
 from importlib import reload
@@ -24,8 +22,7 @@ def time_from_last(flash_times, other_times):
 
 
 def trace_average(values, timestamps, start_time, stop_time):
-    values_this_range = values[
-        ((timestamps >= start_time) & (timestamps < stop_time))]
+    values_this_range = values[((timestamps >= start_time) & (timestamps < stop_time))]
     return values_this_range.mean()
 
 
@@ -37,7 +34,7 @@ expected = np.array([3.5, 3.0, 3.5])
 
 
 def find_change(image_index, omitted_index):
-    '''
+    """
     Args:
         image_index (pd.Series): The index of the presented image for each
         flash
@@ -45,11 +42,10 @@ def find_change(image_index, omitted_index):
 
     Returns:
         change (np.array of bool): Whether each flash was a change flash
-    '''
+    """
 
     change = np.diff(image_index) != 0
-    change = np.concatenate(
-        [np.array([False]), change])  # First flash not a change
+    change = np.concatenate([np.array([False]), change])  # First flash not a change
     omitted = image_index == omitted_index
     omitted_inds = np.flatnonzero(omitted)
     change[omitted_inds] = False
@@ -91,9 +87,9 @@ def get_extended_stimulus_presentations(session):
     intermediate_df["time_from_last_change"] = time_from_last_change
 
     # Was the flash a change flash?
-    omitted_index = intermediate_df.groupby("image_name").apply(
-        lambda group: group["image_index"].unique()[0]
-    )["omitted"]
+    omitted_index = intermediate_df.groupby("image_name").apply(lambda group: group["image_index"].unique()[0])[
+        "omitted"
+    ]
     changes = find_change(intermediate_df["image_index"], omitted_index)
     omitted = intermediate_df["image_index"] == omitted_index
 
@@ -105,15 +101,12 @@ def get_extended_stimulus_presentations(session):
     changes_including_first[0] = True
     change_indices = np.flatnonzero(changes_including_first)
     flash_inds = np.arange(len(intermediate_df))
-    block_inds = np.searchsorted(a=change_indices, v=flash_inds,
-                                 side="right") - 1
+    block_inds = np.searchsorted(a=change_indices, v=flash_inds, side="right") - 1
 
     intermediate_df["block_index"] = block_inds
 
     # Block repetition number
-    blocks_per_image = intermediate_df.groupby("image_name").apply(
-        lambda group: np.unique(group["block_index"])
-    )
+    blocks_per_image = intermediate_df.groupby("image_name").apply(lambda group: np.unique(group["block_index"]))
     block_repetition_number = np.copy(block_inds)
 
     for image_name, image_blocks in blocks_per_image.items():
@@ -121,8 +114,7 @@ def get_extended_stimulus_presentations(session):
             for ind_block, block_number in enumerate(image_blocks):
                 # block_rep_number starts as a copy of block_inds, so we can
                 # go write over the index number with the rep number
-                block_repetition_number[
-                    block_repetition_number == block_number] = ind_block
+                block_repetition_number[block_repetition_number == block_number] = ind_block
 
     intermediate_df["image_block_repetition"] = block_repetition_number
 
@@ -143,19 +135,11 @@ def get_extended_stimulus_presentations(session):
 
     # Lists of licks/rewards on each flash
     licks_each_flash = intermediate_df.apply(
-        lambda row: lick_times[
-            ((lick_times > row["start_time"]) & (
-                        lick_times < row["start_time"] + 0.75))
-        ],
+        lambda row: lick_times[((lick_times > row["start_time"]) & (lick_times < row["start_time"] + 0.75))],
         axis=1,
     )
     rewards_each_flash = intermediate_df.apply(
-        lambda row: reward_times[
-            (
-                    (reward_times > row["start_time"])
-                    & (reward_times < row["start_time"] + 0.75)
-            )
-        ],
+        lambda row: reward_times[((reward_times > row["start_time"]) & (reward_times < row["start_time"] + 0.75))],
         axis=1,
     )
 
@@ -196,24 +180,19 @@ def get_extended_stimulus_presentations(session):
 
 
 if __name__ == "__main__":
-
     case = 0
 
     cache_json = {
         "manifest_path": "/allen/programs/braintv/workgroups/nc-ophys"
-                         "/visual_behavior/SWDB_2019/"
-                         "visual_behavior_data_manifest.csv",
-        "nwb_base_dir": "/allen/programs/braintv/workgroups/nc-ophys"
-                        "/visual_behavior/SWDB_2019/nwb_files",
-        "analysis_files_base_dir":
-            "/allen/programs/braintv/workgroups/nc-ophys/visual_behavior"
-            "/SWDB_2019/extra_files",
+        "/visual_behavior/SWDB_2019/"
+        "visual_behavior_data_manifest.csv",
+        "nwb_base_dir": "/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/nwb_files",
+        "analysis_files_base_dir": "/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/extra_files",
     }
 
     cache = bpc.BehaviorProjectCache(cache_json)
 
     if case == 0:
-
         experiment_id = sys.argv[1]
         # experiment_id = cache.manifest.iloc[5]['ophys_experiment_id']
         nwb_path = cache.get_nwb_filepath(experiment_id)
@@ -222,22 +201,15 @@ if __name__ == "__main__":
 
         #  output_path = "/allen/programs/braintv/workgroups/nc-ophys
         #  /visual_behavior/SWDB_2019/extra_files_final"
-        output_path = "/allen/programs/braintv/workgroups/nc-ophys" \
-                      "/visual_behavior/SWDB_2019/corrected_extended_stim"
+        output_path = "/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/corrected_extended_stim"
 
-        extended_stimulus_presentations_df = \
-            get_extended_stimulus_presentations(session)
+        extended_stimulus_presentations_df = get_extended_stimulus_presentations(session)
 
-        output_fn = os.path.join(
-            output_path,
-            "extended_stimulus_presentations_df_{}.h5".format(experiment_id)
-        )
-        print("Writing extended_stimulus_presentations_df to {}".format(
-            output_fn))
+        output_fn = os.path.join(output_path, "extended_stimulus_presentations_df_{}.h5".format(experiment_id))
+        print("Writing extended_stimulus_presentations_df to {}".format(output_fn))
         extended_stimulus_presentations_df.to_hdf(output_fn, key="df")
 
     elif case == 1:
-
         failed_oeid = 825623170
         success_oeid = 826585773
 
@@ -246,5 +218,4 @@ if __name__ == "__main__":
         api = BehaviorOphysNwbApi(nwb_path, filter_invalid_rois=True)
         session = BehaviorOphysExperiment(api)
 
-        extended_stimulus_presentations_df = \
-            get_extended_stimulus_presentations(session)
+        extended_stimulus_presentations_df = get_extended_stimulus_presentations(session)

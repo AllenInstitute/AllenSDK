@@ -1,5 +1,4 @@
-"""Collection of specific project metadata not readily available on LIMS.
-"""
+"""Collection of specific project metadata not readily available on LIMS."""
 
 
 #####################################################################

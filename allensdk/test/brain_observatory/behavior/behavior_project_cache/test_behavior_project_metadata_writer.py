@@ -25,32 +25,26 @@ class TestVBO:
 
         # Note: these tables will need to be updated if the expected table
         # changes
-        cls.expected_behavior_sessions_table = pd.read_csv(
-            test_dir / "behavior_session_table.csv"
-        )
-        cls.expected_ophys_sessions_table = pd.read_csv(
-            test_dir / "ophys_session_table.csv"
-        )
-        cls.expected_ophys_experiments_table = pd.read_csv(
-            test_dir / "ophys_experiment_table.csv"
-        )
-        cls.expected_ophys_cells_table = pd.read_csv(
-            test_dir / "ophys_cells_table.csv"
-        )
+        cls.expected_behavior_sessions_table = pd.read_csv(test_dir / "behavior_session_table.csv")
+        cls.expected_ophys_sessions_table = pd.read_csv(test_dir / "ophys_session_table.csv")
+        cls.expected_ophys_experiments_table = pd.read_csv(test_dir / "ophys_experiment_table.csv")
+        cls.expected_ophys_cells_table = pd.read_csv(test_dir / "ophys_cells_table.csv")
 
-        cls.session_type_map = cls.expected_behavior_sessions_table.set_index(
-            "behavior_session_id"
-        )[["session_type"]].to_dict()["session_type"]
+        cls.session_type_map = cls.expected_behavior_sessions_table.set_index("behavior_session_id")[
+            ["session_type"]
+        ].to_dict()["session_type"]
 
         cls.test_dir = tempfile.TemporaryDirectory()
 
-        input_data = {"output_dir": cls.test_dir.name,
-                      "data_release_date": ['2021-03-25', '2021-08-12'],
-                      "clobber": True,
-                      "log_level": "INFO",
-                      "behavior_nwb_dir": str(test_dir),
-                      "ophys_nwb_dir": str(test_dir),
-                      "on_missing_file": "warn"}
+        input_data = {
+            "output_dir": cls.test_dir.name,
+            "data_release_date": ["2021-03-25", "2021-08-12"],
+            "clobber": True,
+            "log_level": "INFO",
+            "behavior_nwb_dir": str(test_dir),
+            "ophys_nwb_dir": str(test_dir),
+            "on_missing_file": "warn",
+        }
         cls.project_table_writer = BehaviorProjectMetadataWriter(
             input_data=input_data,
             args=[],
@@ -69,156 +63,101 @@ class TestVBO:
             behavior_session_id=BehaviorSessionId(behavior_session_id),
             equipment=None,
             stimulus_frame_rate=None,
-            session_type=SessionType(
-                self.session_type_map[behavior_session_id]
-            ),
+            session_type=SessionType(self.session_type_map[behavior_session_id]),
             behavior_session_uuid=None,
         )
 
     @pytest.mark.requires_bamboo
     def test_get_behavior_sessions_table(self):
-        with patch.object(
-            BehaviorMetadata, "from_lims", wraps=self._get_behavior_session
-        ):
-            self.project_table_writer._write_behavior_sessions(
-                include_trial_metrics=False
-            )
-            obtained = pd.read_csv(
-                Path(self.test_dir.name) / "behavior_session_table.csv"
-            )
-            obtained = obtained.sort_values("behavior_session_id").reset_index(
-                drop=True
-            )
-            expected = self.expected_behavior_sessions_table.sort_values(
-                "behavior_session_id"
-            ).reset_index(drop=True)
+        with patch.object(BehaviorMetadata, "from_lims", wraps=self._get_behavior_session):
+            self.project_table_writer._write_behavior_sessions(include_trial_metrics=False)
+            obtained = pd.read_csv(Path(self.test_dir.name) / "behavior_session_table.csv")
+            obtained = obtained.sort_values("behavior_session_id").reset_index(drop=True)
+            expected = self.expected_behavior_sessions_table.sort_values("behavior_session_id").reset_index(drop=True)
             # File paths are not created by
             # AllenInstitute/informatics_release_tool hence we ignore them
             # here.
             pd.testing.assert_frame_equal(
-                obtained.drop('file_path', axis=1).sort_index(axis=1),
-                expected.drop('file_path', axis=1).sort_index(axis=1)
+                obtained.drop("file_path", axis=1).sort_index(axis=1),
+                expected.drop("file_path", axis=1).sort_index(axis=1),
             )
 
     @pytest.mark.requires_bamboo
     def test_get_ophys_sessions_table(self):
-        with patch.object(
-            BehaviorMetadata, "from_lims", wraps=self._get_behavior_session
-        ):
+        with patch.object(BehaviorMetadata, "from_lims", wraps=self._get_behavior_session):
             self.project_table_writer._write_ophys_sessions()
-            obtained = pd.read_csv(
-                Path(self.test_dir.name) / "ophys_session_table.csv"
-            )
-            obtained = obtained.sort_values("ophys_session_id").reset_index(
-                drop=True
-            )
-            obtained['date_of_acquisition'] = pd.to_datetime(
-                obtained['date_of_acquisition'], utc=True)
-            expected = self.expected_ophys_sessions_table.sort_values(
-                "ophys_session_id"
-            ).reset_index(drop=True)
-            expected['date_of_acquisition'] = pd.to_datetime(
-                expected['date_of_acquisition'], utc=True)
-            pd.testing.assert_frame_equal(
-                obtained.sort_index(axis=1),
-                expected.sort_index(axis=1)
-            )
+            obtained = pd.read_csv(Path(self.test_dir.name) / "ophys_session_table.csv")
+            obtained = obtained.sort_values("ophys_session_id").reset_index(drop=True)
+            obtained["date_of_acquisition"] = pd.to_datetime(obtained["date_of_acquisition"], utc=True)
+            expected = self.expected_ophys_sessions_table.sort_values("ophys_session_id").reset_index(drop=True)
+            expected["date_of_acquisition"] = pd.to_datetime(expected["date_of_acquisition"], utc=True)
+            pd.testing.assert_frame_equal(obtained.sort_index(axis=1), expected.sort_index(axis=1))
 
     @pytest.mark.requires_bamboo
     def test_get_ophys_experiments_table(self):
-        with patch.object(
-            BehaviorMetadata, "from_lims", wraps=self._get_behavior_session
-        ):
+        with patch.object(BehaviorMetadata, "from_lims", wraps=self._get_behavior_session):
             self.project_table_writer._write_ophys_experiments()
-            obtained = pd.read_csv(
-                Path(self.test_dir.name) / "ophys_experiment_table.csv"
-            )
-            obtained = obtained.sort_values("ophys_experiment_id").reset_index(
-                drop=True
-            )
-            expected = self.expected_ophys_experiments_table.sort_values(
-                "ophys_experiment_id"
-            ).reset_index(drop=True)
+            obtained = pd.read_csv(Path(self.test_dir.name) / "ophys_experiment_table.csv")
+            obtained = obtained.sort_values("ophys_experiment_id").reset_index(drop=True)
+            expected = self.expected_ophys_experiments_table.sort_values("ophys_experiment_id").reset_index(drop=True)
 
-            obtained['date_of_acquisition'] = pd.to_datetime(
-                obtained['date_of_acquisition'], utc=True)
-            expected['date_of_acquisition'] = pd.to_datetime(
-                expected['date_of_acquisition'], utc=True)
+            obtained["date_of_acquisition"] = pd.to_datetime(obtained["date_of_acquisition"], utc=True)
+            expected["date_of_acquisition"] = pd.to_datetime(expected["date_of_acquisition"], utc=True)
             # File paths are not created by
             # AllenInstitute/informatics_release_tool hence we ignore them
             # here.
             pd.testing.assert_frame_equal(
-                obtained.drop('file_path', axis=1).sort_index(axis=1),
-                expected.drop('file_path', axis=1).sort_index(axis=1)
+                obtained.drop("file_path", axis=1).sort_index(axis=1),
+                expected.drop("file_path", axis=1).sort_index(axis=1),
             )
 
     @pytest.mark.requires_bamboo
     def test_get_ophys_cells_table(self):
         self.project_table_writer._write_ophys_cells()
-        obtained = pd.read_csv(
-            Path(self.test_dir.name) / "ophys_cells_table.csv"
-        )
-        pd.testing.assert_frame_equal(
-            obtained, self.expected_ophys_cells_table
-        )
+        obtained = pd.read_csv(Path(self.test_dir.name) / "ophys_cells_table.csv")
+        pd.testing.assert_frame_equal(obtained, self.expected_ophys_cells_table)
 
     @pytest.mark.requires_bamboo
     def test_imaging_plane_group_only_mesoscope(self):
         """Tests that imaging plane group only applies to mesoscope"""
-        with patch.object(
-            BehaviorMetadata, 'from_lims',
-                wraps=self._get_behavior_session):
+        with patch.object(BehaviorMetadata, "from_lims", wraps=self._get_behavior_session):
             self.project_table_writer._write_ophys_sessions()
             self.project_table_writer._write_ophys_experiments()
-        ophys_session_tbl = pd.read_csv(Path(self.test_dir.name) /
-                                        'ophys_session_table.csv')
-        ophys_experiment_tbl = pd.read_csv(Path(self.test_dir.name) /
-                                           'ophys_experiment_table.csv')
-        df = ophys_session_tbl.merge(ophys_experiment_tbl,
-                                     on='ophys_session_id')
+        ophys_session_tbl = pd.read_csv(Path(self.test_dir.name) / "ophys_session_table.csv")
+        ophys_experiment_tbl = pd.read_csv(Path(self.test_dir.name) / "ophys_experiment_table.csv")
+        df = ophys_session_tbl.merge(ophys_experiment_tbl, on="ophys_session_id")
 
-        assert (df[~df['equipment_name_x'].str.startswith('MESO')]
-                ['imaging_plane_group_count'].isna().all())
-        assert (df[~df['equipment_name_x'].str.startswith('MESO')]
-                ['imaging_plane_group'].isna().all())
+        assert df[~df["equipment_name_x"].str.startswith("MESO")]["imaging_plane_group_count"].isna().all()
+        assert df[~df["equipment_name_x"].str.startswith("MESO")]["imaging_plane_group"].isna().all()
 
     @pytest.mark.requires_bamboo
     def test_imaging_plane_group_count_consistent(self):
         """Tests that imaging plane group count in ophys sessions table is
         consistent with the number of imaging plane groups in experiment
         table"""
-        with patch.object(
-            BehaviorMetadata, 'from_lims',
-                wraps=self._get_behavior_session):
+        with patch.object(BehaviorMetadata, "from_lims", wraps=self._get_behavior_session):
             self.project_table_writer._write_ophys_sessions()
             self.project_table_writer._write_ophys_experiments()
-        ophys_session_tbl = pd.read_csv(Path(self.test_dir.name) /
-                                        'ophys_session_table.csv')
-        ophys_experiment_tbl = pd.read_csv(Path(self.test_dir.name) /
-                                           'ophys_experiment_table.csv')
-        df = ophys_session_tbl.merge(ophys_experiment_tbl,
-                                     on='ophys_session_id')
+        ophys_session_tbl = pd.read_csv(Path(self.test_dir.name) / "ophys_session_table.csv")
+        ophys_experiment_tbl = pd.read_csv(Path(self.test_dir.name) / "ophys_experiment_table.csv")
+        df = ophys_session_tbl.merge(ophys_experiment_tbl, on="ophys_session_id")
 
         imaging_plane_group_count = (
-            df[~df['imaging_plane_group'].isna()]
-            .groupby('ophys_session_id')['imaging_plane_group'].nunique()
+            df[~df["imaging_plane_group"].isna()]
+            .groupby("ophys_session_id")["imaging_plane_group"]
+            .nunique()
             .reset_index()
-            .rename(
-                columns={'imaging_plane_group': 'imaging_plane_group_count'})
+            .rename(columns={"imaging_plane_group": "imaging_plane_group_count"})
         )
 
         ophys_session_tbl = ophys_session_tbl.merge(
-            imaging_plane_group_count,
-            on='ophys_session_id',
-            suffixes=('_from_lims', '_recalculated'),
-            how='left'
+            imaging_plane_group_count, on="ophys_session_id", suffixes=("_from_lims", "_recalculated"), how="left"
         )
         assert (
-            (ophys_session_tbl['imaging_plane_group_count_from_lims']
-             [~ophys_session_tbl['imaging_plane_group_count_from_lims'].isna()]
-             ==
-             ophys_session_tbl['imaging_plane_group_count_recalculated']
-             [~ophys_session_tbl['imaging_plane_group_count_recalculated']
-             .isna()])
-            .all()
-        )
+            ophys_session_tbl["imaging_plane_group_count_from_lims"][
+                ~ophys_session_tbl["imaging_plane_group_count_from_lims"].isna()
+            ]
+            == ophys_session_tbl["imaging_plane_group_count_recalculated"][
+                ~ophys_session_tbl["imaging_plane_group_count_recalculated"].isna()
+            ]
+        ).all()

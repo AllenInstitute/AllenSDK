@@ -41,6 +41,7 @@ import numpy as np
 from allensdk.ephys.ephys_extractor import EphysSweepSetFeatureExtractor, input_resistance
 import allensdk.ephys.ephys_extractor as ephys_extractor
 import os
+
 path = os.path.dirname(__file__)
 
 
@@ -139,38 +140,36 @@ def test_extractor_with_high_init_dvdt():
 
 def test_extractor_input_resistance():
     t = np.arange(0, 1.0, 5e-6)
-    v1 = np.ones_like(t) * -5.
-    v2 = np.ones_like(t) * -10.
-    i1 = np.ones_like(t) * -50.
-    i2 = np.ones_like(t) * -100.
+    v1 = np.ones_like(t) * -5.0
+    v2 = np.ones_like(t) * -10.0
+    i1 = np.ones_like(t) * -50.0
+    i2 = np.ones_like(t) * -100.0
 
     ext = EphysSweepSetFeatureExtractor([t, t], [v1, v2], [i1, i2])
     ri = input_resistance(ext)
-    assert np.allclose(ri, 100.)
+    assert np.allclose(ri, 100.0)
 
 
 def test_fit_fi_slope():
-
     nsweeps = 5
-    weights = np.array([ 2, 1 ])
+    weights = np.array([2, 1])
 
     amps = np.random.rand(nsweeps)
     iteramps = iter(amps)
 
     design = np.array([amps, np.ones_like(amps)]).T
     rates = np.dot(design, weights)
+
     def build_stim_amps():
         return lambda sweep: next(iteramps)
 
     class Ext(object):
         def sweeps(self):
             return np.zeros([nsweeps])
+
         def sweep_features(self, key):
             return rates
 
-    with mock.patch(
-        'allensdk.ephys.ephys_extractor._step_stim_amp', 
-        new_callable=build_stim_amps):
-
+    with mock.patch("allensdk.ephys.ephys_extractor._step_stim_amp", new_callable=build_stim_amps):
         slope_obt = ephys_extractor.fit_fi_slope(Ext())
-        assert(np.allclose(weights[0], slope_obt))
+        assert np.allclose(weights[0], slope_obt)

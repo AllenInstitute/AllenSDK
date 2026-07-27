@@ -4,6 +4,7 @@ import logging
 
 import numpy as np
 
+
 class Utils(HocUtils):
     _log = logging.getLogger(__name__)
 
@@ -41,16 +42,16 @@ class Utils(HocUtils):
 
     def load_cell_parameters(self):
         cell = self.cell
-        passive = self.description.data['passive'][0]
-        conditions = self.description.data['conditions'][0]
-        channels = self.description.data['channels']
-        addl_params = self.description.data['addl_params']
+        passive = self.description.data["passive"][0]
+        conditions = self.description.data["conditions"][0]
+        channels = self.description.data["channels"]
+        addl_params = self.description.data["addl_params"]
 
         # Set passive properties
         for sec in cell.all:
-            sec.Ra = passive['ra']
-            sec.cm = passive['cm'][sec.name().split(".")[1][:4]]
-            sec.insert('pas')
+            sec.Ra = passive["ra"]
+            sec.cm = passive["cm"][sec.name().split(".")[1][:4]]
+            sec.insert("pas")
             for seg in sec:
                 seg.pas.e = passive["e_pas"]
         self.h.v_init = passive["e_pas"]
@@ -69,14 +70,14 @@ class Utils(HocUtils):
                     sec.insert(ap["mechanism"])
 
         # Set reversal potentials
-        for erev in conditions['erev']:
+        for erev in conditions["erev"]:
             sections = [s for s in cell.all if s.name().split(".")[1][:4] == erev["section"]]
             for sec in sections:
                 sec.ena = erev["ena"]
                 sec.ek = erev["ek"]
 
     def set_normalized_parameters(self, params):
-        channels_and_others = self.description.data['channels'] + self.description.data['addl_params']
+        channels_and_others = self.description.data["channels"] + self.description.data["addl_params"]
         for i, p in enumerate(params):
             c = channels_and_others[i]
             value = p * (c["max"] - c["min"]) + c["min"]
@@ -88,7 +89,7 @@ class Utils(HocUtils):
                 setattr(sec, param_name, value)
 
     def set_actual_parameters(self, params):
-        channels_and_others = self.description.data['channels'] + self.description.data['addl_params']
+        channels_and_others = self.description.data["channels"] + self.description.data["addl_params"]
         for i, p in enumerate(params):
             c = channels_and_others[i]
             sections = [s for s in self.cell.all if s.name().split(".")[1][:4] == c["section"]]
@@ -100,7 +101,7 @@ class Utils(HocUtils):
 
     def normalize_actual_parameters(self, params):
         params_array = np.array(params)
-        channels_and_others = self.description.data['channels'] + self.description.data['addl_params']
+        channels_and_others = self.description.data["channels"] + self.description.data["addl_params"]
         max_vals = np.array([c["max"] for c in channels_and_others])
         min_vals = np.array([c["min"] for c in channels_and_others])
 
@@ -109,7 +110,7 @@ class Utils(HocUtils):
 
     def actual_parameters_from_normalized(self, params):
         actual_params = []
-        channels_and_others = self.description.data['channels'] + self.description.data['addl_params']
+        channels_and_others = self.description.data["channels"] + self.description.data["addl_params"]
         for i, p in enumerate(params):
             c = channels_and_others[i]
             value = p * (c["max"] - c["min"]) + c["min"]
@@ -137,7 +138,7 @@ class Utils(HocUtils):
         delay = self.stim.delay * 1e-3
         duration = self.stim.dur * 1e-3
         t = t_ms * 1e-3
-        feature_names = self.description.data['features']
+        feature_names = self.description.data["features"]
 
         # penalize for failing to return to rest
         start_index = np.flatnonzero(t >= delay)[0]
@@ -149,18 +150,20 @@ class Utils(HocUtils):
             if swp.sweep_feature("avg_rate") > 0:
                 fail_trace = True
 
-        target_features = self.description.data['target_features']
+        target_features = self.description.data["target_features"]
         target_features_dict = {f["name"]: {"mean": f["mean"], "stdev": f["stdev"]} for f in target_features}
 
         if not fail_trace:
             swp = EphysSweepFeatureExtractor(t, v, i, start=delay, end=(delay + duration), filter=None)
             swp.process_spikes()
-            if len(swp.spikes()) < minimum_num_spikes: # Enough spikes?
+            if len(swp.spikes()) < minimum_num_spikes:  # Enough spikes?
                 fail_trace = True
             else:
-                avg_per_spike_peak_error = np.mean([abs(spk["peak_v"] - target_features_dict["peak_v"]["mean"]) for spk in swp.spikes()])
+                avg_per_spike_peak_error = np.mean(
+                    [abs(spk["peak_v"] - target_features_dict["peak_v"]["mean"]) for spk in swp.spikes()]
+                )
                 avg_overall_error = abs(target_features_dict["peak_v"]["mean"] - swp.spike_feature("peak_v").mean())
-                if avg_per_spike_peak_error > 3.0 * avg_overall_error: # Weird bi-modality of spikes; 3.0 is arbitrary
+                if avg_per_spike_peak_error > 3.0 * avg_overall_error:  # Weird bi-modality of spikes; 3.0 is arbitrary
                     fail_trace = True
 
         if fail_trace:
@@ -180,18 +183,18 @@ class Utils(HocUtils):
             slow_trough_t = swp.spike_feature("slow_trough_t")
 
             delta_t = slow_trough_t - fast_trough_t
-            delta_t[np.isnan(delta_t)] = 0.
+            delta_t[np.isnan(delta_t)] = 0.0
             other_features["slow_trough_delta_time"] = np.mean(delta_t[:-1] / np.diff(threshold_t))
 
             fast_trough_v = swp.spike_feature("fast_trough_v")
             slow_trough_v = swp.spike_feature("slow_trough_v")
             delta_v = fast_trough_v - slow_trough_v
-            delta_v[np.isnan(delta_v)] = 0.
+            delta_v[np.isnan(delta_v)] = 0.0
             other_features["slow_trough_delta_v"] = delta_v.mean()
 
             for f in feature_names:
-                target_mean = target_features_dict[f]['mean']
-                target_stdev = target_features_dict[f]['stdev']
+                target_mean = target_features_dict[f]["mean"]
+                target_stdev = target_features_dict[f]["stdev"]
 
                 if target_stdev == 0:
                     print("Feature with 0 stdev: ", f)

@@ -4,21 +4,19 @@ import pandas as pd
 import pathlib
 import warnings
 
-from allensdk.brain_observatory.data_release_utils \
-    .metadata_utils.id_generator import (
-        FileIDGenerator)
+from allensdk.brain_observatory.data_release_utils.metadata_utils.id_generator import FileIDGenerator
 
 
 def add_file_paths_to_metadata_table(
-        metadata_table: pd.DataFrame,
-        id_generator: FileIDGenerator,
-        file_dir: pathlib.Path,
-        file_prefix: Optional[str],
-        index_col: str,
-        data_dir_col: Optional[str],
-        on_missing_file: str,
-        file_suffix: str = 'nwb',
-        file_stem: Optional[str] = None
+    metadata_table: pd.DataFrame,
+    id_generator: FileIDGenerator,
+    file_dir: pathlib.Path,
+    file_prefix: Optional[str],
+    index_col: str,
+    data_dir_col: Optional[str],
+    on_missing_file: str,
+    file_suffix: str = "nwb",
+    file_stem: Optional[str] = None,
 ) -> pd.DataFrame:
     """
     Add file_id and file_path columns to session dataframe.
@@ -74,10 +72,8 @@ def add_file_paths_to_metadata_table(
     {file_dir}/{file_prefix}_{metadata_table.index_col}.{file_suffix}
     """
 
-    if on_missing_file not in ('error', 'warn', 'skip'):
-        msg = ("on_missing_file must be one of ('error', "
-               "'warn', or 'skip'); you passed in "
-               f"{on_missing_file}")
+    if on_missing_file not in ("error", "warn", "skip"):
+        msg = f"on_missing_file must be one of ('error', 'warn', or 'skip'); you passed in {on_missing_file}"
         raise ValueError(msg)
 
     new_data = []
@@ -88,19 +84,16 @@ def add_file_paths_to_metadata_table(
         data_dir = getattr(row, data_dir_col, row.Index)
 
         if file_stem is None:
-            file_stem_ = \
-                f'{file_prefix}_{row.Index}' if file_prefix is not None else \
-                f'{row.Index}'
+            file_stem_ = f"{file_prefix}_{row.Index}" if file_prefix is not None else f"{row.Index}"
         else:
             file_stem_ = file_stem
 
         if data_dir is None:
             # If `data_dir` is not given, assume files stored flat
-            file_path = file_dir / f'{file_stem_}.{file_suffix}'
+            file_path = file_dir / f"{file_stem_}.{file_suffix}"
         else:
             # assume files stored under data_dir
-            file_path = file_dir / f'{data_dir}' / \
-                        f'{file_stem_}.{file_suffix}'
+            file_path = file_dir / f"{data_dir}" / f"{file_stem_}.{file_suffix}"
 
         if not file_path.exists():
             file_id = id_generator.dummy_value
@@ -108,29 +101,23 @@ def add_file_paths_to_metadata_table(
         else:
             file_id = id_generator.id_from_path(file_path=file_path)
         str_path = str(file_path.resolve().absolute())
-        new_data.append(
-            {'file_id': file_id,
-             'file_path': str_path,
-             index_col: row.Index})
+        new_data.append({"file_id": file_id, "file_path": str_path, index_col: row.Index})
 
     if len(missing_files) > 0:
         msg = "The following files do not exist:"
         for file_path in missing_files:
             msg += f"\n{file_path}"
-        if on_missing_file == 'error':
+        if on_missing_file == "error":
             raise RuntimeError(msg)
         else:
             warnings.warn(msg)
 
     new_df = pd.DataFrame(data=new_data)
-    metadata_table = metadata_table.join(
-                new_df.set_index(index_col),
-                on=index_col,
-                how='left')
-    if on_missing_file == 'skip' and len(missing_files) > 0:
+    metadata_table = metadata_table.join(new_df.set_index(index_col), on=index_col, how="left")
+    if on_missing_file == "skip" and len(missing_files) > 0:
         metadata_table = metadata_table.drop(
-            metadata_table.loc[
-                metadata_table.file_id == id_generator.dummy_value].index)
+            metadata_table.loc[metadata_table.file_id == id_generator.dummy_value].index
+        )
 
     metadata_table = metadata_table.reset_index()
 

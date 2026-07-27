@@ -77,9 +77,7 @@ def test_add_number_to_shuffled_movie(table, expected):
     "table,expected",
     [
         [
-            pd.DataFrame(
-                {"stimulus_name": ["natural_movie_4", "natural_movie_5_more_repeats"]}
-            ),
+            pd.DataFrame({"stimulus_name": ["natural_movie_4", "natural_movie_5_more_repeats"]}),
             pd.DataFrame(
                 {
                     "stimulus_name": [
@@ -105,14 +103,10 @@ def test_standardize_movie_numbers(table, expected):
                 "Natural Images": "natural_scenes",
                 "contrast_response": "drifting_gratings_contrast",
             },
-            pd.DataFrame(
-                {"stimulus_name": ["natural_scenes", "drifting_gratings_contrast"]}
-            ),
+            pd.DataFrame({"stimulus_name": ["natural_scenes", "drifting_gratings_contrast"]}),
         ],
         [
-            pd.DataFrame(
-                {"stimulus_name": ["Natural Images", "contrast_response", np.nan]}
-            ),
+            pd.DataFrame({"stimulus_name": ["Natural Images", "contrast_response", np.nan]}),
             {
                 "Natural Images": "natural_scenes",
                 "contrast_response": "drifting_gratings_contrast",
@@ -186,6 +180,4 @@ def test_drop_empty_columns(table, expected):
 )
 def test_collapse_colimns(table, expected):
     obtained = nu.collapse_columns(table)
-    pd.testing.assert_frame_equal(
-        expected, obtained, check_like=True, check_dtype=False
-    )
+    pd.testing.assert_frame_equal(expected, obtained, check_like=True, check_dtype=False)

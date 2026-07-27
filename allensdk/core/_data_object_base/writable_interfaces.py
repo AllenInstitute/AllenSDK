@@ -5,6 +5,7 @@ from pynwb import NWBFile
 
 class NwbWritableInterface(abc.ABC):
     """Marks a data object as writable to NWB"""
+
     @abc.abstractmethod
     def to_nwb(self, nwbfile: NWBFile) -> NWBFile:  # pragma: no cover
         """Given an already populated DataObject, return an pyNWB file object

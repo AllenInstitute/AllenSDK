@@ -41,20 +41,18 @@ class RmaPager(object):
         pass
 
     @staticmethod
-    def pager(fn,
-              *args,
-              **kwargs):
-        total_rows = kwargs.pop('total_rows', None)
-        num_rows = kwargs.get('num_rows', None)
+    def pager(fn, *args, **kwargs):
+        total_rows = kwargs.pop("total_rows", None)
+        num_rows = kwargs.get("num_rows", None)
 
-        if total_rows == 'all':
+        if total_rows == "all":
             start_row = 0
             result_count = num_rows
             kwargs = kwargs
-            kwargs['count'] = False
+            kwargs["count"] = False
 
             while result_count == num_rows:
-                kwargs['start_row'] = start_row
+                kwargs["start_row"] = start_row
                 data = fn(*args, **kwargs)
 
                 start_row = start_row + num_rows
@@ -65,10 +63,10 @@ class RmaPager(object):
         else:
             start_row = 0
             kwargs = kwargs
-            kwargs['count'] = False
+            kwargs["count"] = False
 
             while start_row < total_rows:
-                kwargs['start_row'] = start_row
+                kwargs["start_row"] = start_row
 
                 data = fn(*args, **kwargs)
                 result_count = len(data)
@@ -77,23 +75,22 @@ class RmaPager(object):
                 for r in data:
                     yield r
 
-def pageable(total_rows=None,
-             num_rows=None):
+
+def pageable(total_rows=None, num_rows=None):
     def decor(func):
-        decor.total_rows=total_rows
-        decor.num_rows=num_rows
+        decor.total_rows = total_rows
+        decor.num_rows = num_rows
 
         @functools.wraps(func)
-        def w(*args,
-              **kwargs):
-            if decor.num_rows and 'num_rows' not in kwargs:
-                kwargs['num_rows'] = decor.num_rows
-            if decor.total_rows and 'total_rows' not in kwargs:
-                kwargs['total_rows'] = decor.total_rows
+        def w(*args, **kwargs):
+            if decor.num_rows and "num_rows" not in kwargs:
+                kwargs["num_rows"] = decor.num_rows
+            if decor.total_rows and "total_rows" not in kwargs:
+                kwargs["total_rows"] = decor.total_rows
 
-            result = RmaPager.pager(func,
-                                    *args,
-                                    **kwargs)
+            result = RmaPager.pager(func, *args, **kwargs)
             return result
+
         return w
+
     return decor

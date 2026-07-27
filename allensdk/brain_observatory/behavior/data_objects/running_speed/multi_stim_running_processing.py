@@ -6,22 +6,19 @@ from allensdk.brain_observatory.behavior.data_files.stimulus_file import (
     BehaviorStimulusFile,
     MappingStimulusFile,
     ReplayStimulusFile,
-    _StimulusFile)
+    _StimulusFile,
+)
 
-from allensdk.brain_observatory.sync_stim_aligner import (
-    get_stim_timestamps_from_stimulus_blocks)
+from allensdk.brain_observatory.sync_stim_aligner import get_stim_timestamps_from_stimulus_blocks
 
-from allensdk.brain_observatory.behavior.data_objects.\
-    running_speed.running_processing import (
-        get_running_df
-    )
+from allensdk.brain_observatory.behavior.data_objects.running_speed.running_processing import get_running_df
 
 
 def _extract_dx_info(
-        frame_times: np.ndarray,
-        stimulus_file: _StimulusFile,
-        zscore_threshold: float = 10.0,
-        use_lowpass_filter: bool = True
+    frame_times: np.ndarray,
+    stimulus_file: _StimulusFile,
+    zscore_threshold: float = 10.0,
+    use_lowpass_filter: bool = True,
 ) -> pd.core.frame.DataFrame:
     """
     Extract all of the running speed data
@@ -54,12 +51,7 @@ def _extract_dx_info(
 
     stim_file = stimulus_file.data
 
-    velocities = get_running_df(
-                    stim_file,
-                    frame_times,
-                    use_lowpass_filter,
-                    zscore_threshold
-    )
+    velocities = get_running_df(stim_file, frame_times, use_lowpass_filter, zscore_threshold)
 
     return velocities
 
@@ -69,7 +61,7 @@ def _merge_dx_data(
     behavior_velocities: pd.core.frame.DataFrame,
     replay_velocities: pd.core.frame.DataFrame,
     frame_times: np.ndarray,
-    behavior_start_frame: int
+    behavior_start_frame: int,
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     Concatenate all of the running speed data
@@ -95,49 +87,23 @@ def _merge_dx_data(
     """
 
     speed = np.concatenate(
-        (
-            behavior_velocities['speed'],
-            mapping_velocities['speed'],
-            replay_velocities['speed']),
-        axis=None
-        )
-
-    dx = np.concatenate(
-        (
-            behavior_velocities['dx'],
-            mapping_velocities['dx'],
-            replay_velocities['dx']),
-        axis=None
+        (behavior_velocities["speed"], mapping_velocities["speed"], replay_velocities["speed"]), axis=None
     )
 
+    dx = np.concatenate((behavior_velocities["dx"], mapping_velocities["dx"], replay_velocities["dx"]), axis=None)
+
     vsig = np.concatenate(
-        (
-            behavior_velocities['v_sig'],
-            mapping_velocities['v_sig'],
-            replay_velocities['v_sig']),
-        axis=None
+        (behavior_velocities["v_sig"], mapping_velocities["v_sig"], replay_velocities["v_sig"]), axis=None
     )
 
     vin = np.concatenate(
-        (
-            behavior_velocities['v_in'],
-            mapping_velocities['v_in'],
-            replay_velocities['v_in']),
-        axis=None
+        (behavior_velocities["v_in"], mapping_velocities["v_in"], replay_velocities["v_in"]), axis=None
     )
 
-    frame_indexes = list(
-        range(behavior_start_frame,
-              behavior_start_frame+len(frame_times))
-    )
+    frame_indexes = list(range(behavior_start_frame, behavior_start_frame + len(frame_times)))
 
     velocities = pd.DataFrame(
-        {
-            "velocity": speed,
-            "net_rotation": dx,
-            "frame_indexes": frame_indexes,
-            "frame_time": frame_times
-        }
+        {"velocity": speed, "net_rotation": dx, "frame_indexes": frame_indexes, "frame_time": frame_times}
     )
 
     # Warning - the 'isclose' line below needs to be refactored
@@ -149,9 +115,7 @@ def _merge_dx_data(
     # there may be exact zeros in the velocity.
     velocities = velocities[~(np.isclose(velocities["net_rotation"], 0.0))]
 
-    raw_data = pd.DataFrame(
-        {"vsig": vsig, "vin": vin, "frame_time": frame_times, "dx": dx}
-    )
+    raw_data = pd.DataFrame({"vsig": vsig, "vin": vin, "frame_time": frame_times, "dx": dx})
 
     return (velocities, raw_data)
 
@@ -163,7 +127,7 @@ def multi_stim_running_df_from_raw_data(
     replay_stimulus_file: ReplayStimulusFile,
     use_lowpass_filter: bool,
     zscore_threshold: float,
-    behavior_start_frame: int
+    behavior_start_frame: int,
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     Derive running speed data frames from sync file and
@@ -221,15 +185,12 @@ def multi_stim_running_df_from_raw_data(
     """
 
     timestamp_results = get_stim_timestamps_from_stimulus_blocks(
-                              stimulus_files=[behavior_stimulus_file,
-                                              mapping_stimulus_file,
-                                              replay_stimulus_file],
-                              sync_file=sync_path,
-                              raw_frame_time_lines=['frames',
-                                                    'stim_vsync',
-                                                    'vsync_stim'],
-                              raw_frame_time_direction='rising',
-                              frame_count_tolerance=0.0)
+        stimulus_files=[behavior_stimulus_file, mapping_stimulus_file, replay_stimulus_file],
+        sync_file=sync_path,
+        raw_frame_time_lines=["frames", "stim_vsync", "vsync_stim"],
+        raw_frame_time_direction="rising",
+        frame_count_tolerance=0.0,
+    )
 
     behavior_timestamps = timestamp_results["timestamps"][0]
     mapping_timestamps = timestamp_results["timestamps"][1]
@@ -241,46 +202,44 @@ def multi_stim_running_df_from_raw_data(
         frame_times=behavior_timestamps,
         stimulus_file=behavior_stimulus_file,
         zscore_threshold=zscore_threshold,
-        use_lowpass_filter=use_lowpass_filter
+        use_lowpass_filter=use_lowpass_filter,
     )
 
     mapping_velocities = _extract_dx_info(
         frame_times=mapping_timestamps,
         stimulus_file=mapping_stimulus_file,
         zscore_threshold=zscore_threshold,
-        use_lowpass_filter=use_lowpass_filter
+        use_lowpass_filter=use_lowpass_filter,
     )
 
     replay_velocities = _extract_dx_info(
         frame_times=replay_timestamps,
         stimulus_file=replay_stimulus_file,
         zscore_threshold=zscore_threshold,
-        use_lowpass_filter=use_lowpass_filter
+        use_lowpass_filter=use_lowpass_filter,
     )
 
-    all_frame_times = np.concatenate(
-            [behavior_timestamps,
-             mapping_timestamps,
-             replay_timestamps])
+    all_frame_times = np.concatenate([behavior_timestamps, mapping_timestamps, replay_timestamps])
 
     velocities, raw_data = _merge_dx_data(
         mapping_velocities=mapping_velocities,
         behavior_velocities=behavior_velocities,
         replay_velocities=replay_velocities,
         frame_times=all_frame_times,
-        behavior_start_frame=start_frame
+        behavior_start_frame=start_frame,
     )
 
     return (velocities, raw_data)
 
 
 def _get_multi_stim_running_df(
-        sync_path: str,
-        behavior_stimulus_file: BehaviorStimulusFile,
-        mapping_stimulus_file: MappingStimulusFile,
-        replay_stimulus_file: ReplayStimulusFile,
-        use_lowpass_filter: bool,
-        zscore_threshold: float) -> Dict[str, pd.DataFrame]:
+    sync_path: str,
+    behavior_stimulus_file: BehaviorStimulusFile,
+    mapping_stimulus_file: MappingStimulusFile,
+    replay_stimulus_file: ReplayStimulusFile,
+    use_lowpass_filter: bool,
+    zscore_threshold: float,
+) -> Dict[str, pd.DataFrame]:
     """
     Parameters
     ----------
@@ -308,29 +267,27 @@ def _get_multi_stim_running_df(
         'running_acquisition': A dataframe mapping time to raw data
                                coming off the running wheel
     """
-    (velocity_data,
-     acq_data) = multi_stim_running_df_from_raw_data(
-                    sync_path=sync_path,
-                    behavior_stimulus_file=behavior_stimulus_file,
-                    mapping_stimulus_file=mapping_stimulus_file,
-                    replay_stimulus_file=replay_stimulus_file,
-                    use_lowpass_filter=use_lowpass_filter,
-                    zscore_threshold=zscore_threshold,
-                    behavior_start_frame=0)
+    (velocity_data, acq_data) = multi_stim_running_df_from_raw_data(
+        sync_path=sync_path,
+        behavior_stimulus_file=behavior_stimulus_file,
+        mapping_stimulus_file=mapping_stimulus_file,
+        replay_stimulus_file=replay_stimulus_file,
+        use_lowpass_filter=use_lowpass_filter,
+        zscore_threshold=zscore_threshold,
+        behavior_start_frame=0,
+    )
 
     running_speed = pd.DataFrame(
-                      data={
-                            'timestamps': velocity_data.frame_time.values,
-                            'speed': velocity_data.velocity.values
-                      })
+        data={"timestamps": velocity_data.frame_time.values, "speed": velocity_data.velocity.values}
+    )
 
     running_acq = pd.DataFrame(
-                     data={
-                         'dx': acq_data.dx.values,
-                         'timestamps': acq_data.frame_time.values,
-                         'v_in': acq_data.vin.values,
-                         'v_sig': acq_data.vsig.values
-                     }).set_index('timestamps')
+        data={
+            "dx": acq_data.dx.values,
+            "timestamps": acq_data.frame_time.values,
+            "v_in": acq_data.vin.values,
+            "v_sig": acq_data.vsig.values,
+        }
+    ).set_index("timestamps")
 
-    return {'running_speed': running_speed,
-            'running_acquisition': running_acq}
+    return {"running_speed": running_speed, "running_acquisition": running_acq}

@@ -47,7 +47,7 @@ class JsonDescriptionParser(DescriptionParser):
         super(JsonDescriptionParser, self).__init__()
 
     def read(self, file_path, description=None, section=None, **kwargs):
-        '''Parse a complete or partial configuration.
+        """Parse a complete or partial configuration.
 
         Parameters
         ----------
@@ -64,7 +64,7 @@ class JsonDescriptionParser(DescriptionParser):
             The input description with parsed configuration added.
 
         Section is only specified for "bare" objects that are to be added to a section array.
-        '''
+        """
         if description is None:
             description = Description()
 
@@ -74,7 +74,7 @@ class JsonDescriptionParser(DescriptionParser):
         return description
 
     def read_string(self, json_string, description=None, section=None, **kwargs):
-        '''Parse a complete or partial configuration.
+        """Parse a complete or partial configuration.
 
         Parameters
         ----------
@@ -91,7 +91,7 @@ class JsonDescriptionParser(DescriptionParser):
             The input description with parsed configuration added.
 
         Section is only specified for "bare" objects that are to be added to a section array.
-        '''
+        """
         if description is None:
             description = Description()
 
@@ -102,26 +102,25 @@ class JsonDescriptionParser(DescriptionParser):
         return description
 
     def write(self, filename, description):
-        '''Write the description to a JSON file.
+        """Write the description to a JSON file.
 
         Parameters
         ----------
         description : Description
             Object to write.
-        '''
+        """
         try:
-            with open(filename, 'w') as f:
+            with open(filename, "w") as f:
                 dump(description.data, f, indent=2)
 
         except Exception:
-            self.log.warn(
-                "Couldn't write allensdk json description: %s" % filename)
+            self.log.warn("Couldn't write allensdk json description: %s" % filename)
             raise
 
         return
 
     def write_string(self, description):
-        '''Write the description to a JSON string.
+        """Write the description to a JSON string.
 
         Parameters
         ----------
@@ -132,10 +131,9 @@ class JsonDescriptionParser(DescriptionParser):
         -------
         string
            JSON serialization of the input.
-        '''
+        """
         try:
-            json_string = dumps(description.data,
-                                indent=2)
+            json_string = dumps(description.data, indent=2)
             return json_string
         except Exception:
             self.log.warn("Couldn't write allensdk json description: %s")

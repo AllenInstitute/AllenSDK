@@ -8,16 +8,12 @@ from pynwb import NWBFile, TimeSeries, ProcessingModule
 from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.core import DataObject
 from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
-from allensdk.core import \
-    NwbReadableInterface
-from allensdk.brain_observatory.behavior.data_files.stimulus_file import \
-    StimulusFileReadableInterface
-from allensdk.core import \
-    NwbWritableInterface
+from allensdk.core import NwbReadableInterface
+from allensdk.brain_observatory.behavior.data_files.stimulus_file import StimulusFileReadableInterface
+from allensdk.core import NwbWritableInterface
 
 
-class Licks(DataObject, StimulusFileReadableInterface, NwbReadableInterface,
-            NwbWritableInterface):
+class Licks(DataObject, StimulusFileReadableInterface, NwbReadableInterface, NwbWritableInterface):
     _logger = logging.getLogger(__name__)
 
     def __init__(self, licks: pd.DataFrame):
@@ -29,14 +25,12 @@ class Licks(DataObject, StimulusFileReadableInterface, NwbReadableInterface,
                 - frame: int
                     frame number in which there was a lick
         """
-        super().__init__(name='licks', value=licks)
+        super().__init__(name="licks", value=licks)
 
     @classmethod
     def from_stimulus_file(
-            cls,
-            stimulus_file: BehaviorStimulusFile,
-            stimulus_timestamps: Union[StimulusTimestamps, np.ndarray]
-            ) -> "Licks":
+        cls, stimulus_file: BehaviorStimulusFile, stimulus_timestamps: Union[StimulusTimestamps, np.ndarray]
+    ) -> "Licks":
         """Get lick data from pkl file.
         This function assumes that the first sensor in the list of
         lick_sensors is the desired lick sensor.
@@ -64,15 +58,16 @@ class Licks(DataObject, StimulusFileReadableInterface, NwbReadableInterface,
         """
         data = stimulus_file.data
 
-        lick_frames = (data["items"]["behavior"]["lick_sensors"][0]
-                       ["lick_events"])
+        lick_frames = data["items"]["behavior"]["lick_sensors"][0]["lick_events"]
 
         if isinstance(stimulus_timestamps, StimulusTimestamps):
             if not np.isclose(stimulus_timestamps.monitor_delay, 0.0):
-                msg = ("Instantiating licks with monitor_delay = "
-                       f"{stimulus_timestamps.monitor_delay: .2e}; "
-                       "monitor_delay should be zero for Licks "
-                       "data object")
+                msg = (
+                    "Instantiating licks with monitor_delay = "
+                    f"{stimulus_timestamps.monitor_delay: .2e}; "
+                    "monitor_delay should be zero for Licks "
+                    "data object"
+                )
                 raise RuntimeError(msg)
 
             lick_times = stimulus_timestamps.value
@@ -93,9 +88,7 @@ class Licks(DataObject, StimulusFileReadableInterface, NwbReadableInterface,
         if len(lick_frames) > 0:
             if lick_frames[-1] == len(lick_times):
                 lick_frames = lick_frames[:-1]
-                cls._logger.error('removed last lick - '
-                                  'it fell outside of stimulus_timestamps '
-                                  'range')
+                cls._logger.error("removed last lick - it fell outside of stimulus_timestamps range")
         if isinstance(stimulus_timestamps, StimulusTimestamps):
             lick_times = np.array([lick_times[frame] for frame in lick_frames])
 
@@ -110,42 +103,36 @@ class Licks(DataObject, StimulusFileReadableInterface, NwbReadableInterface,
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> Optional["Licks"]:
-        if 'licking' in nwbfile.processing:
-            lick_module = nwbfile.processing['licking']
-            licks = lick_module.get_data_interface('licks')
+        if "licking" in nwbfile.processing:
+            lick_module = nwbfile.processing["licking"]
+            licks = lick_module.get_data_interface("licks")
             timestamps = licks.timestamps[:]
             frame = licks.data[:]
         else:
             timestamps = []
             frame = []
 
-        df = pd.DataFrame({
-            'timestamps': timestamps,
-            'frame': frame
-        })
+        df = pd.DataFrame({"timestamps": timestamps, "frame": frame})
 
         return cls(licks=df)
 
     def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
-
         # If there is no lick data, do not write
         # anything to the NWB file (this is
         # expected for passive sessions)
-        if len(self.value['frame']) == 0:
+        if len(self.value["frame"]) == 0:
             return nwbfile
 
         lick_timeseries = TimeSeries(
-            name='licks',
-            data=self.value['frame'].values,
-            timestamps=self.value['timestamps'].values,
-            description=('Timestamps and stimulus presentation '
-                         'frame indices for lick events'),
-            unit='N/A'
+            name="licks",
+            data=self.value["frame"].values,
+            timestamps=self.value["timestamps"].values,
+            description=("Timestamps and stimulus presentation frame indices for lick events"),
+            unit="N/A",
         )
 
         # Add lick interface to nwb file, by way of a processing module:
-        licks_mod = ProcessingModule('licking',
-                                     'Licking behavior processing module')
+        licks_mod = ProcessingModule("licking", "Licking behavior processing module")
         licks_mod.add_data_interface(lick_timeseries)
         nwbfile.add_processing_module(licks_mod)
 

@@ -42,18 +42,14 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
         """
         df.to_csv(output_path, index=False)
         self.files_written.append(output_path)
-        self.logger.info(
-            f"Wrote {output_path} after " f"{time.time()-self.t0: .2e} seconds"
-        )
+        self.logger.info(f"Wrote {output_path} after {time.time() - self.t0: .2e} seconds")
 
     def run(self):
         self.t0 = time.time()
 
         file_id_generator = FileIDGenerator()
 
-        lims_connection = db_connection_creator(
-            fallback_credentials=LIMS_DB_CREDENTIAL_MAP
-        )
+        lims_connection = db_connection_creator(fallback_credentials=LIMS_DB_CREDENTIAL_MAP)
 
         if self.args["probes_to_skip"] is not None:
             probe_ids_to_skip = get_list_of_bad_probe_ids(
@@ -72,9 +68,7 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
             probe_ids_to_skip=probe_ids_to_skip,
         )
 
-        units_table = strip_substructure_acronym_df(
-            df=units_table, col_name="structure_acronym"
-        )
+        units_table = strip_substructure_acronym_df(df=units_table, col_name="structure_acronym")
 
         units_table = units_table[
             [
@@ -125,9 +119,7 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
             probe_ids_to_skip=probe_ids_to_skip,
         )
 
-        probes_table = strip_substructure_acronym_df(
-            df=probes_table, col_name="structure_acronyms"
-        )
+        probes_table = strip_substructure_acronym_df(df=probes_table, col_name="structure_acronyms")
 
         probes_table.drop(
             labels=["temporal_subsampling_factor"],
@@ -161,17 +153,11 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
             probe_ids_to_skip=probe_ids_to_skip,
         )
 
-        channels_table = strip_substructure_acronym_df(
-            df=channels_table, col_name="structure_acronym"
-        )
+        channels_table = strip_substructure_acronym_df(df=channels_table, col_name="structure_acronym")
 
-        channels_table.drop(
-            labels=["structure_id"], axis="columns", inplace=True
-        )
+        channels_table.drop(labels=["structure_id"], axis="columns", inplace=True)
 
-        self.write_df(
-            df=channels_table, output_path=self.args["channels_path"]
-        )
+        self.write_df(df=channels_table, output_path=self.args["channels_path"])
 
         failed_session_list = self.args["failed_ecephys_session_id_list"]
 
@@ -203,12 +189,8 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
         )
 
         ecephys_session_ids = ecephys_session_table["ecephys_session_id"]
-        behavior_ecephys_session_ids = behavior_session_table[
-            "ecephys_session_id"
-        ]
-        ecephys_session_mask = behavior_ecephys_session_ids.isin(
-            ecephys_session_ids
-        )
+        behavior_ecephys_session_ids = behavior_session_table["ecephys_session_id"]
+        ecephys_session_mask = behavior_ecephys_session_ids.isin(ecephys_session_ids)
 
         behavior_only_table = behavior_session_table[~ecephys_session_mask]
         behavior_w_ecephy_table = behavior_session_table[ecephys_session_mask]
@@ -228,9 +210,7 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
             data_dir_col="behavior_session_id",
             on_missing_file=self.args["on_missing_file"],
         )
-        behavior_session_table = pd.concat(
-            [behavior_only_table, behavior_w_ecephy_table]
-        )
+        behavior_session_table = pd.concat([behavior_only_table, behavior_w_ecephy_table])
 
         # add supplemental columns to the ecephys_sessions
         # column
@@ -281,5 +261,5 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
         self.logger.info(
             f"Wrote {self.args['ecephys_sessions_path']}\n"
             f"and {self.args['behavior_sessions_path']}\n"
-            f"after {time.time()-self.t0:.2e} seconds"
+            f"after {time.time() - self.t0:.2e} seconds"
         )

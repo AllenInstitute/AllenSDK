@@ -14,9 +14,7 @@ from allensdk.core import DataObject
 
 
 def _get_sync_file_query_template(behavior_session_id: int):
-
-    """Query returns path to sync timing file associated with behavior session
-    """
+    """Query returns path to sync timing file associated with behavior session"""
     SYNC_FILE_QUERY_TEMPLATE = f"""
         SELECT wkf.storage_directory || wkf.filename AS sync_file
         FROM behavior_sessions bs
@@ -65,33 +63,28 @@ class SyncFile(DataFile):
 
     @classmethod
     @cached(cache=LRUCache(maxsize=10), key=from_json_cache_key)
-    def from_json(cls,
-                  dict_repr: dict,
-                  permissive: bool = False) -> "SyncFile":
+    def from_json(cls, dict_repr: dict, permissive: bool = False) -> "SyncFile":
         filepath = dict_repr["sync_file"]
         return cls(filepath=filepath, permissive=permissive)
 
     @classmethod
     @cached(cache=LRUCache(maxsize=10), key=from_lims_cache_key)
     def from_lims(
-        cls, db: PostgresQueryMixin,
-        behavior_session_id: Union[int, str],
-        permissive: bool = False
+        cls, db: PostgresQueryMixin, behavior_session_id: Union[int, str], permissive: bool = False
     ) -> "SyncFile":
-        query = _get_sync_file_query_template(
-            behavior_session_id=behavior_session_id)
+        query = _get_sync_file_query_template(behavior_session_id=behavior_session_id)
         filepath = db.fetchone(query, strict=True)
         return cls(filepath=filepath, permissive=permissive)
 
     @staticmethod
-    def load_data(filepath: Union[str, Path],
-                  permissive: bool = False) -> dict:
+    def load_data(filepath: Union[str, Path], permissive: bool = False) -> dict:
         filepath = safe_system_path(file_name=filepath)
         return get_sync_data(sync_path=filepath, permissive=permissive)
 
 
 class SyncFileReadableInterface(abc.ABC):
     """Marks a data object as readable from sync file"""
+
     @classmethod
     @abc.abstractmethod
     def from_sync_file(cls, *args) -> "DataObject":

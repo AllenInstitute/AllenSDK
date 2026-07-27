@@ -7,6 +7,7 @@ class OphysMixin:
     _df: pd.DataFrame
 
     """A mixin class for ophys project data"""
+
     def __init__(self):
         self._merge_columns()
 
@@ -19,12 +20,12 @@ class OphysMixin:
         columns = self._df.columns
         to_drop = []
         for column in columns:
-            if column.endswith('_behavior'):
-                column = column.replace('_behavior', '')
-                if f'{column}_ophys' in self._df:
+            if column.endswith("_behavior"):
+                column = column.replace("_behavior", "")
+                if f"{column}_ophys" in self._df:
                     self._check_behavior_ophys_equal(column=column)
                     self._df[column] = self._merge_column_values(column=column)
-                    to_drop += [f'{column}_behavior', f'{column}_ophys']
+                    to_drop += [f"{column}_behavior", f"{column}_ophys"]
         self._df.drop(to_drop, axis=1, inplace=True)
 
     def _check_behavior_ophys_equal(self, column: str):
@@ -36,14 +37,15 @@ class OphysMixin:
         column
             Column to check
         """
-        mask = ~self._df[f'{column}_ophys'].isna()
+        mask = ~self._df[f"{column}_ophys"].isna()
 
-        if not self._df[f'{column}_ophys'][mask].equals(
-                self._df[f'{column}_behavior'][mask]):
-            warnings.warn("BehaviorSession and OphysSession "
-                          f"{column} do not agree. This is "
-                          "likely due to issues with the data in "
-                          f"LIMS.")
+        if not self._df[f"{column}_ophys"][mask].equals(self._df[f"{column}_behavior"][mask]):
+            warnings.warn(
+                "BehaviorSession and OphysSession "
+                f"{column} do not agree. This is "
+                "likely due to issues with the data in "
+                f"LIMS."
+            )
 
     def _merge_column_values(self, column: str) -> pd.Series:
         """Takes the non-null values from ophys and merges with behavior
@@ -60,7 +62,6 @@ class OphysMixin:
             Merged Series
 
         """
-        values = self._df[f'{column}_ophys']
-        values.loc[values.isna()] = \
-            self._df[f'{column}_behavior'][values.isna()]
+        values = self._df[f"{column}_ophys"]
+        values.loc[values.isna()] = self._df[f"{column}_behavior"][values.isna()]
         return values

@@ -42,10 +42,8 @@ from .grid_data_api import GridDataApi
 from .rma_pager import pageable
 
 
-
 class MouseAtlasApi(ReferenceSpaceApi, GridDataApi):
-    ''' Downloads Mouse Brain Atlas grid data, reference volumes, and metadata.
-    '''
+    """Downloads Mouse Brain Atlas grid data, reference volumes, and metadata."""
 
     MOUSE_ATLAS_PRODUCTS = (1,)
     DEVMOUSE_ATLAS_PRODUCTS = (3,)
@@ -53,46 +51,42 @@ class MouseAtlasApi(ReferenceSpaceApi, GridDataApi):
     HUMAN_ORGANISM = (1,)
 
     @cacheable()
-    @pageable(num_rows=2000, total_rows='all')
+    @pageable(num_rows=2000, total_rows="all")
     def get_section_data_sets(self, gene_ids=None, product_ids=None, **kwargs):
-        ''' Download a list of section data sets (experiments) from the Mouse Brain
+        """Download a list of section data sets (experiments) from the Mouse Brain
         Atlas project.
 
         Parameters
         ----------
         gene_ids : list of int, optional
-            Filter results based on the genes whose expression was characterized 
+            Filter results based on the genes whose expression was characterized
             in each experiment. Default is all.
         product_ids : list of int, optional
             Filter results to a subset of products. Default is the Mouse Brain Atlas.
 
         Returns
         -------
-        list of dict : 
-            Each element is a section data set record, with one or more gene 
-            records nested in a list. 
+        list of dict :
+            Each element is a section data set record, with one or more gene
+            records nested in a list.
 
-        '''
-        
+        """
+
         if product_ids is None:
             product_ids = list(self.MOUSE_ATLAS_PRODUCTS)
-        criteria = 'products[id$in{}]'.format(','.join(map(str, product_ids)))
+        criteria = "products[id$in{}]".format(",".join(map(str, product_ids)))
 
         if gene_ids is not None:
-            criteria += ',genes[id$in{}]'.format(','.join(map(str, gene_ids)))
+            criteria += ",genes[id$in{}]".format(",".join(map(str, gene_ids)))
 
-        order = kwargs.pop('order', ['\'id\''])
+        order = kwargs.pop("order", ["'id'"])
 
-        return self.model_query(model='SectionDataSet', 
-                                criteria=criteria,
-                                include='genes',
-                                order=order,
-                                **kwargs)
+        return self.model_query(model="SectionDataSet", criteria=criteria, include="genes", order=order, **kwargs)
 
     @cacheable()
-    @pageable(num_rows=2000, total_rows='all')
+    @pageable(num_rows=2000, total_rows="all")
     def get_genes(self, organism_ids=None, chromosome_ids=None, **kwargs):
-        ''' Download a list of genes
+        """Download a list of genes
 
         Parameters
         ----------
@@ -106,45 +100,39 @@ class MouseAtlasApi(ReferenceSpaceApi, GridDataApi):
         list of dict:
             Each element is a gene record, with a nested chromosome record (also a dict).
 
-        '''
+        """
 
         if organism_ids is None:
             organism_ids = list(self.MOUSE_ORGANISM)
-        criteria = '[organism_id$in{}]'.format(','.join(map(str, organism_ids)))
+        criteria = "[organism_id$in{}]".format(",".join(map(str, organism_ids)))
 
         if chromosome_ids is not None:
-            criteria += ',[chromosome_id$in{}]'.format(','.join(map(str, chromosome_ids)))
-        
-        order = kwargs.pop('order', ['\'id\''])
+            criteria += ",[chromosome_id$in{}]".format(",".join(map(str, chromosome_ids)))
 
-        return self.model_query(model='Gene', 
-                                criteria=criteria,
-                                include='chromosome',
-                                order=order,
-                                **kwargs)
+        order = kwargs.pop("order", ["'id'"])
 
-    @cacheable(strategy='create', 
-               reader = sitk_utilities.read_ndarray_with_sitk, 
-               pathfinder=Cache.pathfinder(file_name_position=1,
-                                           path_keyword='path'))
+        return self.model_query(model="Gene", criteria=criteria, include="chromosome", order=order, **kwargs)
+
+    @cacheable(
+        strategy="create",
+        reader=sitk_utilities.read_ndarray_with_sitk,
+        pathfinder=Cache.pathfinder(file_name_position=1, path_keyword="path"),
+    )
     def download_expression_density(self, path, experiment_id):
-        self.download_gene_expression_grid_data(
-            experiment_id, GridDataApi.DENSITY, path)
+        self.download_gene_expression_grid_data(experiment_id, GridDataApi.DENSITY, path)
 
-
-    @cacheable(strategy='create', 
-               reader = sitk_utilities.read_ndarray_with_sitk, 
-               pathfinder=Cache.pathfinder(file_name_position=1,
-                                           path_keyword='path'))
+    @cacheable(
+        strategy="create",
+        reader=sitk_utilities.read_ndarray_with_sitk,
+        pathfinder=Cache.pathfinder(file_name_position=1, path_keyword="path"),
+    )
     def download_expression_energy(self, path, experiment_id):
-        self.download_gene_expression_grid_data(
-            experiment_id, GridDataApi.ENERGY, path)
+        self.download_gene_expression_grid_data(experiment_id, GridDataApi.ENERGY, path)
 
-
-    @cacheable(strategy='create', 
-               reader = sitk_utilities.read_ndarray_with_sitk, 
-               pathfinder=Cache.pathfinder(file_name_position=1,
-                                           path_keyword='path'))
+    @cacheable(
+        strategy="create",
+        reader=sitk_utilities.read_ndarray_with_sitk,
+        pathfinder=Cache.pathfinder(file_name_position=1, path_keyword="path"),
+    )
     def download_expression_intensity(self, path, experiment_id):
-        self.download_gene_expression_grid_data(
-            experiment_id, GridDataApi.INTENSITY, path)
+        self.download_gene_expression_grid_data(experiment_id, GridDataApi.INTENSITY, path)

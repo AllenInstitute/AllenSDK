@@ -54,18 +54,18 @@ class TestDateOfAcquisitionParsing:
     def test_cloud_api_mixed_precision_dates(self):
         """Simulate the cloud API's to_datetime call on a column with
         mixed microsecond precision, as found in real session CSVs."""
-        df = pd.DataFrame({
-            "date_of_acquisition": [
-                "2019-09-25 13:31:46",
-                "2019-10-01 14:22:33.123456",
-                "2020-01-15 09:00:00",
-                "2020-06-30 16:45:12.500000",
-            ]
-        })
-        # This is the exact call pattern used in behavior_project_cloud_api.py
-        df["date_of_acquisition"] = pd.to_datetime(
-            df["date_of_acquisition"], format="ISO8601", utc=True
+        df = pd.DataFrame(
+            {
+                "date_of_acquisition": [
+                    "2019-09-25 13:31:46",
+                    "2019-10-01 14:22:33.123456",
+                    "2020-01-15 09:00:00",
+                    "2020-06-30 16:45:12.500000",
+                ]
+            }
         )
+        # This is the exact call pattern used in behavior_project_cloud_api.py
+        df["date_of_acquisition"] = pd.to_datetime(df["date_of_acquisition"], format="ISO8601", utc=True)
         assert df["date_of_acquisition"].dt.tz is not None
         assert len(df) == 4
 
@@ -79,9 +79,11 @@ class TestDateOfAcquisitionParsing:
 
         with pytest.raises(ValueError, match="doesn't match format"):
             pd.to_datetime(
-                pd.Series([
-                    "2019-09-25 13:31:46",
-                    "2019-10-01 14:22:33.123456",
-                ]),
+                pd.Series(
+                    [
+                        "2019-09-25 13:31:46",
+                        "2019-10-01 14:22:33.123456",
+                    ]
+                ),
                 format="%Y-%m-%d %H:%M:%S.%f",
             )

@@ -55,8 +55,8 @@ def ephys_sweeps_file(fn_temp_dir):
 def glif_api():
     endpoint = None
 
-    if 'TEST_API_ENDPOINT' in os.environ:
-        endpoint = os.environ['TEST_API_ENDPOINT']
+    if "TEST_API_ENDPOINT" in os.environ:
+        endpoint = os.environ["TEST_API_ENDPOINT"]
         return GlifApi(endpoint)
     else:
         return GlifApi()
@@ -70,8 +70,7 @@ def neuronal_model_id():
 
 
 @pytest.fixture
-def configured_glif_api(glif_api, neuronal_model_id, neuron_config_file,
-                        ephys_sweeps_file):
+def configured_glif_api(glif_api, neuronal_model_id, neuron_config_file, ephys_sweeps_file):
     glif_api.get_neuronal_model(neuronal_model_id)
 
     neuron_config = glif_api.get_neuron_config()
@@ -87,18 +86,18 @@ def configured_glif_api(glif_api, neuronal_model_id, neuron_config_file,
 def output(neuron_config_file, ephys_sweeps_file):
     neuron_config = json_utilities.read(neuron_config_file)
     ephys_sweeps = json_utilities.read(ephys_sweeps_file)
-    ephys_file_name = 'stimulus.nwb'
+    ephys_file_name = "stimulus.nwb"
 
     # pull out the stimulus for the first sweep
     ephys_sweep = ephys_sweeps[0]
     ds = NwbDataSet(ephys_file_name)
-    data = ds.get_sweep(ephys_sweep['sweep_number'])
-    stimulus = data['stimulus']
+    data = ds.get_sweep(ephys_sweep["sweep_number"])
+    stimulus = data["stimulus"]
 
     # initialize the neuron
     # important! update the neuron's dt for your stimulus
     neuron = GlifNeuron.from_dict(neuron_config)
-    neuron.dt = 1.0 / data['sampling_rate']
+    neuron.dt = 1.0 / data["sampling_rate"]
 
     # simulate the neuron
     truncate = 56041
@@ -110,13 +109,13 @@ def output(neuron_config_file, ephys_sweeps_file):
 @pytest.fixture
 def stimulus(neuron_config_file, ephys_sweeps_file):
     ephys_sweeps = json_utilities.read(ephys_sweeps_file)
-    ephys_file_name = 'stimulus.nwb'
+    ephys_file_name = "stimulus.nwb"
 
     # pull out the stimulus for the first sweep
     ephys_sweep = ephys_sweeps[0]
     ds = NwbDataSet(ephys_file_name)
-    data = ds.get_sweep(ephys_sweep['sweep_number'])
-    stimulus = data['stimulus']
+    data = ds.get_sweep(ephys_sweep["sweep_number"])
+    stimulus = data["stimulus"]
 
     return stimulus
 
@@ -136,10 +135,15 @@ def test_run_glifneuron(configured_glif_api, neuron_config_file):
     # simulate the neuron
     output = neuron.run(stimulus)
 
-    expected_fields = {"AScurrents", "grid_spike_times",
-                       "interpolated_spike_threshold",
-                       "interpolated_spike_times",
-                       "interpolated_spike_voltage",
-                       "spike_time_steps", "threshold", "voltage"}
+    expected_fields = {
+        "AScurrents",
+        "grid_spike_times",
+        "interpolated_spike_threshold",
+        "interpolated_spike_times",
+        "interpolated_spike_voltage",
+        "spike_time_steps",
+        "threshold",
+        "voltage",
+    }
 
     assert expected_fields.difference(output.keys()) == set()

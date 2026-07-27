@@ -3,10 +3,12 @@ import sys
 import threading
 import time
 
+
 class OutputGrabber(object):
     """
     Class used to grab standard output or another stream.
     """
+
     escape_char = "\b"
 
     def __init__(self, stream=None, threaded=False):
@@ -18,7 +20,6 @@ class OutputGrabber(object):
         self.capturedtext = ""
         # Create a pipe so the stream can be captured:
         self.pipe_out, self.pipe_in = os.pipe()
-
 
     def start(self):
         """
@@ -35,7 +36,6 @@ class OutputGrabber(object):
             self.workerThread.start()
             # Make sure that the thread is running and os.read is executed:
             time.sleep(0.01)
-
 
     def stop(self):
         """
@@ -57,7 +57,6 @@ class OutputGrabber(object):
         os.close(self.pipe_out)
         # Restore the original stream:
         os.dup2(self.streamfd, self.origstreamfd)
-
 
     def readOutput(self):
         """

@@ -86,88 +86,57 @@ def test_prior_exposure_to_omissions():
 
 
 def test_add_experience_level():
-
     input_data = []
     expected_data = []
 
-    datum = {'id': 0,
-             'session_number': 1,
-             'prior_exposures_to_image_set': 4,
-             'session_type': 'OPHYS_1'}
+    datum = {"id": 0, "session_number": 1, "prior_exposures_to_image_set": 4, "session_type": "OPHYS_1"}
     input_data.append(copy.deepcopy(datum))
-    datum['experience_level'] = 'Familiar'
+    datum["experience_level"] = "Familiar"
     expected_data.append(copy.deepcopy(datum))
 
-    datum = {'id': 1,
-             'session_number': 2,
-             'prior_exposures_to_image_set': 5,
-             'session_type': 'OPHYS_2'}
+    datum = {"id": 1, "session_number": 2, "prior_exposures_to_image_set": 5, "session_type": "OPHYS_2"}
     input_data.append(copy.deepcopy(datum))
-    datum['experience_level'] = 'Familiar'
+    datum["experience_level"] = "Familiar"
     expected_data.append(copy.deepcopy(datum))
 
-    datum = {'id': 2,
-             'session_number': 3,
-             'prior_exposures_to_image_set': 1772,
-             'session_type': 'OPHYS_3'}
+    datum = {"id": 2, "session_number": 3, "prior_exposures_to_image_set": 1772, "session_type": "OPHYS_3"}
     input_data.append(copy.deepcopy(datum))
-    datum['experience_level'] = 'Familiar'
+    datum["experience_level"] = "Familiar"
     expected_data.append(copy.deepcopy(datum))
 
-    datum = {'id': 3,
-             'session_number': 4,
-             'prior_exposures_to_image_set': 0,
-             'session_type': 'OPHYS_4'}
+    datum = {"id": 3, "session_number": 4, "prior_exposures_to_image_set": 0, "session_type": "OPHYS_4"}
     input_data.append(copy.deepcopy(datum))
-    datum['experience_level'] = 'Novel 1'
+    datum["experience_level"] = "Novel 1"
     expected_data.append(copy.deepcopy(datum))
 
-    datum = {'id': 4,
-             'session_number': 5,
-             'prior_exposures_to_image_set': 0,
-             'session_type': 'OPHYS_5'}
+    datum = {"id": 4, "session_number": 5, "prior_exposures_to_image_set": 0, "session_type": "OPHYS_5"}
     input_data.append(copy.deepcopy(datum))
-    datum['experience_level'] = 'Novel 1'
+    datum["experience_level"] = "Novel 1"
     expected_data.append(copy.deepcopy(datum))
 
-    datum = {'id': 5,
-             'session_number': 6,
-             'prior_exposures_to_image_set': 0,
-             'session_type': 'OPHYS_6'}
+    datum = {"id": 5, "session_number": 6, "prior_exposures_to_image_set": 0, "session_type": "OPHYS_6"}
     input_data.append(copy.deepcopy(datum))
-    datum['experience_level'] = 'Novel 1'
+    datum["experience_level"] = "Novel 1"
     expected_data.append(copy.deepcopy(datum))
 
-    datum = {'id': 7,
-             'session_number': 4,
-             'prior_exposures_to_image_set': 2,
-             'session_type': 'OPHYS_4'}
+    datum = {"id": 7, "session_number": 4, "prior_exposures_to_image_set": 2, "session_type": "OPHYS_4"}
     input_data.append(copy.deepcopy(datum))
-    datum['experience_level'] = 'Novel >1'
+    datum["experience_level"] = "Novel >1"
     expected_data.append(copy.deepcopy(datum))
 
-    datum = {'id': 8,
-             'session_number': 5,
-             'prior_exposures_to_image_set': 1,
-             'session_type': 'OPHYS_5'}
+    datum = {"id": 8, "session_number": 5, "prior_exposures_to_image_set": 1, "session_type": "OPHYS_5"}
     input_data.append(copy.deepcopy(datum))
-    datum['experience_level'] = 'Novel >1'
+    datum["experience_level"] = "Novel >1"
     expected_data.append(copy.deepcopy(datum))
 
-    datum = {'id': 9,
-             'session_number': 6,
-             'prior_exposures_to_image_set': 3,
-             'session_type': 'OPHYS_6'}
+    datum = {"id": 9, "session_number": 6, "prior_exposures_to_image_set": 3, "session_type": "OPHYS_6"}
     input_data.append(copy.deepcopy(datum))
-    datum['experience_level'] = 'Novel >1'
+    datum["experience_level"] = "Novel >1"
     expected_data.append(copy.deepcopy(datum))
 
-    datum = {'id': 10,
-             'session_number': 7,
-             'prior_exposures_to_image_set': 3,
-             'session_type': 'OPHYS_7'}
+    datum = {"id": 10, "session_number": 7, "prior_exposures_to_image_set": 3, "session_type": "OPHYS_7"}
     input_data.append(copy.deepcopy(datum))
-    datum['experience_level'] = 'None'
+    datum["experience_level"] = "None"
     expected_data.append(copy.deepcopy(datum))
 
     input_df = pd.DataFrame(input_data)

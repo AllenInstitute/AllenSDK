@@ -86,6 +86,4 @@ class NaturalMovieOneCache(S3CloudCache):
             movie_frames=movie_data,
             n_workers=n_workers,
         )
-        return movie_template.to_dataframe(
-            index_name="movie_frame_index", index_type="int"
-        )
+        return movie_template.to_dataframe(index_name="movie_frame_index", index_type="int")

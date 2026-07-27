@@ -57,169 +57,150 @@ def cache():
 
 
 @pytest.mark.parametrize("file_exists", (True, False))
-@patch("nrrd.read", return_value=('mock_annotation_data',
-                                  'mock_annotation_image'))
-@patch.object(Manifest, 'safe_mkdir')
+@patch("nrrd.read", return_value=("mock_annotation_data", "mock_annotation_image"))
+@patch.object(Manifest, "safe_mkdir")
 def test_file_download_lazy(nrrd_read, safe_mkdir, mca, cache, file_exists):
     with patch.object(mca, "retrieve_file_over_http") as mock_retrieve:
-        @cacheable(strategy='lazy',
-                reader=nrrd_read,
-                pathfinder=Cache.pathfinder(file_name_position=3,
-                                            secondary_file_name_position=1))
-        def download_volumetric_data(data_path,
-                                    file_name,
-                                    voxel_resolution=None,
-                                    save_file_path=None,
-                                    release=None,
-                                    coordinate_framework=None):
-            url = mca.build_volumetric_data_download_url(data_path,
-                                                        file_name,
-                                                        voxel_resolution,
-                                                        release,
-                                                        coordinate_framework)
+
+        @cacheable(
+            strategy="lazy",
+            reader=nrrd_read,
+            pathfinder=Cache.pathfinder(file_name_position=3, secondary_file_name_position=1),
+        )
+        def download_volumetric_data(
+            data_path, file_name, voxel_resolution=None, save_file_path=None, release=None, coordinate_framework=None
+        ):
+            url = mca.build_volumetric_data_download_url(
+                data_path, file_name, voxel_resolution, release, coordinate_framework
+            )
 
             mca.retrieve_file_over_http(url, save_file_path)
 
-        with patch('os.path.exists',
-                Mock(name="os.path.exists",
-                        return_value=file_exists)):
+        with patch("os.path.exists", Mock(name="os.path.exists", return_value=file_exists)):
             nrrd_read.reset_mock()
-            download_volumetric_data(MCA.AVERAGE_TEMPLATE,
-                                    'annotation_10.nrrd',
-                                    MCA.VOXEL_RESOLUTION_10_MICRONS,
-                                    'volumetric.nrrd',
-                                    MCA.CCF_2016,
-                                    strategy='lazy')
+            download_volumetric_data(
+                MCA.AVERAGE_TEMPLATE,
+                "annotation_10.nrrd",
+                MCA.VOXEL_RESOLUTION_10_MICRONS,
+                "volumetric.nrrd",
+                MCA.CCF_2016,
+                strategy="lazy",
+            )
 
         if file_exists:
-            assert not mock_retrieve.called, 'server call not needed when file exists'
+            assert not mock_retrieve.called, "server call not needed when file exists"
         else:
             mock_retrieve.assert_called_once_with(
-                'http://download.alleninstitute.org/informatics-archive/annotation/ccf_2016/mouse_ccf/average_template/annotation_10.nrrd',
-                'volumetric.nrrd')
-        assert not safe_mkdir.called, 'safe_mkdir should not have been called.'
-        nrrd_read.assert_called_once_with('volumetric.nrrd')
+                "http://download.alleninstitute.org/informatics-archive/annotation/ccf_2016/mouse_ccf/average_template/annotation_10.nrrd",
+                "volumetric.nrrd",
+            )
+        assert not safe_mkdir.called, "safe_mkdir should not have been called."
+        nrrd_read.assert_called_once_with("volumetric.nrrd")
 
 
 @pytest.mark.parametrize("file_exists", (True, False))
-@patch("nrrd.read", return_value=('mock_annotation_data',
-                                  'mock_annotation_image'))
-@patch.object(Manifest, 'safe_mkdir')
+@patch("nrrd.read", return_value=("mock_annotation_data", "mock_annotation_image"))
+@patch.object(Manifest, "safe_mkdir")
 def test_file_download_server(nrrd_read, safe_mkdir, mca, cache, file_exists):
     with patch.object(mca, "retrieve_file_over_http") as mock_retrieve:
-        @cacheable(reader=nrrd_read,
-                pathfinder=Cache.pathfinder(file_name_position=3,
-                                            secondary_file_name_position=1))
-        def download_volumetric_data(data_path,
-                                    file_name,
-                                    voxel_resolution=None,
-                                    save_file_path=None,
-                                    release=None,
-                                    coordinate_framework=None):
-            url = mca.build_volumetric_data_download_url(data_path,
-                                                        file_name,
-                                                        voxel_resolution,
-                                                        release,
-                                                        coordinate_framework)
+
+        @cacheable(reader=nrrd_read, pathfinder=Cache.pathfinder(file_name_position=3, secondary_file_name_position=1))
+        def download_volumetric_data(
+            data_path, file_name, voxel_resolution=None, save_file_path=None, release=None, coordinate_framework=None
+        ):
+            url = mca.build_volumetric_data_download_url(
+                data_path, file_name, voxel_resolution, release, coordinate_framework
+            )
 
             mca.retrieve_file_over_http(url, save_file_path)
 
-        with patch('os.path.exists',
-                Mock(name="os.path.exists",
-                        return_value=file_exists)):
+        with patch("os.path.exists", Mock(name="os.path.exists", return_value=file_exists)):
             nrrd_read.reset_mock()
-            
-            download_volumetric_data(MCA.AVERAGE_TEMPLATE,
-                                    'annotation_10.nrrd',
-                                    MCA.VOXEL_RESOLUTION_10_MICRONS,
-                                    'volumetric.nrrd',
-                                    MCA.CCF_2016,
-                                    strategy='create')
+
+            download_volumetric_data(
+                MCA.AVERAGE_TEMPLATE,
+                "annotation_10.nrrd",
+                MCA.VOXEL_RESOLUTION_10_MICRONS,
+                "volumetric.nrrd",
+                MCA.CCF_2016,
+                strategy="create",
+            )
 
         mock_retrieve.assert_called_once_with(
-            'http://download.alleninstitute.org/informatics-archive/annotation/ccf_2016/mouse_ccf/average_template/annotation_10.nrrd',
-            'volumetric.nrrd')
-        assert not safe_mkdir.called, 'safe_mkdir should not have been called.'
-        nrrd_read.assert_called_once_with('volumetric.nrrd')
+            "http://download.alleninstitute.org/informatics-archive/annotation/ccf_2016/mouse_ccf/average_template/annotation_10.nrrd",
+            "volumetric.nrrd",
+        )
+        assert not safe_mkdir.called, "safe_mkdir should not have been called."
+        nrrd_read.assert_called_once_with("volumetric.nrrd")
 
 
 @pytest.mark.parametrize("file_exists", (True, False))
-@patch("nrrd.read", return_value=('mock_annotation_data',
-                                  'mock_annotation_image'))
-@patch.object(Manifest, 'safe_mkdir')
+@patch("nrrd.read", return_value=("mock_annotation_data", "mock_annotation_image"))
+@patch.object(Manifest, "safe_mkdir")
 def test_file_download_cached_file(nrrd_read, safe_mkdir, mca, cache, file_exists):
     with patch.object(mca, "retrieve_file_over_http") as mock_retrieve:
-        @cacheable(reader=nrrd_read,
-                pathfinder=Cache.pathfinder(file_name_position=3,
-                                            secondary_file_name_position=1))
-        def download_volumetric_data(data_path,
-                                    file_name,
-                                    voxel_resolution=None,
-                                    save_file_path=None,
-                                    release=None,
-                                    coordinate_framework=None):
-            url = mca.build_volumetric_data_download_url(data_path,
-                                                        file_name,
-                                                        voxel_resolution,
-                                                        release,
-                                                        coordinate_framework)
+
+        @cacheable(reader=nrrd_read, pathfinder=Cache.pathfinder(file_name_position=3, secondary_file_name_position=1))
+        def download_volumetric_data(
+            data_path, file_name, voxel_resolution=None, save_file_path=None, release=None, coordinate_framework=None
+        ):
+            url = mca.build_volumetric_data_download_url(
+                data_path, file_name, voxel_resolution, release, coordinate_framework
+            )
 
             mca.retrieve_file_over_http(url, save_file_path)
 
-        with patch('os.path.exists',
-                Mock(name="os.path.exists",
-                        return_value=file_exists)):
+        with patch("os.path.exists", Mock(name="os.path.exists", return_value=file_exists)):
             nrrd_read.reset_mock()
 
-            download_volumetric_data(MCA.AVERAGE_TEMPLATE,
-                                    'annotation_10.nrrd',
-                                    MCA.VOXEL_RESOLUTION_10_MICRONS,
-                                    'volumetric.nrrd',
-                                    MCA.CCF_2016,
-                                    strategy='file')
+            download_volumetric_data(
+                MCA.AVERAGE_TEMPLATE,
+                "annotation_10.nrrd",
+                MCA.VOXEL_RESOLUTION_10_MICRONS,
+                "volumetric.nrrd",
+                MCA.CCF_2016,
+                strategy="file",
+            )
 
-        assert not mock_retrieve.called, 'server should not have been called'
-        assert not safe_mkdir.called, 'safe_mkdir should not have been called.'
-        nrrd_read.assert_called_once_with('volumetric.nrrd')
+        assert not mock_retrieve.called, "server should not have been called"
+        assert not safe_mkdir.called, "safe_mkdir should not have been called."
+        nrrd_read.assert_called_once_with("volumetric.nrrd")
 
 
 @pytest.mark.parametrize("file_exists", (True, False))
-@patch("nrrd.read", return_value=('mock_annotation_data',
-                                  'mock_annotation_image'))
-@patch.object(Manifest, 'safe_mkdir')
+@patch("nrrd.read", return_value=("mock_annotation_data", "mock_annotation_image"))
+@patch.object(Manifest, "safe_mkdir")
 def test_file_kwarg(nrrd_read, safe_mkdir, mca, cache, file_exists):
     with patch.object(mca, "retrieve_file_over_http") as mock_retrieve:
-        @cacheable(reader=nrrd_read,
-                pathfinder=Cache.pathfinder(file_name_position=3,
-                                            secondary_file_name_position=1,
-                                            path_keyword='save_file_path'))
-        def download_volumetric_data(data_path,
-                                    file_name,
-                                    voxel_resolution=None,
-                                    save_file_path=None,
-                                    release=None,
-                                    coordinate_framework=None):
-            url = mca.build_volumetric_data_download_url(data_path,
-                                                        file_name,
-                                                        voxel_resolution,
-                                                        release,
-                                                        coordinate_framework)
+
+        @cacheable(
+            reader=nrrd_read,
+            pathfinder=Cache.pathfinder(
+                file_name_position=3, secondary_file_name_position=1, path_keyword="save_file_path"
+            ),
+        )
+        def download_volumetric_data(
+            data_path, file_name, voxel_resolution=None, save_file_path=None, release=None, coordinate_framework=None
+        ):
+            url = mca.build_volumetric_data_download_url(
+                data_path, file_name, voxel_resolution, release, coordinate_framework
+            )
 
             mca.retrieve_file_over_http(url, save_file_path)
 
-        with patch('os.path.exists',
-                Mock(name="os.path.exists",
-                        return_value=file_exists)):
+        with patch("os.path.exists", Mock(name="os.path.exists", return_value=file_exists)):
             nrrd_read.reset_mock()
 
-            download_volumetric_data(MCA.AVERAGE_TEMPLATE,
-                                    'annotation_10.nrrd',
-                                    MCA.VOXEL_RESOLUTION_10_MICRONS,
-                                    'volumetric.nrrd',
-                                    MCA.CCF_2016,
-                                    strategy='file',
-                                    save_file_path='file.nrrd' )
+            download_volumetric_data(
+                MCA.AVERAGE_TEMPLATE,
+                "annotation_10.nrrd",
+                MCA.VOXEL_RESOLUTION_10_MICRONS,
+                "volumetric.nrrd",
+                MCA.CCF_2016,
+                strategy="file",
+                save_file_path="file.nrrd",
+            )
 
-        assert not mock_retrieve.called, 'server should not have been called'
-        assert not safe_mkdir.called, 'safe_mkdir should not have been called.'
-        nrrd_read.assert_called_once_with('file.nrrd')
+        assert not mock_retrieve.called, "server should not have been called"
+        assert not safe_mkdir.called, "safe_mkdir should not have been called."
+        nrrd_read.assert_called_once_with("file.nrrd")

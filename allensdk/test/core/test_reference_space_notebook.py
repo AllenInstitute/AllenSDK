@@ -40,7 +40,6 @@ import os
 
 @pytest.mark.nightly
 def test_notebook(tmpdir_factory):
-
     # coding: utf-8
 
     # # Reference Space
@@ -66,16 +65,14 @@ def test_notebook(tmpdir_factory):
     structure_graph = oapi.get_structures_with_sets([1])  # 1 is the id of the adult mouse structure graph
 
     # This removes some unused fields returned by the query
-    structure_graph = StructureTree.clean_structures(structure_graph)  
+    structure_graph = StructureTree.clean_structures(structure_graph)
 
     tree = StructureTree(structure_graph)
-
 
     # In[2]:
 
     # now let's take a look at a structure
-    tree.get_structures_by_name(['Dorsal auditory area'])
-
+    tree.get_structures_by_name(["Dorsal auditory area"])
 
     # The fields are:
     #     * acronym: a shortened name for the structure
@@ -94,14 +91,12 @@ def test_notebook(tmpdir_factory):
     # get a structure's parent
     tree.parent([1011])
 
-
     # In[4]:
 
     # get a dictionary mapping structure ids to names
 
     name_map = tree.get_name_map()
     name_map[247]
-
 
     # In[5]:
 
@@ -110,20 +105,18 @@ def test_notebook(tmpdir_factory):
     strida = 385
     stridb = 247
 
-    is_desc = '' if tree.structure_descends_from(385, 247) else ' not'
+    is_desc = "" if tree.structure_descends_from(385, 247) else " not"
 
-    print( '{0} is{1} in {2}'.format(name_map[strida], is_desc, name_map[stridb]) )
-
+    print("{0} is{1} in {2}".format(name_map[strida], is_desc, name_map[stridb]))
 
     # In[6]:
 
     # build a custom map that looks up acronyms by ids
-    # the syntax here is just a pair of node-wise functions. 
+    # the syntax here is just a pair of node-wise functions.
     # The first one returns keys while the second one returns values
 
-    acronym_map = tree.value_map(lambda x: x['id'], lambda y: y['acronym'])
-    print( acronym_map[385] )
-
+    acronym_map = tree.value_map(lambda x: x["id"], lambda y: y["acronym"])
+    print(acronym_map[385])
 
     # ## Downloading an annotation volume
     #
@@ -139,15 +132,14 @@ def test_notebook(tmpdir_factory):
     from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi
 
     # the annotation download writes a file, so we will need somwhere to put it
-    annotation_dir = str(tmpdir_factory.mktemp('annotation'))
+    annotation_dir = str(tmpdir_factory.mktemp("annotation"))
 
-    annotation_path = os.path.join(annotation_dir, 'annotation.nrrd')
+    annotation_path = os.path.join(annotation_dir, "annotation.nrrd")
 
     mcapi = MouseConnectivityApi()
-    mcapi.download_annotation_volume('annotation/ccf_2016', 25, annotation_path)
+    mcapi.download_annotation_volume("annotation/ccf_2016", 25, annotation_path)
 
     annotation, meta = nrrd.read(annotation_path)
-
 
     # ## Constructing a ReferenceSpace
 
@@ -155,10 +147,9 @@ def test_notebook(tmpdir_factory):
 
     from allensdk.core.reference_space import ReferenceSpace
 
-    # build a reference space from a StructureTree and annotation volume, the third argument is 
+    # build a reference space from a StructureTree and annotation volume, the third argument is
     # the resolution of the space in microns
     rsp = ReferenceSpace(tree, annotation, [25, 25, 25])
-
 
     # ## Using a ReferenceSpace
 
@@ -173,14 +164,13 @@ def test_notebook(tmpdir_factory):
 
     # view in coronal section
 
-
     # What if you want a mask for a whole collection of ontologically disparate structures? Just pass more structure ids to make_structure_masks:
 
     # In[10]:
 
     # This gets all of the structures targeted by the Allen Brain Observatory project
     brain_observatory_structures = rsp.structure_tree.get_structures_by_set_id([514166994])
-    brain_observatory_ids = [st['id'] for st in brain_observatory_structures]
+    brain_observatory_ids = [st["id"] for st in brain_observatory_structures]
 
     rsp.make_structure_mask(brain_observatory_ids)
 
@@ -192,20 +182,19 @@ def test_notebook(tmpdir_factory):
 
     import functools
 
-    # Define a wrapper function that will control the mask generation. 
-    # This one checks for a nrrd file in the specified base directory 
+    # Define a wrapper function that will control the mask generation.
+    # This one checks for a nrrd file in the specified base directory
     # and builds/writes the mask only if one does not exist
     mask_writer = functools.partial(ReferenceSpace.check_and_write, annotation_dir)
-        
+
     # many_structure_masks is a generator - nothing has actrually been run yet
     mask_generator = rsp.many_structure_masks([385, 1097], mask_writer)
 
     # consume the resulting iterator to make and write the masks
     for structure_id in mask_generator:
-        print( 'made mask for structure {0}.'.format(structure_id) ) 
+        print("made mask for structure {0}.".format(structure_id))
 
     os.listdir(annotation_dir)
-
 
     # #### Removing unassigned structures
 
@@ -216,8 +205,8 @@ def test_notebook(tmpdir_factory):
     # In[12]:
 
     # Double-check the voxel counts
-    no_voxel_id = rsp.structure_tree.get_structures_by_name(['Somatosensory areas, layer 6a'])[0]['id']
-    print( 'voxel count for structure {0}: {1}'.format(no_voxel_id, rsp.total_voxel_map[no_voxel_id]) )
+    no_voxel_id = rsp.structure_tree.get_structures_by_name(["Somatosensory areas, layer 6a"])[0]["id"]
+    print("voxel count for structure {0}: {1}".format(no_voxel_id, rsp.total_voxel_map[no_voxel_id]))
 
     # remove unassigned structures from the ReferenceSpace's StructureTree
     rsp.remove_unassigned()
@@ -225,12 +214,9 @@ def test_notebook(tmpdir_factory):
     # check the structure tree
     no_voxel_id in rsp.structure_tree.node_ids()
 
-
     # #### View a slice from the annotation
 
     # In[13]:
-
-
 
     # #### Downsample the space
     #
@@ -242,20 +228,18 @@ def test_notebook(tmpdir_factory):
 
     target_resolution = [75, 75, 75]
 
-    # in some versions of scipy, scipy.ndimage.zoom raises a helpful but distracting 
-    # warning about the method used to truncate integers. 
-    warnings.simplefilter('ignore')
+    # in some versions of scipy, scipy.ndimage.zoom raises a helpful but distracting
+    # warning about the method used to truncate integers.
+    warnings.simplefilter("ignore")
 
     sf_rsp = rsp.downsample(target_resolution)
 
     # re-enable warnings
-    warnings.simplefilter('default')
+    warnings.simplefilter("default")
 
-    print( rsp.annotation.shape )
-    print( sf_rsp.annotation.shape )
-
+    print(rsp.annotation.shape)
+    print(sf_rsp.annotation.shape)
 
     # Now view the downsampled space:
 
     # In[15]:
-

@@ -69,22 +69,16 @@ def test_stimulus_file_from_lims(stimulus_file_fixture, behavior_session_id):
 
     # Basic test case
     mock_db_conn.fetchone.return_value = str(stim_pkl_path)
-    stimulus_file = BehaviorStimulusFile.from_lims(
-        mock_db_conn, behavior_session_id
-    )
+    stimulus_file = BehaviorStimulusFile.from_lims(mock_db_conn, behavior_session_id)
     assert stimulus_file.data == stim_pkl_data
 
     # Now test caching by deleting stimulus_file and also asserting db
     # `fetchone` called only once
     stim_pkl_path.unlink()
-    stimfile_cached = BehaviorStimulusFile.from_lims(
-        mock_db_conn, behavior_session_id
-    )
+    stimfile_cached = BehaviorStimulusFile.from_lims(mock_db_conn, behavior_session_id)
     assert stimfile_cached.data == stim_pkl_data
 
-    query = BEHAVIOR_STIMULUS_FILE_QUERY_TEMPLATE.format(
-        behavior_session_id=behavior_session_id
-    )
+    query = BEHAVIOR_STIMULUS_FILE_QUERY_TEMPLATE.format(behavior_session_id=behavior_session_id)
 
     mock_db_conn.fetchone.assert_called_once_with(query, strict=True)
 
@@ -134,9 +128,7 @@ def test_malformed_behavior_pkl(general_pkl_fixture):
         _ = stim.num_frames
 
 
-def test_stimulus_file_lookup(
-    behavior_stim_fixture, mapping_stim_fixture, replay_stim_fixture
-):
+def test_stimulus_file_lookup(behavior_stim_fixture, mapping_stim_fixture, replay_stim_fixture):
     """
     Smoke test of StimulusFileLookup
     """

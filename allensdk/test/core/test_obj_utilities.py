@@ -44,7 +44,7 @@ from allensdk.core.obj_utilities import read_obj, parse_obj
 
 @pytest.fixture
 def wavefront_obj():
-    return '''
+    return """
 
 v 8578 5484.96 5227.57
 v 8509.2 5487.54 5237.07
@@ -69,26 +69,24 @@ f 4//4 1//1 3//3
 f 3//3 2//2 5//5 
 f 6//6 3//3 5//5 
 
-    '''
+    """
 
 
 def test_read_obj(wavefront_obj):
-
-    path = 'path!'
+    path = "path!"
 
     # need to patch the version in allensdk.api.cache because of import x from y syntax above
-    with patch( 'allensdk.core.obj_utilities.open', mock_open(read_data=wavefront_obj), create=True ) as p:
+    with patch("allensdk.core.obj_utilities.open", mock_open(read_data=wavefront_obj), create=True) as p:
         obt = read_obj(path)
-        p.assert_called_with(path, 'r')
-        assert( obt is not None )        
+        p.assert_called_with(path, "r")
+        assert obt is not None
 
 
 def test_parse_obj(wavefront_obj):
-
-    lines = wavefront_obj.split('\n')
+    lines = wavefront_obj.split("\n")
     vertices, vertex_normals, face_vertices, face_normals = parse_obj(lines)
-    
-    assert(np.allclose( face_vertices, face_normals ))
-    assert(np.allclose( face_vertices[2, :], [2, 1, 4] ))
-    assert(np.allclose( vertices[1, :], [8509.2, 5487.54, 5237.07] ))
-    assert(np.allclose( vertex_normals[2, :], [-0.0880336, -0.0323767, -0.995591] ))
+
+    assert np.allclose(face_vertices, face_normals)
+    assert np.allclose(face_vertices[2, :], [2, 1, 4])
+    assert np.allclose(vertices[1, :], [8509.2, 5487.54, 5237.07])
+    assert np.allclose(vertex_normals[2, :], [-0.0880336, -0.0323767, -0.995591])

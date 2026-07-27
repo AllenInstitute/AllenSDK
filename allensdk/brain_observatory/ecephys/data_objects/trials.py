@@ -2,21 +2,12 @@ from typing import Union, Tuple, List
 
 import numpy as np
 
-from allensdk.brain_observatory.behavior.data_objects.trials.trial import (
-    Trial)
-from allensdk.brain_observatory.behavior.data_objects.\
-    trials.trials import Trials
+from allensdk.brain_observatory.behavior.data_objects.trials.trial import Trial
+from allensdk.brain_observatory.behavior.data_objects.trials.trials import Trials
 
 
 class VBNTrial(Trial):
-
-    def calculate_change_frame(
-            self,
-            event_dict: dict,
-            go: bool,
-            catch: bool,
-            auto_rewarded: bool) -> Union[int, float]:
-
+    def calculate_change_frame(self, event_dict: dict, go: bool, catch: bool, auto_rewarded: bool) -> Union[int, float]:
         """
         Calculate the frame index of a stimulus change
         associated with a specific event.
@@ -46,9 +37,9 @@ class VBNTrial(Trial):
         """
 
         if go or auto_rewarded:
-            change_frame = event_dict.get(('stimulus_changed', ''))['frame']
+            change_frame = event_dict.get(("stimulus_changed", ""))["frame"]
         elif catch:
-            change_frame = event_dict.get(('sham_change', ''))['frame']
+            change_frame = event_dict.get(("sham_change", ""))["frame"]
         else:
             change_frame = float("nan")
 
@@ -85,7 +76,7 @@ class VBNTrial(Trial):
         ----
         Modified trial_dict in-place, in addition to returning it
         """
-        change_frame = trial_dict['change_frame']
+        change_frame = trial_dict["change_frame"]
         if np.isnan(change_frame):
             change_time = np.nan
         else:
@@ -93,12 +84,11 @@ class VBNTrial(Trial):
             change_frame = int(change_frame)
             change_time = no_delay.value[change_frame]
 
-        trial_dict['change_time_no_display_delay'] = change_time
+        trial_dict["change_time_no_display_delay"] = change_time
         return trial_dict, change_time
 
 
 class VBNTrials(Trials):
-
     @classmethod
     def trial_class(cls):
         """
@@ -111,14 +101,29 @@ class VBNTrials(Trials):
         """
         Return the list of columns to be output in this table
         """
-        return ['initial_image_name', 'change_image_name',
-                'stimulus_change', 'change_time_no_display_delay',
-                'go', 'catch', 'lick_times', 'response_time',
-                'reward_time', 'reward_volume',
-                'hit', 'false_alarm', 'miss', 'correct_reject',
-                'aborted', 'auto_rewarded', 'change_frame',
-                'start_time', 'stop_time', 'trial_length']
+        return [
+            "initial_image_name",
+            "change_image_name",
+            "stimulus_change",
+            "change_time_no_display_delay",
+            "go",
+            "catch",
+            "lick_times",
+            "response_time",
+            "reward_time",
+            "reward_volume",
+            "hit",
+            "false_alarm",
+            "miss",
+            "correct_reject",
+            "aborted",
+            "auto_rewarded",
+            "change_frame",
+            "start_time",
+            "stop_time",
+            "trial_length",
+        ]
 
     @property
     def change_time(self):
-        return self.data['change_time_no_display_delay']
+        return self.data["change_time_no_display_delay"]

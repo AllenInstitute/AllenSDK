@@ -28,8 +28,7 @@ SITK_NUMPY_TYPE_LOOKUP = {v: k for k, v in NUMPY_SITK_TYPE_LOOKUP.items()}
 
 
 def set_image_spacing(image, spacing, origin=True):
-    '''
-    '''
+    """ """
 
     spacing = np.array(spacing)
 
@@ -40,8 +39,7 @@ def set_image_spacing(image, spacing, origin=True):
 
 
 def new_image(dims, spacing, dtype, origin=True):
-    '''
-    '''
+    """ """
 
     if len(dims) == 2:
         image = sitk.Image(dims[0], dims[1], dtype)
@@ -53,8 +51,7 @@ def new_image(dims, spacing, dtype, origin=True):
 
 
 def image_from_array(array, spacing, origin=True):
-    '''
-    '''
+    """ """
 
     image = sitk.GetImageFromArray(array)
     set_image_spacing(image, spacing, origin)
@@ -63,15 +60,13 @@ def image_from_array(array, spacing, origin=True):
 
 
 def np_sitk_convert(np_type):
-    '''
-    '''
+    """ """
 
     return NUMPY_SITK_TYPE_LOOKUP[np_type]
 
 
 def sitk_np_convert(sitk_type):
-    '''
-    '''
+    """ """
 
     return SITK_NUMPY_TYPE_LOOKUP[sitk_type]
 
@@ -80,8 +75,7 @@ def sitk_np_convert(sitk_type):
 
 
 def compute_coarse_parameters(in_dims, in_spacing, out_spacing, reduce_level):
-    '''
-    '''
+    """ """
 
     reduce_factor = pow(2, reduce_level)
     fradius = np.divide(out_spacing, in_spacing) / 2.0 / reduce_factor
@@ -90,51 +84,39 @@ def compute_coarse_parameters(in_dims, in_spacing, out_spacing, reduce_level):
     coarse_grid_size = (coarse_grid_radius * 2 + 1) * reduce_factor
 
     coarse_grid_spacing = np.multiply(in_spacing, coarse_grid_size)
-    coarse_grid_dims = np.ceil(
-        np.divide(in_dims, coarse_grid_size)
-    ).astype(int)
+    coarse_grid_dims = np.ceil(np.divide(in_dims, coarse_grid_size)).astype(int)
 
     return coarse_grid_dims, coarse_grid_spacing, coarse_grid_radius
 
 
 def block_apply(in_image, out_shape, dtype, blocks, fn):
-    '''
-    '''
+    """ """
 
     out_image = np.zeros(out_shape, dtype=dtype)
 
     for ii, row_block in enumerate(blocks[0]):
         for jj, col_block in enumerate(blocks[1]):
-
-            out_image[ii, jj] = fn(in_image[row_block[0]:row_block[1],
-                                            col_block[0]:col_block[1]])
+            out_image[ii, jj] = fn(in_image[row_block[0] : row_block[1], col_block[0] : col_block[1]])
 
     return out_image
 
 
 def grid_image_blocks(in_shape, in_spacing, out_spacing):
-    '''
-    '''
+    """ """
 
     blocks = []
     out_shape = []
     for dim in range(len(in_shape)):
-        in_px_centers = np.arange(in_spacing[dim]*0.5,
-                                  in_shape[dim]*in_spacing[dim],
-                                  in_spacing[dim])
+        in_px_centers = np.arange(in_spacing[dim] * 0.5, in_shape[dim] * in_spacing[dim], in_spacing[dim])
 
-        out_px_edges = np.arange(out_spacing[dim],
-                                 (in_shape[dim]-0.5)*in_spacing[dim],
-                                 out_spacing[dim])
+        out_px_edges = np.arange(out_spacing[dim], (in_shape[dim] - 0.5) * in_spacing[dim], out_spacing[dim])
 
         dig = np.digitize(in_px_centers, out_px_edges)
 
         inds = np.where(np.diff(dig) > 0)[0] + 1
         inds = [0] + inds.tolist() + [in_shape[dim]]
 
-        dim_blocks = [
-            (int(inds[i]), int(inds[i+1])) for i in range(len(inds)-1)
-        ]
+        dim_blocks = [(int(inds[i]), int(inds[i + 1])) for i in range(len(inds) - 1)]
 
         out_shape.append(len(dim_blocks))
         blocks.append(dim_blocks)
@@ -146,16 +128,10 @@ def grid_image_blocks(in_shape, in_spacing, out_spacing):
 
 
 def rasterize_polygons(shape, scale, polys):
-
     canvas = np.zeros(shape, dtype=np.uint8)
     for points in polys:
-
-        rpts = np.array([
-            int(np.around(item[1] * scale[1])) for item in points
-        ])
-        cpts = np.array([
-            int(np.around(item[0] * scale[0])) for item in points
-        ])
+        rpts = np.array([int(np.around(item[1] * scale[1])) for item in points])
+        cpts = np.array([int(np.around(item[0] * scale[0])) for item in points])
 
         poly = polygon(rpts, cpts)
         canvas[poly] = 1
@@ -167,8 +143,7 @@ def rasterize_polygons(shape, scale, polys):
 
 
 def resample_into_volume(image, transform, z, vol, dtype=sitk.sitkFloat32):
-    '''
-    '''
+    """ """
 
     if transform is None:
         transform = sitk.Transform()
@@ -179,8 +154,7 @@ def resample_into_volume(image, transform, z, vol, dtype=sitk.sitkFloat32):
 
 
 def build_affine_transform(aff_params):
-    '''
-    '''
+    """ """
 
     xfm = sitk.AffineTransform(3)
     xfm.SetParameters(aff_params)
@@ -189,11 +163,9 @@ def build_affine_transform(aff_params):
 
 
 def build_composite_transform(dfmfield=None, aff_params=None):
-    '''
-    '''
+    """ """
 
-    if dfmfield is not None and \
-       dfmfield.GetPixelIDValue() != sitk.sitkVectorFloat64:
+    if dfmfield is not None and dfmfield.GetPixelIDValue() != sitk.sitkVectorFloat64:
         dfmfield = sitk.Cast(dfmfield, sitk.sitkVectorFloat64)
 
     if dfmfield is None and aff_params is None:
@@ -212,8 +184,7 @@ def build_composite_transform(dfmfield=None, aff_params=None):
 
 
 def resample_volume(volume, dims, spacing, interpolator=None, transform=None):
-    '''
-    '''
+    """ """
 
     if transform is None:
         transform = sitk.Transform()
@@ -224,27 +195,20 @@ def resample_volume(volume, dims, spacing, interpolator=None, transform=None):
     return sitk.Resample(volume, ref, transform, interpolator)
 
 
-def write_volume(volume,
-                 name,
-                 prefix=None,
-                 specify_resolution=None,
-                 extension='.nrrd',
-                 paths=None):
-
+def write_volume(volume, name, prefix=None, specify_resolution=None, extension=".nrrd", paths=None):
     if prefix is None:
         path = name
     else:
         path = os.path.join(prefix, name)
 
     if specify_resolution is not None:
-        if isinstance(specify_resolution, (float, np.floating)) and \
-           specify_resolution % 1.0 == 0:
+        if isinstance(specify_resolution, (float, np.floating)) and specify_resolution % 1.0 == 0:
             specify_resolution = int(specify_resolution)
-        path = path + '_{0}'.format(specify_resolution)
+        path = path + "_{0}".format(specify_resolution)
 
     path = path + extension
 
-    logging.info('writing {0} volume to {1}'.format(name, path))
+    logging.info("writing {0} volume to {1}".format(name, path))
     Manifest.safe_make_parent_dirs(path)
     volume.SetOrigin([0, 0, 0])
     sitk.WriteImage(volume, str(path), True)
@@ -255,13 +219,13 @@ def write_volume(volume,
 
 def __read_segmentation_image_with_kakadu(path):
     if not os.path.exists(path):
-        raise OSError('file not found at {}'.format(path))
+        raise OSError("file not found at {}".format(path))
     return jpeg_twok.read(path).T
 
 
 def __read_intensity_image_with_kakadu(path, reduce_level, channel):
     if not os.path.exists(path):
-        raise OSError('file not found at {}'.format(path))
+        raise OSError("file not found at {}".format(path))
     return jpeg_twok.read(path, reduce_level, channel).T
 
 
@@ -281,11 +245,13 @@ try:
     # however, since it is proprietary, we can't share it
     # alongside the allensdk,
     # so we default to glymur (a python openjpeg) for external users.
-    sys.path.append('/shared/bioapps/itk/itk_shared/jp2/build')
+    sys.path.append("/shared/bioapps/itk/itk_shared/jp2/build")
     import jpeg_twok
+
     read_segmentation_image = __read_segmentation_image_with_kakadu
     read_intensity_image = __read_intensity_image_with_kakadu
 except failed_import:
     import glymur
+
     read_segmentation_image = __read_segmentation_image_with_glymur
     read_intensity_image = __read_intensity_image_with_glymur

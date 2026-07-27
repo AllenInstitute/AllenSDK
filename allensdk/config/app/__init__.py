@@ -33,8 +33,8 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-'''
+"""
 allensdk.config.app is a package that assists in
 configuring application software, as opposed to
 domain-specific configuration.
-'''
+"""
