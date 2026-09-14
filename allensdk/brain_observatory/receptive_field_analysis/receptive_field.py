@@ -34,7 +34,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 from .eventdetection import detect_events
-from statsmodels.sandbox.stats.multicomp import multipletests
+from statsmodels.stats.multitest import multipletests
 import numpy as np
 from .utilities import get_A, get_A_blur, get_shuffle_matrix, get_components, \
     dict_generator
